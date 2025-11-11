@@ -278,7 +278,7 @@ export default function EscalafonServicio() {
   };
 
   return (
-    <div className="mb-8 p-6 space-y-4 bg-gray-50 min-h-screen dark:bg-slate-950 transition-colors duration-300">
+    <div className="mb-20 p-6 space-y-4 bg-gradient-to-b from-blue-50 to-white min-h-screen dark:bg-slate-950 transition-colors duration-300">
       {/* Controles */}
       <div className="mb-6 flex flex-wrap items-center justify-start gap-4">
         <div>
