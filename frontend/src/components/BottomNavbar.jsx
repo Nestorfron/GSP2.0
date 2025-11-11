@@ -46,7 +46,7 @@ const BottomNavbar = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-blue-100 dark:border-slate-700 shadow-lg z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-blue-100 dark:border-slate-700 shadow-lg z-50 pb-4">
       <div className="flex justify-around items-center h-16">
         {filteredMenuItems.map((item) => {
           const isActive = location.pathname === item.path;

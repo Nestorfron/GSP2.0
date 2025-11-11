@@ -335,7 +335,7 @@ export default function EscalafonServicio() {
               <table className="min-w-full text-sm text-center border-collapse table-fixed w-full">
                 <thead>
                   <tr className="bg-gray-200 dark:bg-slate-900">
-                    <th className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 min-w-[8rem] sticky left-0 z-20 shadow-md">
+                    <th className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 min-w-[8rem] sticky left-0 z-20">
                       <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-400 truncate">
                         {turno.nombre}
                       </h2>
@@ -370,7 +370,7 @@ export default function EscalafonServicio() {
                       .map((f) => (
                         <tr key={f.id}>
                           <td
-                            className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 whitespace-nowrap overflow-hidden truncate sticky left-0 z-10 shadow-md"
+                            className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
                             title={`G${f.grado} ${f.nombre}`}
                           >
                             G{f.grado} {abreviarNombre(f.nombre)}
