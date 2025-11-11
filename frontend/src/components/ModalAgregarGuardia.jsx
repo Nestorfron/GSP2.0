@@ -1,7 +1,11 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ModalAgregarGuardia({ selectorTipo, setSelectorTipo, onConfirmar }) {
+export default function ModalAgregarGuardia({
+  selectorTipo,
+  setSelectorTipo,
+  onConfirmar,
+}) {
   if (!selectorTipo) return null;
 
   const { usuario, dia } = selectorTipo;
@@ -27,13 +31,13 @@ export default function ModalAgregarGuardia({ selectorTipo, setSelectorTipo, onC
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-6 w-[90%] max-w-sm"
+          className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-4 sm:p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -42,7 +46,7 @@ export default function ModalAgregarGuardia({ selectorTipo, setSelectorTipo, onC
             Seleccionar tipo de guardia
           </h2>
 
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
             {tipos.map((tipo) => {
               const baseClass = `w-full font-medium py-2 px-4 rounded transition text-sm`;
               const colorClass =
