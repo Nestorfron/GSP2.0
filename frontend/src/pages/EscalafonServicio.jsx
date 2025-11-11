@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import html2canvas from "html2canvas";
 import { Camera } from "lucide-react";
 import Loading from "../components/Loading";
 import BottomNavbar from "../components/BottomNavbar";
@@ -16,6 +15,8 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 import utc from "dayjs/plugin/utc";
+import "dayjs/locale/es"; 
+dayjs.locale("es");
 dayjs.extend(utc);
 import { toPng } from "html-to-image";
 

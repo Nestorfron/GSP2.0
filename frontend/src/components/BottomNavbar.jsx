@@ -30,8 +30,15 @@ const BottomNavbar = () => {
     { icon: <Calendar size={22} />, label: "Escalafón", path: "/escalafon-servicio" },
     { icon: <User size={22} />, label: "Perfil", path: "/perfil" },
     { icon: <Bell size={22} />, label: "Notificaciones", path: "/notificaciones" },
-
   ];
+
+  // Filtrar el Escalafón para roles permitidos
+  const filteredMenuItems = menuItems.filter(item => {
+    if (item.label === "Escalafón") {
+      return !["ADMINISTRADOR", "JEFE_ZONA"].includes(usuario?.rol_jerarquico);
+    }
+    return true;
+  });
 
   const handleLogout = () => {
     logout();
@@ -41,7 +48,7 @@ const BottomNavbar = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-blue-100 dark:border-slate-700 shadow-lg">
       <div className="flex justify-around items-center h-16">
-        {menuItems.map((item) => {
+        {filteredMenuItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <button
