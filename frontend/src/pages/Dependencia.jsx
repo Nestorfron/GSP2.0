@@ -25,6 +25,7 @@ const Dependencia = () => {
     guardias,
     extraordinarias,
     licencias,
+    licenciasPendientes,
     token,
     loading,
     recargarDatos,
@@ -35,7 +36,7 @@ const Dependencia = () => {
   const [guardiaAEliminar, setGuardiaAEliminar] = useState(null);
 
   useEffect(() => {
-    if ( !token || estaTokenExpirado(token)) {
+    if (!token || estaTokenExpirado(token)) {
       navigate("/login");
     }
   }, [token, navigate]);
@@ -49,6 +50,10 @@ const Dependencia = () => {
     )
   );
 
+ // Licencias pendientes de TODOS los funcionarios de la dependencia
+const licenciasPendientesDeLaDependencia = licenciasPendientes.filter((l) =>
+  miDependencia.usuarios.some((u) => u.id === l.usuario_id)
+);
 
   // Guardías de la fecha seleccionada
   const guardiasHoy = guardias.filter(
@@ -168,6 +173,20 @@ const Dependencia = () => {
           </p>
         </div>
 
+        {/* Solicitudes de licencias pendientes */}
+
+        {licenciasPendientesDeLaDependencia.length > 0 && (
+          <div
+            onClick={() => navigate("/solicitudes-licencia")}
+            className="cursor-pointer bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300 rounded-xl px-4 py-3 text-center text-sm font-medium shadow-sm hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+          >
+            📌 Tienes {licenciasPendientes.length} solicitud
+            {licenciasPendientes.length > 1 ? "es" : ""} de licencia pendiente
+            {licenciasPendientes.length > 1 ? "s" : ""}. Haz clic para
+            revisarlas.
+          </div>
+        )}
+
         {/* Contenido */}
         {usuario.rol_jerarquico === "JEFE_DEPENDENCIA" && miDependencia ? (
           <div className="space-y-6">
@@ -230,40 +249,43 @@ const Dependencia = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                       {extraordinarias.map((g) => {
-                            return (
-                              <tr
-                                key={g.id}
-                                className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
+                        {extraordinarias.map((g) => {
+                          return (
+                            <tr
+                              key={g.id}
+                              className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
+                            >
+                              <td className="text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                {usuarioExtraordinaria(g.usuario_id)}
+                              </td>
+                              <td className="border px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                {dayjs(g.fecha_inicio)
+                                  .utc()
+                                  .format("DD/MM HH:mm")}{" "}
+                                -{" "}
+                                {dayjs(g.fecha_inicio).utc().format("DD/MM") ===
+                                dayjs(g.fecha_fin).utc().format("DD/MM")
+                                  ? dayjs(g.fecha_fin).utc().format("HH:mm")
+                                  : dayjs(g.fecha_fin)
+                                      .utc()
+                                      .format("DD/MM HH:mm")}
+                              </td>
+                              <td
+                                className={`border px-4 py-2 text-sm text-center`}
                               >
-                                <td className="text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-                                  {usuarioExtraordinaria(g.usuario_id)}
-                                </td>
-                                <td className="border px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-                                  {dayjs(g.fecha_inicio).utc().format("DD/MM HH:mm")}{" "}
-                                  -{" "}
-                                  {dayjs(g.fecha_inicio).utc().format("DD/MM") ===
-                                  dayjs(g.fecha_fin).utc().format("DD/MM")
-                                    ? dayjs(g.fecha_fin).utc().format("HH:mm")
-                                    : dayjs(g.fecha_fin).utc().format("DD/MM HH:mm")}
-                                </td>
-                                <td
-                                  className={`border px-4 py-2 text-sm text-center`}
+                                {g.comentario}
+                              </td>
+                              <td className="px-2 py-2 text-center">
+                                <button
+                                  className="inline-flex items-center justify-center p-1 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 transition-all"
+                                  onClick={() => handleAbrirConfirmacion(g.id)}
                                 >
-                                  {g.comentario}
-                                </td>
-                                <td className="px-2 py-2 text-center">
-                                  <button
-                                    className="inline-flex items-center justify-center p-1 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 transition-all"
-                                    onClick={() => handleAbrirConfirmacion(g.id)}
-                                  >
-                                    <Trash size={18} />
-                                  </button>
-                                </td>
-                              </tr>
-                            );
-                          })
-                        }
+                                  <Trash size={18} />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

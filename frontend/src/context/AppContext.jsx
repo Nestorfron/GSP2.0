@@ -13,6 +13,10 @@ export const AppProvider = ({ children }) => {
   const [guardias, setGuardias] = useState([]);
   const [licencias, setLicencias] = useState([]);
   const [extraordinarias, setExtraordinarias] = useState([]);
+  const [licenciasPendientes, setLicenciasPendientes] = useState([]);
+  const [licenciasRechazadas, setLicenciasRechazadas] = useState([]);
+  
+
 
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [userId, setUserId] = useState(localStorage.getItem("userId") || null);
@@ -46,7 +50,12 @@ export const AppProvider = ({ children }) => {
         setGuardias(ordinariasData);
         const extraorariasData = guardiasData.filter(g => g.tipo === "extraordinaria" || g.tipo === "curso");
         setExtraordinarias(extraorariasData);
-        setLicencias(licenciasData || []);
+        const licenciasAprobadas = licenciasData.filter(l => l.estado === "aprobada" || l.estado === "aprobado" || l.estado === "activo");
+        setLicencias(licenciasAprobadas || []);
+        const licenciasPendientes = licenciasData.filter(l => l.estado === "pendiente");
+        setLicenciasPendientes(licenciasPendientes || []);
+        const licenciasRechazadas = licenciasData.filter(l => l.estado === "rechazada");
+        setLicenciasRechazadas(licenciasRechazadas || []);
       }
     } catch (error) {
       console.error("Error cargando datos de la app:", error);
@@ -101,6 +110,8 @@ export const AppProvider = ({ children }) => {
     setGuardias([]);
     setExtraordinarias([]);
     setLicencias([]);
+    setLicenciasPendientes([]);
+    setLicenciasRechazadas([]);
     setUsuario(null);
 
   };
@@ -130,6 +141,8 @@ export const AppProvider = ({ children }) => {
         guardias,
         extraordinarias,
         licencias,
+        licenciasPendientes,
+        licenciasRechazadas,
         token,
         loading,
         login,

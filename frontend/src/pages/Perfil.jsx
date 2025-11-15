@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Mail, Shield, Key } from "lucide-react";
+import { User, Mail, Shield, Key, LogOut } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/BottomNavbar";
@@ -8,7 +8,7 @@ import { putData } from "../utils/api";
 
 export default function Perfil() {
   const navigate = useNavigate();
-  const { usuario, token, dependencias, loading } = useAppContext();
+  const { usuario, token, dependencias, loading, logout } = useAppContext();
 
   const [mostrarCambioPass, setMostrarCambioPass] = useState(false);
   const [currentPass, setCurrentPass] = useState("");
@@ -75,6 +75,11 @@ export default function Perfil() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
       <div className="flex-grow flex flex-col items-center px-4 py-8 pb-24">
@@ -89,7 +94,11 @@ export default function Perfil() {
               {usuario.nombre}
             </h1>
             <p className="text-sm text-blue-600 dark:text-blue-400">
-              {usuario.rol_jerarquico || "Sin rol definido"}
+              {usuario.rol_jerarquico === "JEFE_DEPENDENCIA"
+                ? "JEFE DEPENDENCIA"
+                : usuario.rol_jerarquico === "JEFE_ZONA"
+                ? "JEFE DE ZONA"
+                : usuario.rol_jerarquico || "sin rol definido"}
             </p>
           </div>
 
@@ -204,6 +213,12 @@ export default function Perfil() {
               </div>
             )}
           </div>
+          <button
+            onClick={handleLogout}
+            className="mt-6 w-full flex items-center justify-center gap-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 py-2 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-800 transition-colors"
+          >
+            <LogOut size={24} /> Cerrar sesión
+          </button>
         </div>
       </div>
 

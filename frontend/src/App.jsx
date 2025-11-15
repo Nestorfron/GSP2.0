@@ -11,6 +11,8 @@ import Dependencia from "./pages/Dependencia";
 import Funcionario from "./pages/Funcionario";
 import Notificaciones from "./pages/Notificaciones";
 import EscalafonServicio from "./pages/EscalafonServicio";
+import Licencias from "./pages/Licencias";
+import LicenciasSolicitadas from "./pages/LicenciasSolicitadas";
 import CrearUsuario from "./pages/CrearUsuario";
 import EditarUsuario from "./pages/EditarUsuario";
 import CrearJefatura from "./pages/CrearJefatura";
@@ -18,6 +20,8 @@ import CrearZona from "./pages/CrearZona";
 import CrearDependencia from "./pages/CrearDependencia";
 import CrearTurno from "./pages/CrearTurno";
 import CrearExtraordinaria from "./pages/CrearExtraordinaria";
+import CrearLicencia from "./pages/CrearLicencia";
+
 
 
 function App() {
@@ -56,6 +60,8 @@ function App() {
           <Route path="/funcionario" element={ <Funcionario /> } />
           <Route path="/notificaciones" element={ <Notificaciones /> } />
           <Route path="/escalafon-servicio" element={ <EscalafonServicio /> } />
+          <Route path="/licencias" element={ <Licencias /> } />
+          <Route path="/solicitudes-licencia" element={ <LicenciasSolicitadas /> } />
           <Route path="/crear-usuario/:dependenciaId" element={ <CrearUsuario /> } />
           <Route path="/editar-usuario" element={ <EditarUsuario /> } />
           <Route path="/crear-jefatura" element={ <CrearJefatura /> } />
@@ -63,6 +69,7 @@ function App() {
           <Route path="/crear-dependencia/:zonaId" element={ <CrearDependencia /> } />
           <Route path="/crear-turno" element={ <CrearTurno /> } />
           <Route path="/crear-extraordinaria" element={ <CrearExtraordinaria /> } />
+          <Route path="/crear-licencia/:year" element={ <CrearLicencia /> } />
         </Routes>
       </BrowserRouter>
 

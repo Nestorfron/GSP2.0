@@ -1,12 +1,12 @@
 import React from "react";
-import { Home, User, Bell, LogOut, Calendar } from "lucide-react";
+import { Home, User, Bell, Calendar, CalendarCheck } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 
 const BottomNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { usuario, logout } = useAppContext();
+  const { usuario } = useAppContext();
 
   // Determinar ruta del Home según rol
   const getHomePath = () => {
@@ -26,10 +26,12 @@ const BottomNavbar = () => {
   };
 
   const menuItems = [
-    { icon: <Home size={22} />, label: "Inicio", path: getHomePath() },
-    { icon: <Calendar size={22} />, label: "Escalafón", path: "/escalafon-servicio" },
-    { icon: <User size={22} />, label: "Perfil", path: "/perfil" },
-    { icon: <Bell size={22} />, label: "Notificaciones", path: "/notificaciones" },
+    { icon: <Home size={24} />, path: getHomePath() },
+    { icon: <Calendar size={24} />, path: "/escalafon-servicio" },
+    { icon: <CalendarCheck size={24} />, path: "/licencias" },
+    { icon: <Bell size={24} />, path: "/notificaciones" },
+    { icon: <User size={24} />, path: "/perfil" },
+
   ];
 
   // Filtrar el Escalafón para roles permitidos
@@ -73,17 +75,6 @@ const BottomNavbar = () => {
             </button>
           );
         })}
-
-        {/* Botón de Logout aparte */}
-        <button
-          onClick={handleLogout}
-          className="flex flex-col items-center justify-center text-gray-400 hover:text-red-500 transition-all"
-        >
-          <div className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30">
-            <LogOut size={22} />
-          </div>
-          <span className="text-xs mt-1">Salir</span>
-        </button>
       </div>
     </nav>
   );
