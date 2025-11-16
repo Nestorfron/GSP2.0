@@ -7,6 +7,7 @@ import Navbar from "../components/BottomNavbar";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import { useAppContext } from "../context/AppContext";
 import BackButton from "../components/BackButton";
+import Loading from "../components/Loading";
 
 export default function CrearLicencia() {
   const navigate = useNavigate();
@@ -28,18 +29,18 @@ export default function CrearLicencia() {
   const validate = (name, value) => {
     let message = "";
     if (!value.trim()) message = "Campo obligatorio";
-    setErrors(prev => ({ ...prev, [name]: message }));
+    setErrors((prev) => ({ ...prev, [name]: message }));
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     validate(name, value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const hasErrors = Object.values(errors).some(e => e);
+    const hasErrors = Object.values(errors).some((e) => e);
     if (hasErrors) return alert("Corrige los errores antes de enviar");
 
     setLoading(true);
@@ -74,15 +75,21 @@ export default function CrearLicencia() {
     }
   }, [token, navigate]);
 
+  if (loading) return <Loading />;
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
       <div className="flex-grow flex flex-col items-center p-4 pb-24">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4"
+          className="w-full max-w-md space-y-4"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
-            <ClipboardList className="text-blue-600 dark:text-blue-300" size={28} />
+            <ClipboardList
+              className="text-blue-600 dark:text-blue-300"
+              size={28}
+            />
             <h1 className="text-xl font-semibold text-blue-900 dark:text-blue-200">
               Solicitar Nueva Licencia
             </h1>
@@ -108,7 +115,9 @@ export default function CrearLicencia() {
                     : "border-blue-200 dark:border-slate-700 focus:ring-blue-400"
                 }`}
               />
-              {errors[name] && <p className="text-xs text-red-500 mt-1">{errors[name]}</p>}
+              {errors[name] && (
+                <p className="text-xs text-red-500 mt-1">{errors[name]}</p>
+              )}
             </div>
           ))}
 
@@ -124,7 +133,9 @@ export default function CrearLicencia() {
             <option value="extraordinaria">Extraordinaria</option>
             <option value="compensacion">Compensación</option>
           </select>
-          {errors.tipo && <p className="text-xs text-red-500 mt-1">{errors.tipo}</p>}
+          {errors.tipo && (
+            <p className="text-xs text-red-500 mt-1">{errors.tipo}</p>
+          )}
 
           {/* Motivo */}
           <input
@@ -139,7 +150,9 @@ export default function CrearLicencia() {
                 : "border-blue-200 dark:border-slate-700 focus:ring-blue-400"
             }`}
           />
-          {errors.motivo && <p className="text-xs text-red-500 mt-1">{errors.motivo}</p>}
+          {errors.motivo && (
+            <p className="text-xs text-red-500 mt-1">{errors.motivo}</p>
+          )}
 
           {/* Botón */}
           <button
@@ -154,8 +167,9 @@ export default function CrearLicencia() {
             {loading ? "Enviando Solicitud..." : "Solicitar"}
           </button>
 
-          <BackButton to={-1} tooltip="Volver" />
         </form>
+        <BackButton to={"/licencias"} tooltip="Volver" />
+        </div>
       </div>
 
       <Navbar />
