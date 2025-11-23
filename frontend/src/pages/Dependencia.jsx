@@ -80,7 +80,7 @@ const licenciasPendientesDeLaDependencia = licenciasPendientes.filter((l) =>
 
   // Asignacion de licencias
   licenciasHoy.forEach((l) => {
-    turnoPorFuncionario[l.usuario_id] = "licencia"; // "descanso" u otro tipo de licencia
+    turnoPorFuncionario[l.usuario_id] = l.tipo; // "descanso" u otro tipo de licencia
   });
 
   // Orden de turnos
@@ -347,18 +347,14 @@ const licenciasPendientesDeLaDependencia = licenciasPendientes.filter((l) =>
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
                           <thead className="bg-blue-50 dark:bg-slate-900">
                             <tr>
-                              <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                              <th className="w-12 px-2 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Grado
                               </th>
-                              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                              <th className="w-72 px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Nombre
                               </th>
                               <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {dayjs(fechaSeleccionada).format("DD/MM")}
-                              </th>
-
-                              <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                                -
+                                {fechaSeleccionada === dayjs().format("YYYY-MM-DD") ? "Hoy" : dayjs(fechaSeleccionada).format("DD/MM")}
                               </th>
                             </tr>
                           </thead>
@@ -383,18 +379,6 @@ const licenciasPendientesDeLaDependencia = licenciasPendientes.filter((l) =>
                                       className={`border px-4 py-2 text-sm text-center ${clase}`}
                                     >
                                       {contenido}
-                                    </td>
-                                    <td className="px-4 py-2 text-center">
-                                      <button
-                                        className="inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 transition-all"
-                                        onClick={() =>
-                                          navigate("/editar-usuario", {
-                                            state: { usuario: f },
-                                          })
-                                        }
-                                      >
-                                        <Edit size={18} />
-                                      </button>
                                     </td>
                                   </tr>
                                 );
@@ -435,7 +419,7 @@ const licenciasPendientesDeLaDependencia = licenciasPendientes.filter((l) =>
                   icon={PlusCircle}
                   tooltip="Agregar usuario"
                   onClick={() =>
-                    navigate(`/crear-usuario/${miDependencia?.id}`)
+                    navigate(`/agregar-usuarios`)
                   }
                   size="sm"
                 />
@@ -454,8 +438,8 @@ const licenciasPendientesDeLaDependencia = licenciasPendientes.filter((l) =>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
                         Turno
                       </th>
-                      <th className="py-1 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                        -
+                      <th className="font-bold py-1 text-center text-sm text-gray-700 dark:text-gray-300">
+                        . . .
                       </th>
                     </tr>
                   </thead>

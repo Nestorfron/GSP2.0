@@ -83,10 +83,10 @@ export default function CrearTurno() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-      <div className="flex-grow flex flex-col items-center p-4 pb-24">
+      <div className="flex flex-col items-center m-4 py-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4"
+          className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl mb-2 p-6  space-y-4"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <PlusCircle className="text-blue-600 dark:text-blue-300" size={28} />
@@ -149,8 +149,8 @@ export default function CrearTurno() {
             {loading ? "Creando turno..." : "Crear turno"}
           </button>
 
-          <BackButton to={-1} tooltip="Volver" />
         </form>
+        <BackButton to={-1} tooltip="Volver" />
       </div>
 
       <Navbar />

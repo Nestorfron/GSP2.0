@@ -50,8 +50,9 @@ export default function EscalafonServicio() {
 
   if (!miDependencia) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-gray-500">
-        No se encontró tu dependencia.
+      <div className="flex flex-col items-center justify-center min-h-screen text-gray-500">
+        <h1 className="m-auto">No se encontró tu dependencia.</h1>
+        <BottomNavbar />
       </div>
     );
   }

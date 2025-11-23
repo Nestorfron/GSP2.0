@@ -115,10 +115,10 @@ export default function CrearGuardia() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-      <div className="flex-grow flex flex-col items-center p-4 pb-24">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl flex-grow flex flex-col items-center mx-4 mt-8 mb-24 pb-8 shadow-lg">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4"
+          className="w-full max-w-md space-y-4 p-4"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <PlusCircle
@@ -230,9 +230,10 @@ export default function CrearGuardia() {
             {loading ? "Creando guardia..." : "Crear guardia"}
           </button>
 
+        </form>
+        
           {/* Botón volver */}
           <BackButton to={-1} tooltip="Volver" />
-        </form>
       </div>
 
       <Navbar />

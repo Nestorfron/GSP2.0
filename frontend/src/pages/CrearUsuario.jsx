@@ -242,7 +242,7 @@ export default function CrearUsuario() {
             {loading ? "Creando usuario..." : "Crear usuario"}
           </button>
 
-          <BackButton to={usuario.rol_jerarquico === "JEFE_DEPENDENCIA" ? "/dependencia" : "/admin"} tooltip="Volver" />
+          <BackButton to={-1} tooltip="Volver" />
         </form>
       </div>
 
@@ -274,7 +274,7 @@ export default function CrearUsuario() {
                 >
                   Crear otro
                 </button>
-                <BackButton to={usuario.rol_jerarquico === "JEFE_DEPENDENCIA" ? "/dependencia" : "/admin"} tooltip="Volver" />
+                <BackButton to={-1} tooltip="Volver" />
               </div>
             </motion.div>
           </motion.div>

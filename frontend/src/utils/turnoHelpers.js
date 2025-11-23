@@ -7,9 +7,9 @@ export function getTurnoProps(turno) {
       };
   
     const t = turno.toLowerCase();
-    if (t === "L.Med" || t === "l.med")
+    if (t === "L.Med" || t === "l.med" || t === "medica")
       return { clase: "text-xs text-black font-bold bg-yellow-300", contenido: "L.Med" };
-    if (t === "licencia" || turno === "L")
+    if (t === "licencia" || turno === "L" || t === "reglamentaria")
       return { clase: "text-xs text-white bg-green-600", contenido: "L" };
     if (t === "l.ext")
       return { clase: "text-xs text-white bg-green-600", contenido: "L.Ext" };

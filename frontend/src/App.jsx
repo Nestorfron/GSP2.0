@@ -13,6 +13,7 @@ import Notificaciones from "./pages/Notificaciones";
 import EscalafonServicio from "./pages/EscalafonServicio";
 import Licencias from "./pages/Licencias";
 import LicenciasSolicitadas from "./pages/LicenciasSolicitadas";
+import AgregarUsuarios from "./pages/AgregarUsuarios";
 import CrearUsuario from "./pages/CrearUsuario";
 import EditarUsuario from "./pages/EditarUsuario";
 import CrearJefatura from "./pages/CrearJefatura";
@@ -62,6 +63,7 @@ function App() {
           <Route path="/escalafon-servicio" element={ <EscalafonServicio /> } />
           <Route path="/licencias" element={ <Licencias /> } />
           <Route path="/solicitudes-licencia" element={ <LicenciasSolicitadas /> } />
+          <Route path="/agregar-usuarios" element={ <AgregarUsuarios /> } />
           <Route path="/crear-usuario/:dependenciaId" element={ <CrearUsuario /> } />
           <Route path="/editar-usuario" element={ <EditarUsuario /> } />
           <Route path="/crear-jefatura" element={ <CrearJefatura /> } />

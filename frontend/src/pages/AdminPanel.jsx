@@ -21,7 +21,7 @@ const AdminPanel = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-      <main className="flex-1 px-6 py-8 space-y-8 mb-8">
+      <main className="flex-1 px-6 py-8 space-y-8 mb-14">
         {/* Encabezado */}
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
@@ -57,9 +57,9 @@ const AdminPanel = () => {
                       jefatura.zonas
                         .sort((a, b) => a.nombre.localeCompare(b.nombre, undefined, { numeric: true }))
                         .map((zona) => (
-                          <div key={zona.id} className="space-y-2">
+                          <div key={zona.id} className="space-y-2" >
                             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">
-                              <div className="flex px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl justify-between items-center">
+                              <div className="min-w-full flex px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl justify-between items-center">
                                 <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
                                   {zona.nombre}
                                 </h3>
@@ -85,8 +85,8 @@ const AdminPanel = () => {
                                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
                                         Cant. Func.
                                       </th>
-                                      <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Acciones
+                                      <th className="px-4 py-2 text-center text-sm font-bold text-gray-700 dark:text-gray-300">
+                                       . . .
                                       </th>
                                     </tr>
                                   </thead>
@@ -124,7 +124,7 @@ const AdminPanel = () => {
                                             <IconButton
                                               icon={Plus}
                                               tooltip="Agregar funcionario"
-                                              onClick={() => navigate(`/crear-usuario/${dep.id}`)}
+                                              onClick={() => navigate(`/agregar-usuarios/`)}
                                               size="sm"
                                             />
                                           </td>

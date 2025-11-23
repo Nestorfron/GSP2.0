@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import BottomNavbar from "../components/BottomNavbar";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import { getTurnoProps } from "../utils/turnoHelpers";
-import { AnimatePresence, motion } from "framer-motion";
-import { Trash } from "lucide-react";
 import Loading from "../components/Loading";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -87,7 +85,7 @@ const Funcionario = () => {
           diaMs <= dayjs(l.fecha_fin).utc().startOf("day").valueOf()
       );
       if (licencia) {
-        turnoPorFuncionario[f.id][fechaStr] = getTurnoProps("licencia");
+        turnoPorFuncionario[f.id][fechaStr] = getTurnoProps(licencia.tipo);
         return;
       }
 

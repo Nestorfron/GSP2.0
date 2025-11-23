@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Mail, Shield, Key, LogOut } from "lucide-react";
+import { User, Mail, Key, LogOut } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/BottomNavbar";
@@ -54,11 +54,12 @@ export default function Perfil() {
 
     try {
       await putData(
-        `/usuarios`,
+        `/usuarios/${usuario.id}/cambiar-password`,
         {
           correo: usuario.correo,
           current_password: currentPass,
           new_password: newPass,
+          confirm_password: confirmPass,
         },
         token
       );
@@ -83,6 +84,7 @@ export default function Perfil() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
       <div className="flex-grow flex flex-col items-center px-4 py-8 pb-24">
+
         {/* Tarjeta principal */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 w-full max-w-md text-center border border-blue-100 dark:border-slate-800">
           {/* Avatar */}
@@ -221,7 +223,6 @@ export default function Perfil() {
           </button>
         </div>
       </div>
-
       <Navbar />
     </div>
   );
