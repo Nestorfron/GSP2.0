@@ -180,6 +180,8 @@ const Dependencia = () => {
           </p>
         </div>
 
+
+
         {/* Solicitudes de licencias pendientes */}
 
         {licenciasPendientesDeLaDependencia.length > 0 && (

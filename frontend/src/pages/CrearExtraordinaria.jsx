@@ -73,25 +73,29 @@ export default function CrearGuardia() {
     e.preventDefault();
     const hasErrors = Object.values(errors).some((e) => e);
     if (hasErrors) return alert("Corrige los errores antes de enviar");
-
+  
     setLoading(true);
-
+  
     try {
       const token = localStorage.getItem("token");
-
+  
       const body = {
         ...formData,
         fecha_inicio: dayjs(formData.fecha_inicio).format("YYYY-MM-DD HH:mm"),
         fecha_fin: dayjs(formData.fecha_fin).format("YYYY-MM-DD HH:mm"),
       };
-
+  
+      // Crear guardia
       const data = await postData("guardias", body, token);
+  
+      // Crear notificación en backend (el backend se encarga de enviar push)
+      const mensaje = `Se le ha asignado ${formData.tipo} para el día ${dayjs(formData.fecha_inicio).format("DD/MM/YYYY")} hora ${dayjs(formData.fecha_inicio).format("HH:mm")}`;
       const data1 = await postData("notificaciones", {
-        usuario_id: formData.usuario_id,
+        usuario_id: Number(formData.usuario_id),
         fecha: dayjs(formData.fecha_inicio).format("YYYY-MM-DD HH:mm"),
-        mensaje: `Se le ha asignado ${formData.tipo} para el día ${dayjs(formData.fecha_inicio).format("DD/MM/YYYY")} hora ${dayjs(formData.fecha_inicio).format("HH:mm")}`,
+        mensaje,
       }, token);
-
+  
       if (data && data1) setSuccess(true);
       recargarDatos();
     } catch (err) {
@@ -100,6 +104,9 @@ export default function CrearGuardia() {
       setLoading(false);
     }
   };
+  
+  
+  
 
   const resetForm = () => {
     setFormData({

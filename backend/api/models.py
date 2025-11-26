@@ -119,7 +119,7 @@ class Usuario(db.Model):
     licencias = db.relationship('Licencia', backref='usuario', lazy=True)
 
     notificaciones = db.relationship('Notificacion', backref='usuario', lazy=True)
-
+    suscripciones = db.relationship('Suscripcion', backref='usuario', lazy=True)
 
     def serialize(self):
         return {
@@ -254,4 +254,24 @@ class Notificacion(db.Model):
     def __repr__(self):
         return f'<Notificacion {self.id}>'
     
+
+class Suscripcion(db.Model):
+    __tablename__ = "suscripciones"
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    endpoint = db.Column(db.String(300), nullable=False)
+    p256dh = db.Column(db.String(300), nullable=False)
+    auth = db.Column(db.String(300), nullable=False)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'usuario_id': self.usuario_id,
+            'endpoint': self.endpoint,
+            'p256dh': self.p256dh,
+            'auth': self.auth
+        }
+
+    def __repr__(self):
+        return f'<Suscripcion {self.id}>'
 

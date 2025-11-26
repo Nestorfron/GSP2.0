@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import Logo from "../assets/logo.png";
+import { registerPush } from "../utils/registerPush";
+
+
 
 const Login = () => {
   const [correo, setCorreo] = useState("");
@@ -18,6 +21,12 @@ const Login = () => {
       const data = await login(correo, password);
       const rol = data?.usuario?.rol_jerarquico;
 
+      // ⭐ ID DEL USUARIO PARA GUARDAR LA SUBSCRIPCIÓN PUSH
+      const usuarioId = data?.usuario?.id;
+
+      // ⭐ REGISTRAR LA SUSCRIPCIÓN PUSH
+      await registerPush(usuarioId);
+
       // Redirección según el rol jerárquico
       switch (rol) {
         case "ADMINISTRADOR":
@@ -33,7 +42,7 @@ const Login = () => {
           navigate("/funcionario");
           break;
         default:
-          alert("Rol no reconocido. Contacta con un administrador.");
+          alert("Rol no reconocido. Contacte a un administrador.");
           navigate("/login");
           break;
       }

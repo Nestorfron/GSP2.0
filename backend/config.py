@@ -1,5 +1,6 @@
 import os
-from dotenv import load_dotenv  # type: ignore
+from dotenv import load_dotenv # type: ignore
+from sqlalchemy.pool import NullPool # type: ignore
 
 load_dotenv()
 
@@ -9,16 +10,12 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwt-secret-key")
 
-    # ✅ Configuración del pool de SQLAlchemy
+    # 🔧 Supabase Free — SIN pooling
     SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_size": 5,
-        "max_overflow": 0,
-        "pool_recycle": 280,
-        "pool_timeout": 30,
-        "pool_pre_ping": True
+        "poolclass": NullPool
     }
 
-    # ✅ Configuración de correo desde variables de entorno
+    # Correo
     MAIL_SERVER = os.getenv("MAIL_SERVER", "smtp.gmail.com")
     MAIL_PORT = int(os.getenv("MAIL_PORT", 587))
     MAIL_USE_TLS = os.getenv("MAIL_USE_TLS", "True").lower() in ["true", "1", "yes"]

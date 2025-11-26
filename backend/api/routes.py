@@ -1,13 +1,17 @@
 from flask import Blueprint, request, jsonify # type: ignore
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_current_user # type: ignore
 from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
-from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion
+from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion
 import secrets
 from datetime import datetime, timedelta
-from .utils.email_utils import send_email  
+from .utils.email_utils import send_email
+from pywebpush import webpush, WebPushException # type: ignore
+import json  
 
 api = Blueprint("api", __name__)
 
+VAPID_PUBLIC_KEY = "BOv4kW68bvJn-1UMmf90hsycVfvmqqWW45zANVv4S799NLDZ1bHH1QrnhMkvrgQ0mVY5i79DYZoZKfRHUaITYNc="
+VAPID_PRIVATE_KEY = "6uq6q6d5M2n5BeSw3leoGMnFVQH4n_9LVsEj0AQqojE="
 
 
 # -------------------------------------------------------------------
@@ -613,6 +617,8 @@ def crear_notificacion():
     db.session.add(nueva)
     db.session.commit()
 
+    enviar_push(usuario_id, mensaje)
+
     return jsonify(nueva.serialize()), 201
 
 
@@ -624,4 +630,82 @@ def eliminar_notificacion(id):
     db.session.delete(notificacion)
     db.session.commit()
     return jsonify({'status': 'ok'}), 200  
+
+#-------------------------------------------------------------------
+# SUBSCRIPCIONES
+# -------------------------------------------------------------------
+@api.route('/save-subscription', methods=['POST'])
+def save_subscription():
+    data = request.json
+
+    usuario_id = data.get("usuario_id")
+    endpoint = data.get("endpoint")
+    p256dh = data.get("p256dh")
+    auth = data.get("auth")
+
+    if not p256dh or not auth:
+        return jsonify({
+            "error": "La suscripción no incluye claves p256dh/auth (probablemente VAPID inválido)"
+        }), 400
+
+    # Verificar si ya existe la suscripción
+    sus = Suscripcion.query.filter_by(usuario_id=usuario_id, endpoint=endpoint).first()
+    if sus:
+        # Actualizar claves por si cambiaron
+        sus.p256dh = p256dh
+        sus.auth = auth
+        db.session.commit()
+        return jsonify({"msg": "Suscripción existente actualizada"}), 200
+
+    # Si no existe, crear nueva
+    sus = Suscripcion(
+        usuario_id=usuario_id,
+        endpoint=endpoint,
+        p256dh=p256dh,
+        auth=auth
+    )
+    db.session.add(sus)
+    db.session.commit()
+
+    return jsonify({"msg": "Suscripción creada"}), 201
+
+
+@api.route('/subscriptions', methods=['GET'])
+def listar_subscripciones():
+    data = Suscripcion.query.all()
+    return jsonify([x.serialize() for x in data]), 200
+
+@api.route('/subscriptions/<int:id>', methods=['DELETE'])
+def eliminar_subscripcion(id):
+    suscripcion = Suscripcion.query.get(id)
+    db.session.delete(suscripcion)
+    db.session.commit() 
+    return jsonify({'status': 'ok'}), 200
+
+# -------------------------------------------------------------------
+# PUSH
+# -------------------------------------------------------------------
+def enviar_push(usuario_id, mensaje):
+    """
+    Envía notificaciones push a un usuario específico o a todos si no se pasa usuario_id.
+    mensaje debe ser un string.
+    """
+    if usuario_id:
+        subs = Suscripcion.query.filter_by(usuario_id=usuario_id).all()
+    else:
+        subs = Suscripcion.query.all()
+
+    for sub in subs:
+        try:
+            webpush(
+                subscription_info={
+                    "endpoint": sub.endpoint,
+                    "keys": {"p256dh": sub.p256dh, "auth": sub.auth}
+                },
+                data=mensaje,
+                vapid_private_key=VAPID_PRIVATE_KEY,
+                vapid_claims={"sub": "mailto:nestorfrones07@gmail.com"}
+            )
+        except Exception as e:
+            print(f"Error enviando push a {sub.id}: {e}")
 

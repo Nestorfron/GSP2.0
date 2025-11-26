@@ -24,7 +24,7 @@ const Funcionario = () => {
     loading,
   } = useAppContext();
 
-  useEffect(() => {
+  useEffect(() => {   
     if (!token || estaTokenExpirado(token)) navigate("/login");
   }, [token, navigate]);
 
