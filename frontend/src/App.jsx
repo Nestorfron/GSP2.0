@@ -46,7 +46,6 @@ function App() {
   useEffect(() => {
     const handlePushMessage = (event) => {
       if (event.data?.type === "PUSH_RECEIVED") {
-        console.log("Notificación push recibida en página:", event.data.payload);
         addToast(`${event.data.payload.title}: ${event.data.payload.body}`);
       }
     };

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import BottomNavbar from "../components/BottomNavbar";
@@ -9,25 +9,27 @@ import IconButton from "../components/IconButton";
 
 const Notificaciones = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { token, recargarDatos } = useAppContext();
+  const { token, recargarNotificaciones, notificaciones, usuario } = useAppContext();
 
-  const notificacionesState = location.state?.notificaciones || [];
+  const notificacionesUsuario = notificaciones.filter(
+    (n) => n.usuario_id === usuario.id
+  );
 
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) {
       navigate("/login");
     }
+    recargarNotificaciones();
   }, [token, navigate]);
 
   const handleEliminarNotificacion = async (id) => {
     try {
       const data = await deleteData(`/notificaciones/${id}`, token);
       if (data) navigate("/notificaciones");
-      recargarDatos();
     } catch (err) {
       alert(`❌ Error: ${err.message}`);
     }
+    recargarNotificaciones();
   };
 
   return (
@@ -41,7 +43,7 @@ const Notificaciones = () => {
         </div>
 
         {/* Si NO hay notificaciones */}
-        {notificacionesState.length === 0 && (
+        {notificacionesUsuario?.length === 0 && (
           <div className="text-center mt-10">
             <p className="text-gray-600 dark:text-gray-300 text-lg">
               No tienes notificaciones
@@ -51,7 +53,7 @@ const Notificaciones = () => {
 
         {/* Lista de notificaciones */}
         <div className="space-y-6">
-          {notificacionesState.map((n) => (
+          {notificacionesUsuario?.map((n) => (
             <div
               key={n.id}
               className=" flex items-center justify-between p-4 bg-white dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-2xl shadow-sm"
