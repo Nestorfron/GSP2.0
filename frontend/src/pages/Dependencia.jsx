@@ -129,21 +129,16 @@ const Dependencia = () => {
 
   // Eliminar Extraordinaria (ahora con loading)
   const handleDelete = async (id) => {
-    setLoading2(true);
     try {
       const tokenLocal = localStorage.getItem("token");
       await deleteData(`/guardias/${id}`, tokenLocal);
-      setSuccess(true);
       if (typeof recargarDatos === "function") recargarDatos();
+  
     } catch (err) {
       alert(`❌ Error: ${err.message}`);
-    } finally {
-      setLoading2(false);
-      // cerrar modal si se estaba usando
-      setConfirmarBorrado(false);
-      setGuardiaAEliminar(null);
     }
   };
+  
 
   // Abrir modal de confirmación
   const handleAbrirConfirmacion = (id) => {
@@ -152,12 +147,20 @@ const Dependencia = () => {
   };
 
   // Confirmar y borrar
-  const handleEliminarGuardia = async () => {
-    if (!guardiaAEliminar) return;
-    await handleDelete(guardiaAEliminar);
-    setConfirmarBorrado(false);
-    setGuardiaAEliminar(null);
-  };
+ const handleEliminarGuardia = async () => {
+  if (!guardiaAEliminar) return;
+
+  const id = guardiaAEliminar;
+
+  // cerrar modal de inmediato
+  setConfirmarBorrado(false);
+  setGuardiaAEliminar(null);
+
+  // la petición corre en segundo plano
+  handleDelete(id);
+};
+
+  
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">

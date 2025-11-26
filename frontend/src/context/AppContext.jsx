@@ -74,6 +74,8 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  
+
   useEffect(() => {
     if (token && userId && !estaTokenExpirado(token)) {
       fetchAppData();
@@ -136,6 +138,19 @@ export const AppProvider = ({ children }) => {
     setLicencias(data2);
   };
 
+  const recargarNotificaciones = async () => {
+    try {
+      const notificacionesData = await fetchData("/notificaciones", token);
+      if (notificacionesData) {
+        setNotificaciones(notificacionesData || []);
+      }
+    } catch (error) {
+      console.error("Error cargando datos de notificaciones:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const recargarDatos = async () => {
     await fetchAppData();
   };
@@ -160,6 +175,7 @@ export const AppProvider = ({ children }) => {
         logout,
         recargarDatos,
         recargarGuaridas,
+        recargarNotificaciones,
         setUsuario,
       }}
     >
