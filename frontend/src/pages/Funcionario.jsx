@@ -245,7 +245,7 @@ const Funcionario = () => {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-200 dark:divide-slate-700">
-              {miDependencia.usuarios
+              {miDependencia?.usuarios
                 .filter(
                   (f) =>
                     f.rol_jerarquico !== "JEFE_DEPENDENCIA" &&
