@@ -37,10 +37,15 @@ export default function EscalafonServicio() {
   const [startDate, setStartDate] = useState(dayjs().startOf("day"));
   const [selectorTipo, setSelectorTipo] = useState(null);
   const [selectorLicencia, setSelectorLicencia] = useState(null);
+  const [controlTurnos, setControlTurnos] = useState({});
+
+
 
   useEffect(() => {
-    if ( !token || estaTokenExpirado(token)) navigate("/login");
+    if (!token || estaTokenExpirado(token)) navigate("/login");
   }, [token, navigate]);
+
+
 
   if (loading) return <Loading />;
 
@@ -187,8 +192,8 @@ export default function EscalafonServicio() {
             existente.tipo === "licencia"
               ? `licencias/${existente.id}`
               : existente.tipo === "licencia_medica"
-              ? `licencias-medicas/${existente.id}`
-              : `guardias/${existente.id}`;
+                ? `licencias-medicas/${existente.id}`
+                : `guardias/${existente.id}`;
           await deleteData(endpoint, token);
         }
 
@@ -231,8 +236,8 @@ export default function EscalafonServicio() {
               existente.tipo === "licencia"
                 ? `licencias/${existente.id}`
                 : existente.tipo === "licencia_medica"
-                ? `licencias-medicas/${existente.id}`
-                : `guardias/${existente.id}`;
+                  ? `licencias-medicas/${existente.id}`
+                  : `guardias/${existente.id}`;
             await deleteData(endpoint, token);
           }
 
@@ -277,6 +282,89 @@ export default function EscalafonServicio() {
       alert("Ocurrió un error al eliminar la licencia.");
     }
   };
+  const imprimirFuncionariosPorTurno = (dia) => {
+    const resultado = {};
+
+    const dias = Array.from({ length: daysToShow }, (_, i) =>
+      dia.add(i, "day").utc()
+    );
+
+    // Estados que NO cuentan como presencia
+    const LICENCIAS = [
+      "l", "licencia", "reglamentaria",
+      "l.ext", "extraordinaria",
+      "l.med", "medica",
+      "ch",
+    ];
+
+    const estaDisponible = (estado) => {
+      if (!estado) return false;
+      const e = estado.toLowerCase();
+
+      if (LICENCIAS.includes(e)) return false;
+      if (e === "t" || e === "guardia") return true;
+      if (["1ro", "2do", "3er"].includes(e)) return true;
+      if (e === "d" || e === "descanso") return false;
+
+      return true;
+    };
+
+    const mapTurnoGuardia = (estado) => {
+      if (!estado) return null;
+      const e = estado.toLowerCase();
+
+      if (e === "1ro") return "Primer Turno";
+      if (e === "2do") return "Segundo Turno";
+      if (e === "3er") return "Tercer Turno";
+
+      return null;
+    };
+
+    dias.forEach((diaActual) => {
+      const fecha = diaActual.format("YYYY-MM-DD");
+
+      resultado[fecha] = {
+        "Primer Turno": { cumple: false, presentes: [] },
+        "Segundo Turno": { cumple: false, presentes: [] },
+        "Tercer Turno": { cumple: false, presentes: [] },
+      };
+
+      ["Primer Turno", "Segundo Turno", "Tercer Turno"].forEach((nombreTurno) => {
+        const turno = turnosOrdenados.find((t) => t.nombre === nombreTurno);
+        if (!turno) return;
+
+        let presentes = [];
+
+        funcionarios.forEach((f) => {
+          const estado = getCelda(f, diaActual);
+          if (!estaDisponible(estado)) return;
+
+          const turnoEspecial = mapTurnoGuardia(estado);
+
+          if (turnoEspecial) {
+            if (turnoEspecial === nombreTurno) {
+              presentes.push(f.nombre);
+            }
+            return;
+          }
+
+          if (f.turno_id === turno.id) {
+            presentes.push(f.nombre);
+          }
+        });
+
+        resultado[fecha][nombreTurno] = {
+          cumple: presentes.length >= 3,
+          presentes,
+        };
+      });
+    });
+
+    setControlTurnos(resultado);
+  };
+
+
+
 
   return (
     <div className="mb-20 p-6 space-y-4 bg-gradient-to-b from-blue-50 to-white min-h-screen dark:bg-slate-950 transition-colors duration-300">
@@ -312,6 +400,14 @@ export default function EscalafonServicio() {
             }
           />
         </div>
+        {usuario?.rol_jerarquico === "JEFE_DEPENDENCIA" ||
+          usuario?.is_admin === true &&
+          <button
+            onClick={() => imprimirFuncionariosPorTurno(startDate)}
+            className="bg-blue-600 text-white px-3 py-2 rounded ml-2"
+          >
+            Verificar
+          </button>}
 
         <div className="ml-auto">
           <button
@@ -341,16 +437,29 @@ export default function EscalafonServicio() {
                         {turno.nombre}
                       </h2>
                     </th>
-                    {dias.map((d) => (
-                      <th
-                        key={d.format("YYYY-MM-DD")}
-                        className="border px-2 py-1 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 w-12"
-                      >
-                        {d.format("DD/MM")}
-                        <br />
-                        {d.format("ddd")}
-                      </th>
-                    ))}
+                    {dias.map((d) => {
+                      const fecha = d.format("YYYY-MM-DD");
+                      const turnoActual = turno.nombre; // "Primer Turno", "Segundo Turno", etc.
+                      const hayError =
+                        controlTurnos[fecha] &&
+                        controlTurnos[fecha][turnoActual] &&
+                        controlTurnos[fecha][turnoActual].cumple === false;
+                      return (
+                        <th
+                          key={fecha}
+                          className="border px-2 py-1 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 w-12 relative"
+                        >
+                          {d.format("DD/MM")}
+                          <br />
+                          {d.format("ddd")}
+
+                          {hayError && (
+                            <div className="absolute top-0 right-0 w-3 h-3 bg-red-600 rounded-full"></div>
+                          )}
+                        </th>
+                      );
+                    })}
+
                   </tr>
                 </thead>
 
