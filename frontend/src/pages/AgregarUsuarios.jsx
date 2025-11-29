@@ -9,6 +9,8 @@ export default function AgregarUsuarios() {
   const navigate = useNavigate();
   const { dependencias, usuario } = useAppContext();
 
+
+
   const miDependencia = dependencias.find((dep) =>
     dep.usuarios?.some(
       (u) => u.id === usuario.id && u.rol_jerarquico === "JEFE_DEPENDENCIA"

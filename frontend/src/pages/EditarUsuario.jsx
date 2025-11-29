@@ -29,7 +29,7 @@ export default function EditarUsuario() {
       fecha_ingreso: "",
       dependencia_id: "",
       zona_id: "",
-      turno_id: "",
+      turno_id: null,
       estado: "",
       is_admin: false,
     }

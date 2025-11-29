@@ -388,9 +388,18 @@ def actualizar_usuario(id):
     dependencia_id = body.get("dependencia_id", usuario.dependencia_id)
     zona_id = body.get("zona_id", usuario.zona_id)
     estado = body.get("estado", usuario.estado)
-    turno_id = body.get("turno_id", usuario.turno_id)  
     is_admin = body.get("is_admin", usuario.is_admin)
 
+    # 🔥 ESTA ES LA PARTE IMPORTANTE
+    turno_id = body.get("turno_id", usuario.turno_id)
+    if turno_id in ("", None):
+        turno_id = None
+    else:
+        turno_id = int(turno_id)   # Garantiza entero válido
+
+    # -------------------------------
+
+    # Validaciones de lógica
     if rol_jerarquico == 'JEFE_ZONA':
         if not zona_id:
             return jsonify({"error": "Un jefe de zona debe tener zona_id"}), 400
@@ -400,7 +409,7 @@ def actualizar_usuario(id):
             return jsonify({"error": "Este usuario debe tener dependencia_id"}), 400
         zona_id = None
 
-
+    # Asignaciones
     usuario.grado = grado
     usuario.nombre = nombre
     usuario.correo = correo

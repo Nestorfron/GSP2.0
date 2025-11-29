@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import BottomNavbar from "../components/BottomNavbar";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import { getTurnoProps } from "../utils/turnoHelpers";
-import { AnimatePresence, motion } from "framer-motion";
 import Loading from "../components/Loading";
 import { Home, SearchX } from "lucide-react";
 import dayjs from "dayjs";
@@ -16,7 +15,9 @@ const DetalleDependencia = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const dependenciaFromState = location.state?.dependencia || null;
+  const [dependenciaFinal, setDependenciaFinal] = useState(
+    location.state?.dependencia || null
+  );
 
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
     dayjs().format("YYYY-MM-DD")
@@ -26,17 +27,13 @@ const DetalleDependencia = () => {
     jefaturas,
     licencias,
     guardias,
-    extraordinarias,
     token,
     loading,
   } = useAppContext();
-  const [verTodas, setVerTodas] = useState(false);
+
 
   // Extraordinarias a partir de hoy
-  const extraordinariasDesdeHoy = extraordinarias.filter(
-    (g) =>
-      dayjs(g.fecha_inicio).utc().format("YYYY-MM-DD") === fechaSeleccionada
-  );
+
 
   // ahora guardamos solo el ID cuando se selecciona desde el select
   const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState(null);
@@ -50,14 +47,11 @@ const DetalleDependencia = () => {
     .filter((dep) => dep.nombre?.startsWith("Seccional"));
 
   // dependenciaFinal: usa el state si viene por navigate, si no busca por id en la lista
-  const dependenciaFinal =
-    dependenciaFromState ||
-    dependencias.find((d) => d.id === dependenciaSeleccionada) ||
-    null;
 
   const handleChange = (e) => {
     const id = Number(e.target.value) || null;
-    setDependenciaSeleccionada(id);
+    const dependencia = dependencias.find((d) => d.id === id);
+    setDependenciaFinal(dependencia);
   };
 
   useEffect(() => {
@@ -128,13 +122,6 @@ const DetalleDependencia = () => {
       : `${inicial}. ${partes[1] || ""}`;
   };
 
-  // Funcionario extraordinaria (con protección si no encuentra usuario)
-  const usuarioExtraordinaria = (id) => {
-    const usuarioLocal = dependenciaFinal?.usuarios?.find((u) => u.id === id);
-    if (!usuarioLocal) return "—";
-    return "G" + usuarioLocal.grado + " " + abreviarNombre(usuarioLocal.nombre);
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
       <main className="flex-1 px-6 py-8 space-y-6 mb-14">
@@ -186,84 +173,6 @@ const DetalleDependencia = () => {
               </button>
             </div>
 
-            {/* ================= Extraordinarias ================= */}
-            <div>
-
-              {/* Botón para ver todas */}
-              <div className="flex justify-end my-2">
-                {extraordinarias.length > 0 && <button
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                  onClick={() => setVerTodas(!verTodas)}
-                >
-                  {verTodas ? "Ver menos" : "Ver más"}
-                </button>}
-              </div>
-
-              {(verTodas ? extraordinarias : extraordinariasDesdeHoy)
-                .length > 0 ? (
-                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">
-                  <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl">
-                    <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
-                      Extraordinarias
-                    </h3>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-                      <thead className="bg-blue-50 dark:bg-slate-900">
-                        <tr>
-                          <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Grado / Nombre
-                          </th>
-                          <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Fecha
-                          </th>
-                          <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Observaciones
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                        {(verTodas
-                          ? extraordinarias
-                          : extraordinariasDesdeHoy
-                        ).map((g) => (
-                          <tr
-                            key={g.id}
-                            className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
-                          >
-                            <td className="text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-                              {usuarioExtraordinaria(g.usuario_id)}
-                            </td>
-                            <td className="border px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-                              {dayjs(g.fecha_inicio)
-                                .utc()
-                                .format("DD/MM HH:mm")}{" "}
-                              -{" "}
-                              {dayjs(g.fecha_inicio).utc().format("DD/MM") ===
-                              dayjs(g.fecha_fin).utc().format("DD/MM")
-                                ? dayjs(g.fecha_fin).utc().format("HH:mm")
-                                : dayjs(g.fecha_fin)
-                                    .utc()
-                                    .format("DD/MM HH:mm")}
-                            </td>
-                            <td className="border px-4 py-2 text-sm text-center">
-                              {g.tipo} - {g.comentario}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-center text-gray-500 bg-white dark:bg-slate-800 dark:text-gray-400 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 p-4 text-center">
-                    No hay extraordinarias asignadas.
-                  </p>
-                </div>
-              )}
-            </div>
 
             {/* ================= Turnos ================= */}
             <div>

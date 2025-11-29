@@ -32,13 +32,15 @@ export const AppProvider = ({ children }) => {
       setUsuario(usuarioData);
 
       if (usuarioData?.rol_jerarquico === "ADMINISTRADOR" || usuarioData?.rol_jerarquico === "JEFE_ZONA") {
-        const [jefaturasData, guardiasData, licenciasData, notificacionesData] = await Promise.all([
+        const [jefaturasData, dependenciasData, guardiasData, licenciasData, notificacionesData] = await Promise.all([
           fetchData("/jefaturas"),
+          fetchData("/dependencias"),
           fetchData("/guardias"),
           fetchData("/licencias"),
           fetchData("/notificaciones")
         ]);
         setJefaturas(jefaturasData || []);
+        setDependencias(dependenciasData || []);
         setGuardias(guardiasData || []);
         setLicencias(licenciasData || []);
         setNotificaciones(notificacionesData || []);

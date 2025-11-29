@@ -282,13 +282,15 @@ export default function EscalafonServicio() {
       alert("Ocurrió un error al eliminar la licencia.");
     }
   };
+
+
   const imprimirFuncionariosPorTurno = (dia) => {
     const resultado = {};
-
+  
     const dias = Array.from({ length: daysToShow }, (_, i) =>
       dia.add(i, "day").utc()
     );
-
+  
     // Estados que NO cuentan como presencia
     const LICENCIAS = [
       "l", "licencia", "reglamentaria",
@@ -296,75 +298,105 @@ export default function EscalafonServicio() {
       "l.med", "medica",
       "ch",
     ];
-
+  
+    // -----------------------------
+    // FECHAS EXCLUIDAS (no verificar)
+    // -----------------------------
+    const esFechaExcluida = (dia) => {
+      const fecha = dia.format("MM-DD");
+  
+      // Rango 23 → 26 de diciembre
+      if (["12-23", "12-24", "12-25", "12-26"].includes(fecha)) return true;
+  
+      // Rango 30 dic → 2 ene (cruza año)
+      if (["12-30", "12-31", "01-01", "01-02"].includes(fecha)) return true;
+  
+      return false;
+    };
+  
+    // -----------------------------
+    // Lógica de disponibilidad
+    // -----------------------------
     const estaDisponible = (estado) => {
       if (!estado) return false;
       const e = estado.toLowerCase();
-
+  
       if (LICENCIAS.includes(e)) return false;
       if (e === "t" || e === "guardia") return true;
       if (["1ro", "2do", "3er"].includes(e)) return true;
       if (e === "d" || e === "descanso") return false;
-
+  
       return true;
     };
-
+  
     const mapTurnoGuardia = (estado) => {
       if (!estado) return null;
       const e = estado.toLowerCase();
-
+  
       if (e === "1ro") return "Primer Turno";
       if (e === "2do") return "Segundo Turno";
       if (e === "3er") return "Tercer Turno";
-
+  
       return null;
     };
-
+  
+    // -----------------------------
+    // PROCESAMIENTO DE CADA DÍA
+    // -----------------------------
     dias.forEach((diaActual) => {
       const fecha = diaActual.format("YYYY-MM-DD");
-
+  
+      // ---- DÍAS EXCLUIDOS ----
+      if (esFechaExcluida(diaActual)) {
+        resultado[fecha] = {
+          "Primer Turno": { cumple: true, presentes: [] },
+          "Segundo Turno": { cumple: true, presentes: [] },
+          "Tercer Turno": { cumple: true, presentes: [] },
+        };
+        return;
+      }
+  
+      // ---- DÍAS NORMALES ----
       resultado[fecha] = {
         "Primer Turno": { cumple: false, presentes: [] },
         "Segundo Turno": { cumple: false, presentes: [] },
         "Tercer Turno": { cumple: false, presentes: [] },
       };
-
+  
       ["Primer Turno", "Segundo Turno", "Tercer Turno"].forEach((nombreTurno) => {
         const turno = turnosOrdenados.find((t) => t.nombre === nombreTurno);
         if (!turno) return;
-
+  
         let presentes = [];
-
+  
         funcionarios.forEach((f) => {
           const estado = getCelda(f, diaActual);
           if (!estaDisponible(estado)) return;
-
+  
           const turnoEspecial = mapTurnoGuardia(estado);
-
+  
           if (turnoEspecial) {
             if (turnoEspecial === nombreTurno) {
               presentes.push(f.nombre);
             }
             return;
           }
-
+  
           if (f.turno_id === turno.id) {
             presentes.push(f.nombre);
           }
         });
-
+  
         resultado[fecha][nombreTurno] = {
           cumple: presentes.length >= 3,
           presentes,
         };
       });
     });
-
+  
     setControlTurnos(resultado);
   };
-
-
-
+  
 
   return (
     <div className="mb-20 p-6 space-y-4 bg-gradient-to-b from-blue-50 to-white min-h-screen dark:bg-slate-950 transition-colors duration-300">
