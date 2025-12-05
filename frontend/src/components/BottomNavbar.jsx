@@ -173,32 +173,37 @@ const BottomNavbar = () => {
       </nav>
 
       {/* MODAL EXTENDER SESIÓN */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-xl w-80 text-center">
-            <h2 className="text-lg font-semibold mb-3">¿Extender sesión?</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
-              Tu sesión está por expirar. ¿Deseas mantenerla activa?
-            </p>
+      {/* MODAL EXTENDER SESIÓN */}
+{showModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
+    <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-xl w-80 text-center">
+      {/* ICONO de advertencia */}
+      <div className="flex justify-center mb-4">
+        <span className="text-red-500 text-4xl">⚠️</span>
+      </div>
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
+        Tu sesión está por expirar. ¿Deseas mantenerla activa?
+      </p>
 
-            <div className="flex justify-between gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-              >
-                No
-              </button>
+      <div className="flex justify-between gap-3">
+        <button
+          onClick={() => setShowModal(false)}
+          className="flex-1 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+        >
+          No
+        </button>
 
-              <button
-                onClick={renovarSesion}
-                className="flex-1 py-2 rounded bg-blue-600 text-white"
-              >
-                Sí, continuar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <button
+          onClick={renovarSesion}
+          className="flex-1 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+        >
+          Sí, continuar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 };
