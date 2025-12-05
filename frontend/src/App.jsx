@@ -13,6 +13,7 @@ import Funcionario from "./pages/Funcionario";
 import Notificaciones from "./pages/Notificaciones";
 import EscalafonServicio from "./pages/EscalafonServicio";
 import Licencias from "./pages/Licencias";
+import LicenciasFuncionario from "./pages/LicenciasFuncionario";
 import LicenciasSolicitadas from "./pages/LicenciasSolicitadas";
 import AgregarUsuarios from "./pages/AgregarUsuarios";
 import CrearUsuario from "./pages/CrearUsuario";
@@ -90,6 +91,7 @@ function App() {
           <Route path="/dependencia" element={<Dependencia />} />
           <Route path="/detalle-dependencia" element={<DetalleDependencia />} />
           <Route path="/funcionario" element={<Funcionario />} />
+          <Route path="/funcionario/:id" element={<LicenciasFuncionario />} />
           <Route path="/notificaciones" element={<Notificaciones />} />
           <Route path="/escalafon-servicio" element={<EscalafonServicio />} />
           <Route path="/licencias" element={<Licencias />} />

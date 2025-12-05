@@ -6,7 +6,14 @@ import { estaTokenExpirado } from "../utils/tokenUtils";
 import { getTurnoProps } from "../utils/turnoHelpers";
 import { AnimatePresence, motion } from "framer-motion";
 import Loading from "../components/Loading";
-import { Edit, Home, PlusCircle, Trash, CheckCircle2 } from "lucide-react";
+import {
+  Edit,
+  Home,
+  PlusCircle,
+  Trash,
+  CheckCircle2,
+  BarChart2,
+} from "lucide-react";
 import { deleteData } from "../utils/api";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -61,7 +68,7 @@ const Dependencia = () => {
   );
 
   // Guardías de la fecha seleccionada
-    const guardiasHoy = miDependencia?.usuarios
+  const guardiasHoy = miDependencia?.usuarios
     .map((f) => {
       const guardia = guardias.find(
         (g) =>
@@ -491,16 +498,57 @@ const Dependencia = () => {
                               "-"}
                           </td>
                           <td className="px-2 py-2 text-center">
-                            <button
-                              className="inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 transition-all"
-                              onClick={() =>
-                                navigate("/editar-usuario", {
-                                  state: { usuario: f },
-                                })
-                              }
-                            >
-                              <Edit size={18} />
-                            </button>
+                            <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-center justify-center">
+                              {/* Botón Licencias */}
+                              <div className="relative group">
+                                <button
+                                  className="inline-flex items-center justify-center p-1.5 rounded-lg
+        hover:bg-blue-100 dark:hover:bg-blue-800
+        text-blue-600 dark:text-blue-400 transition-all"
+                                  onClick={() =>
+                                    navigate(`/funcionario/${f.id}`, {
+                                      state: { usuario: f },
+                                    })
+                                  }
+                                >
+                                  <BarChart2 size={18} />
+                                </button>
+
+                                {/* Tooltip */}
+                                <span
+                                  className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2
+        bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap
+        opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+                                >
+                                  Licencias
+                                </span>
+                              </div>
+
+                              {/* Botón Editar */}
+                              <div className="relative group">
+                                <button
+                                  className="inline-flex items-center justify-center p-1.5 rounded-lg
+        hover:bg-blue-100 dark:hover:bg-blue-800
+        text-blue-600 dark:text-blue-400 transition-all"
+                                  onClick={() =>
+                                    navigate("/editar-usuario", {
+                                      state: { usuario: f },
+                                    })
+                                  }
+                                >
+                                  <Edit size={18} />
+                                </button>
+
+                                {/* Tooltip */}
+                                <span
+                                  className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2
+        bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap
+        opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+                                >
+                                  Editar
+                                </span>
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       ))}
