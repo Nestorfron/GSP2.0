@@ -529,7 +529,14 @@ export default function EscalafonServicio() {
                             return (
                               <td
                                 key={d.format("YYYY-MM-DD")}
-                                className={`border py-1 relative group ${clase}`}
+                                className={`border py-1 relative group ${
+                                  turno?.nombre === "BROU"
+                                    ? clase
+                                    : contenido === "BROU"
+                                      ? "text-xs text-white bg-blue-600"
+                                      : clase
+                                }`}
+                                
                               >
                                 {contenido}
                                 {puedeEditar && (
