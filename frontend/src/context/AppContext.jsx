@@ -109,6 +109,11 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const setNewToken = (token) => {
+    localStorage.setItem("token", token);
+    setToken(token);
+  };
+
   const logout = () => {
     logoutUser();
     localStorage.removeItem("token");
@@ -173,6 +178,7 @@ export const AppProvider = ({ children }) => {
         notificaciones,
         token,
         loading,
+        setNewToken,
         login,
         logout,
         recargarDatos,

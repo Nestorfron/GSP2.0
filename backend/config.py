@@ -1,6 +1,7 @@
 import os
-from dotenv import load_dotenv # type: ignore
-from sqlalchemy.pool import NullPool # type: ignore
+from dotenv import load_dotenv
+from sqlalchemy.pool import NullPool
+from datetime import timedelta
 
 load_dotenv()
 
@@ -10,6 +11,8 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwt-secret-key")
 
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=12)
+    
     # 🔧 Supabase Free — SIN pooling
     SQLALCHEMY_ENGINE_OPTIONS = {
         "poolclass": NullPool

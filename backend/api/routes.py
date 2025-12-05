@@ -531,6 +531,21 @@ def login():
     }), 200
 
 # -------------------------------------------------------------------
+# REFRESH TOKEN
+# -------------------------------------------------------------------
+
+@api.route("/refresh-token", methods=["POST"])
+@jwt_required()
+def refresh_token():
+    user_id = get_jwt_identity()
+    new_token = create_access_token(identity=user_id)
+    
+    return jsonify({
+        "token": new_token,
+        "message": "Token renovado con éxito"
+    })
+
+# -------------------------------------------------------------------
 # PASSWORD RESET
 # -------------------------------------------------------------------
 
