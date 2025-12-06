@@ -26,7 +26,7 @@ const AdminPanel = () => {
         src={Logo}
         alt="Logo"
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-             w-72 opacity-5 pointer-events-none"
+             w-72 opacity-5 blur-sm pointer-events-none"
       />
       <main className="flex-1 px-6 py-8 space-y-8 mb-14">
         {/* Encabezado */}
