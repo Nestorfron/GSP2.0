@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Home,
-  User,
-  Bell,
-  Calendar,
-  CalendarCheck,
-  List,
-} from "lucide-react";
+import { Home, User, Bell, Calendar, CalendarCheck, List } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { estaTokenExpirado } from "../utils/tokenUtils";
@@ -125,9 +118,10 @@ const BottomNavbar = () => {
   return (
     <>
       {/* BOTTOM NAV */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 
-                      border-t border-slate-200 dark:border-slate-800 shadow-lg z-50 pb-6">
-
+      <nav
+        className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 
+                      border-t border-slate-200 dark:border-slate-800 shadow-lg z-50 pb-6"
+      >
         <div className="flex justify-around items-center h-16 px-2">
           {filteredMenuItems.map((item) => {
             const Icon = item.icon;
@@ -154,12 +148,11 @@ const BottomNavbar = () => {
                 >
                   <Icon size={24} />
 
-                  {item.key === "notificaciones" &&
-                    notificacionesCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full shadow">
-                        {notificacionesCount}
-                      </span>
-                    )}
+                  {item.key === "notificaciones" && notificacionesCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full shadow">
+                      {notificacionesCount}
+                    </span>
+                  )}
                 </div>
 
                 <span
@@ -179,15 +172,18 @@ const BottomNavbar = () => {
 
       {/* FOOTER */}
       <footer className="pb-24 text-center text-xs text-gray-500 dark:text-gray-400">
-        GSP — desarrollado por{" "}
-        <a
-          href="https://github.com/nestorfron"
-          target="_blank"
-          rel="noreferrer"
-          className="text-blue-600 dark:text-blue-400"
-        >
-          Nestor Frones 
-        </a> - Todos los derechos reservados
+        <p>
+          GSP — desarrollado por{" "}
+          <a
+            href="https://github.com/nestorfron"
+            target="_blank"
+            rel="noreferrer"
+            className="text-blue-600 dark:text-blue-400"
+          >
+            Nestor Frones
+          </a>
+        </p>
+        <p>Todos los derechos reservados — © 2025</p>
       </footer>
 
       {/* MODAL EXTENDER SESIÓN */}
