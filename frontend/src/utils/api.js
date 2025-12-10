@@ -119,3 +119,50 @@ export const loginUser = async (correo, password) => {
 export const logoutUser = async () => {
   localStorage.removeItem("token");
 };
+
+
+export const forgotPassword = async (email) => {
+  const url = buildUrl("/auth/forgot-password");
+  const payload = { email };
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      mode: "cors",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || `POST ${url} → ${res.status}`);
+    }
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const resetPasswordRequest = async (token, newPassword) => {
+  const url = buildUrl("/auth/reset-password");
+  const payload = { token, newPassword };
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      mode: "cors",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || `POST ${url} → ${res.status}`);
+    }
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+

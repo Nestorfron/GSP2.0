@@ -173,7 +173,7 @@ const BottomNavbar = () => {
       {/* FOOTER */}
       <footer className="pb-24 text-center text-xs text-gray-500 dark:text-gray-400">
         <p>
-          GSP — desarrollado por{" "}
+          SGP — desarrollado por{" "}
           <a
             href="https://github.com/nestorfron"
             target="_blank"

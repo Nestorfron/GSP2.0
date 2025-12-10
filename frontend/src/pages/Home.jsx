@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import BottomNavbar from "../components/BottomNavbar";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import Logo from "../assets/logo.png";
+import Loading from "../components/Loading";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -17,14 +18,10 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-slate-900">
-        <div className="animate-pulse text-blue-600 dark:text-blue-400 text-lg">
-          Cargando datos...
-        </div>
-      </div>
+      <Loading />
     );
   }
-
+    
   if (!usuario) {
     return (
       <div className="flex items-center justify-center h-screen bg-white dark:bg-slate-900">

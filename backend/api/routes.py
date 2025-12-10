@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify # type: ignore
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, get_current_user # type: ignore
+from flask_mail import Message # type: ignore
+from extensions import mail
 from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
 from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion
 import secrets
 from datetime import datetime, timedelta
 from .utils.email_utils import send_email
 from pywebpush import webpush, WebPushException # type: ignore
-import json  
+
 
 api = Blueprint("api", __name__)
 
@@ -566,7 +568,7 @@ def forgot_password():
 
     # Generar token único y fecha expiración (1 hora)
     token = secrets.token_hex(32)
-    expiration = datetime.utcnow() + timedelta(hours=1)
+    expiration = datetime.now() + timedelta(hours=1)
 
     # Guardar token en DB
     reset_token = PasswordResetToken(
@@ -579,7 +581,7 @@ def forgot_password():
     db.session.commit()
 
    
-    frontend_url = "http://localhost:3000"  
+    frontend_url = "http://localhost:5173"  
     reset_link = f"{frontend_url}/reset-password/{token}"
 
    
@@ -620,6 +622,22 @@ def reset_password():
     db.session.commit()
 
     return jsonify({"message": "Contraseña actualizada correctamente."}), 200
+
+@api.route('/test-email', methods=['GET'])
+def test_email():
+
+    msg = Message(
+        subject="Prueba desde Flask con Mailjet",
+        recipients=["nestorfrones07@gmail.com"]
+    )
+    msg.body = "Si recibís este correo, Mailjet funciona."
+
+    try:
+        mail.send(msg)
+        return {"message": "Correo enviado exitosamente."}
+    except Exception as e:
+        return {"error": str(e)}, 500
+
 
 # -------------------------------------------------------------------
 # NOTIFICACIONES

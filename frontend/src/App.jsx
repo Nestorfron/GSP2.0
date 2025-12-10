@@ -4,6 +4,8 @@ import { registerSW } from "virtual:pwa-register";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Perfil from "./pages/Perfil";
 import AdminPanel from "./pages/AdminPanel";
 import Zona from "./pages/Zona";
@@ -86,6 +88,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/Login" element={<Login />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/" element={<Home />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/admin" element={<AdminPanel />} />
