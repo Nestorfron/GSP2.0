@@ -281,7 +281,7 @@ const Funcionario = () => {
                       return (
                         <td
                           key={fecha}
-                          className={`px-2 py-1 text-center ${clase}`}
+                          className={contenido === "BROU" ? "px-2 py-1 text-center text-xs text-white bg-blue-600" :`px-2 py-1 text-center ${clase}`}
                         >
                           {contenido}
                         </td>
