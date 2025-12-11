@@ -11,11 +11,14 @@ export default function AgregarUsuarios() {
 
 
 
-  const miDependencia = dependencias.find((dep) =>
+  const miDependencia =
+  dependencias.find((dep) =>
     dep.usuarios?.some(
       (u) => u.id === usuario.id && u.rol_jerarquico === "JEFE_DEPENDENCIA"
     )
-  );
+  ) || dependencias[0];
+
+
 
   const usuarios = dependencias?.flatMap((dep) => dep.usuarios) || [];
 
@@ -72,7 +75,7 @@ export default function AgregarUsuarios() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
       <div className="flex-grow flex flex-col items-center p-4 pb-24 w-full max-w-xl mx-auto space-y-6">
 
         {/* ================= Crear usuario ================= */}

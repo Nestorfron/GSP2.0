@@ -22,18 +22,10 @@ const DetalleDependencia = () => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
     dayjs().format("YYYY-MM-DD")
   );
-  const {
-    usuario,
-    jefaturas,
-    licencias,
-    guardias,
-    token,
-    loading,
-  } = useAppContext();
+  const { usuario, jefaturas, licencias, guardias, token, loading } =
+    useAppContext();
 
-
-  // Extraordinarias a partir de hoy
-
+  
 
   // ahora guardamos solo el ID cuando se selecciona desde el select
   const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState(null);
@@ -59,6 +51,10 @@ const DetalleDependencia = () => {
       navigate("/login");
     }
   }, [token, navigate]);
+
+  const JefeDependencia = dependenciaFinal?.usuarios.find((u) => u.rol_jerarquico === "JEFE_DEPENDENCIA") || [];
+
+  const CantidadFuncionarios = dependenciaFinal.usuarios.filter((u) => u.rol_jerarquico !== "JEFE_DEPENDENCIA").length || 0;
 
   if (loading) return <Loading />;
 
@@ -136,7 +132,6 @@ const DetalleDependencia = () => {
             onChange={handleChange}
             className="border border-gray-300 dark:border-slate-700 rounded px-3 py-2 bg-transparent focus:ring-2 transition-all"
           >
-            <option value="">Selecciona una dependencia</option>
             {dependencias
               ?.filter((dep) => dep.nombre?.startsWith("Seccional"))
               .sort((a, b) =>
@@ -150,6 +145,24 @@ const DetalleDependencia = () => {
                 </option>
               ))}
           </select>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
+            Jefe: 
+          </h3>
+          <span className="font-bold text-gray-600 dark:text-gray-200">
+            {JefeDependencia ? "G" + JefeDependencia.grado + " " + JefeDependencia.nombre : "Sin Jefe"}
+             </span>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
+            Cantidad de funcionarios
+          </h3>
+          <span className="font-bold text-gray-600 dark:text-gray-200">
+            {CantidadFuncionarios}
+          </span>
         </div>
 
         {/* Si el usuario es JEFE_ZONA mostramos contenido para seleccionar/visualizar dependencia */}
@@ -172,7 +185,6 @@ const DetalleDependencia = () => {
                 <Home size={20} />
               </button>
             </div>
-
 
             {/* ================= Turnos ================= */}
             <div>
