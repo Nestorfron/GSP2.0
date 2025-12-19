@@ -10,6 +10,7 @@ import {
   Package,
   Trash,
   PlusCircle,
+  Pencil,
 } from "lucide-react";
 import IconButton from "../components/IconButton";
 import ModalAgregarPrenda from "../components/ModalAgregarPrenda";
@@ -36,6 +37,7 @@ const PrendasFuncionario = () => {
     () => location.state?.usuario?.prendas ?? []
   );
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [prendaEditar, setPrendaEditar] = useState(null);
 
   /* -------- Seguridad -------- */
   useEffect(() => {
@@ -82,7 +84,7 @@ const PrendasFuncionario = () => {
 
         {/* Botón agregar prenda */}
         <IconButton
-          className="mx-auto my-4"
+          className="ms-auto"s
           icon={PlusCircle}
           tooltip="Agregar prenda"
           onClick={() => setMostrarModal(true)}
@@ -112,7 +114,7 @@ const PrendasFuncionario = () => {
                     Vencimiento
                   </th>
                   <th className="px-4 py-3 text-center text-sm font-semibold">
-                    Acción
+                    ...
                   </th>
                 </tr>
               </thead>
@@ -124,7 +126,7 @@ const PrendasFuncionario = () => {
                   return (
                     <tr
                       key={p.id}
-                      className="hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"
+                      className="text-center hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"
                     >
                       <td className="px-4 py-3 flex items-center gap-2">
                         <Icon
@@ -140,13 +142,25 @@ const PrendasFuncionario = () => {
                         {p.vencimiento || "No"}
                       </td>
 
-                      <td className="px-4 py-3 text-center">
+                      <td className="flex px-4 py-3 text-center">
+                      <IconButton
+                        className="mx-auto"
+                        icon={Pencil}
+                        tooltip="Editar"
+                        size="xs"
+                        onClick={() => {
+                          setPrendaEditar(p);
+                          setMostrarModal(true);
+                        }}
+                      />
                         <IconButton
+                          className="mx-auto"
                           icon={Trash}
                           tooltip="Eliminar prenda"
                           onClick={() => handleEliminar(p.id)}
                           size="sm"
                         />
+                        
                       </td>
                     </tr>
                   );
@@ -162,6 +176,7 @@ const PrendasFuncionario = () => {
         <ModalAgregarPrenda
           usuario={usuario}
           token={token}
+          prenda={prendaEditar}
           onCerrar={() => setMostrarModal(false)}
           onPrendaAgregada={(nuevaPrenda) => {
             setPrendas((prev) => [...prev, nuevaPrenda]);
