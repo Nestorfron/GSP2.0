@@ -413,7 +413,13 @@ const Dependencia = () => {
                                       {abreviarNombre(f.nombre)}
                                     </td>
                                     <td
-                                      className={`border px-4 py-2 text-sm text-center ${clase}`}
+                                      className={`border px-4 py-1 text-sm text-center py-1 relative group ${
+                                        turnoPorFuncionario?.nombre === "BROU"
+                                          ? clase
+                                          : contenido === "BROU"
+                                          ? "text-xs text-white bg-blue-600"
+                                          : clase
+                                      }`}
                                     >
                                       {contenido}
                                     </td>

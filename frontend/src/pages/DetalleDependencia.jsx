@@ -15,17 +15,13 @@ const DetalleDependencia = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [dependenciaFinal, setDependenciaFinal] = useState(
-    location.state?.dependencia || null
-  );
-
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
     dayjs().format("YYYY-MM-DD")
   );
   const { usuario, jefaturas, licencias, guardias, token, loading } =
     useAppContext();
 
-  
+
 
   // ahora guardamos solo el ID cuando se selecciona desde el select
   const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState(null);
@@ -37,6 +33,10 @@ const DetalleDependencia = () => {
     )
     .filter((dep) => dep.zona_id === usuario.zona_id)
     .filter((dep) => dep.nombre?.startsWith("Seccional"));
+
+    const [dependenciaFinal, setDependenciaFinal] = useState(
+      location.state?.dependencia || dependencias[0]
+    );
 
   // dependenciaFinal: usa el state si viene por navigate, si no busca por id en la lista
 
@@ -52,9 +52,15 @@ const DetalleDependencia = () => {
     }
   }, [token, navigate]);
 
-  const JefeDependencia = dependenciaFinal?.usuarios.find((u) => u.rol_jerarquico === "JEFE_DEPENDENCIA") || [];
+  const JefeDependencia =
+    dependenciaFinal?.usuarios.find(
+      (u) => u.rol_jerarquico === "JEFE_DEPENDENCIA"
+    ) || [];
 
-  const CantidadFuncionarios = dependenciaFinal.usuarios.filter((u) => u.rol_jerarquico !== "JEFE_DEPENDENCIA").length || 0;
+  const CantidadFuncionarios =
+    dependenciaFinal.usuarios.filter(
+      (u) => u.rol_jerarquico !== "JEFE_DEPENDENCIA"
+    ).length || 0;
 
   if (loading) return <Loading />;
 
@@ -149,11 +155,13 @@ const DetalleDependencia = () => {
 
         <div className="flex flex-col items-center">
           <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
-            Jefe: 
+            Jefe:
           </h3>
           <span className="font-bold text-gray-600 dark:text-gray-200">
-            {JefeDependencia ? "G" + JefeDependencia.grado + " " + JefeDependencia.nombre : "Sin Jefe"}
-             </span>
+            {JefeDependencia
+              ? "G" + JefeDependencia.grado + " " + JefeDependencia.nombre
+              : "Sin Jefe"}
+          </span>
         </div>
 
         <div className="flex flex-col items-center">
@@ -255,7 +263,13 @@ const DetalleDependencia = () => {
                                       {abreviarNombre(f.nombre)}
                                     </td>
                                     <td
-                                      className={`border px-4 py-2 text-sm text-center ${clase}`}
+                                      className={`border px-4 py-1 text-sm text-center py-1 relative group ${
+                                        turnoPorFuncionario?.nombre === "BROU"
+                                          ? clase
+                                          : contenido === "BROU"
+                                          ? "text-xs text-white bg-blue-600"
+                                          : clase
+                                      }`}
                                     >
                                       {contenido}
                                     </td>
