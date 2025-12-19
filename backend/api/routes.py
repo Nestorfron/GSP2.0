@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from flask_mail import Message # type: ignore
 from extensions import mail
 from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
-from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion
+from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda
 import secrets
 from datetime import datetime, timedelta
 from .utils.email_utils import send_email
@@ -750,4 +750,50 @@ def enviar_push(usuario_id, mensaje):
             )
         except Exception as e:
             print(f"Error enviando push a {sub.id}: {e}")
+
+
+# -------------------------------------------------------------------
+# PRENDAS DE UNIFORME
+# -------------------------------------------------------------------
+@api.route('/prendas', methods=['GET'])
+def listar_prendas():
+    data = Prenda.query.all()
+    return jsonify([x.serialize() for x in data]), 200
+
+@api.route('/prendas', methods=['POST'])
+@jwt_required()
+def crear_prenda():
+    body = request.json
+    nombre = body.get("nombre")
+    talle = body.get("talle")
+    descripcion = body.get("descripcion")
+    usuario_id = body.get("usuario_id")
+
+    nueva = Prenda(nombre=nombre, talle=talle, descripcion=descripcion, usuario_id=usuario_id)
+    db.session.add(nueva)
+    db.session.commit()
+    return jsonify(nueva.serialize()), 201
+
+@api.route('/prendas/<int:id>', methods=['PUT'])
+@jwt_required()
+def actualizar_prenda(id):
+    body = request.json
+    prenda = Prenda.query.get(id)
+    if not prenda:
+        return jsonify({"error": "Prenda no encontrada"}), 404
+
+    prenda.nombre = body.get("nombre", prenda.nombre)
+    prenda.talle = body.get("talle", prenda.talle)
+    prenda.descripcion = body.get("descripcion", prenda.descripcion)
+
+    db.session.commit()
+    return jsonify(prenda.serialize()), 200
+
+@api.route('/prendas/<int:id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_prenda(id):
+    prenda = Prenda.query.get(id)
+    db.session.delete(prenda)
+    db.session.commit()
+    return jsonify({'status': 'ok'}), 200  
 

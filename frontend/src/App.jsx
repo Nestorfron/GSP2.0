@@ -12,6 +12,7 @@ import Zona from "./pages/Zona";
 import Dependencia from "./pages/Dependencia";
 import DetalleDependencia from "./pages/DetalleDependencia";
 import Funcionario from "./pages/Funcionario";
+import PrendasFuncionario from "./pages/PrendasFuncionario";
 import Notificaciones from "./pages/Notificaciones";
 import EscalafonServicio from "./pages/EscalafonServicio";
 import Licencias from "./pages/Licencias";
@@ -97,6 +98,7 @@ function App() {
           <Route path="/dependencia" element={<Dependencia />} />
           <Route path="/detalle-dependencia" element={<DetalleDependencia />} />
           <Route path="/funcionario" element={<Funcionario />} />
+          <Route path="/prendas-funcionario/:id" element={<PrendasFuncionario />} />
           <Route path="/funcionario/:id" element={<LicenciasFuncionario />} />
           <Route path="/notificaciones" element={<Notificaciones />} />
           <Route path="/escalafon-servicio" element={<EscalafonServicio />} />

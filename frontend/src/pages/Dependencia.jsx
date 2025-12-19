@@ -13,6 +13,7 @@ import {
   Trash,
   CheckCircle2,
   BarChart2,
+  Shirt,
 } from "lucide-react";
 import { deleteData } from "../utils/api";
 import dayjs from "dayjs";
@@ -169,7 +170,7 @@ const Dependencia = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-       <img
+      <img
         src={Logo}
         alt="Logo"
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
@@ -521,13 +522,36 @@ const Dependencia = () => {
                                   <BarChart2 size={18} />
                                 </button>
 
-                                {/* Tooltip */}
                                 <span
                                   className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2
         bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap
         opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
                                 >
                                   Licencias
+                                </span>
+                              </div>
+
+                              {/* Botón Prendas */}
+                              <div className="relative group">
+                                <button
+                                  className="inline-flex items-center justify-center p-1.5 rounded-lg
+        hover:bg-blue-100 dark:hover:bg-blue-800
+        text-blue-600 dark:text-blue-400 transition-all"
+                                  onClick={() =>
+                                    navigate(`/prendas-funcionario/${f.id}`, {
+                                      state: { usuario: f },
+                                    })
+                                  }
+                                >
+                                  <Shirt size={18} />
+                                </button>
+
+                                <span
+                                  className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2
+        bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap
+        opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+                                >
+                                  Prendas
                                 </span>
                               </div>
 
@@ -546,7 +570,6 @@ const Dependencia = () => {
                                   <Edit size={18} />
                                 </button>
 
-                                {/* Tooltip */}
                                 <span
                                   className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2
         bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap

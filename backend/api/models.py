@@ -121,6 +121,8 @@ class Usuario(db.Model):
     notificaciones = db.relationship('Notificacion', backref='usuario', lazy=True)
     suscripciones = db.relationship('Suscripcion', backref='usuario', lazy=True)
 
+    prendas = db.relationship('Prenda', backref='usuario', lazy=True)
+
     def serialize(self):
         return {
             'id': self.id,
@@ -133,12 +135,17 @@ class Usuario(db.Model):
             'zona_id': self.zona_id,
             'turno_id': self.turno_id,
             'estado': self.estado,
-            'is_admin': self.is_admin
+            'is_admin': self.is_admin,
+            'prendas': [p.serialize() for p in self.prendas]
         }
 
 
     def __repr__(self):
         return f'<Usuario {self.nombre}>'
+    
+# -------------------------
+# TOKENS DE RECUPERACION DE CONTRASEÑA
+# -------------------------
     
 
 class PasswordResetToken(db.Model):
@@ -234,6 +241,10 @@ class Licencia(db.Model):
 
     def __repr__(self):
         return f'<Licencia {self.id}>'
+    
+# -------------------------
+# NOTIFICACIONES
+# -------------------------
 
 class Notificacion(db.Model):
     __tablename__ = 'notificaciones'
@@ -253,6 +264,10 @@ class Notificacion(db.Model):
 
     def __repr__(self):
         return f'<Notificacion {self.id}>'
+    
+# -------------------------
+# SUSCRIPCIONES
+# -------------------------
     
 
 class Suscripcion(db.Model):
@@ -274,4 +289,32 @@ class Suscripcion(db.Model):
 
     def __repr__(self):
         return f'<Suscripcion {self.id}>'
+    
+
+# -------------------------
+# PRENDAS DE UNIFORME
+# -------------------------
+
+class Prenda(db.Model):
+    __tablename__ = 'prendas'
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False)
+    talle = db.Column(db.String(100), nullable=False)
+    descripcion = db.Column(db.Text)
+    vencimiento = db.Column(db.Date, nullable=True)
+    
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'usuario_id': self.usuario_id,            
+            'nombre': self.nombre,
+            'descripcion': self.descripcion,
+            'talle': self.talle,
+            'vencimiento': self.vencimiento,
+        }
+
+    def __repr__(self):
+        return f'<Prenda {self.nombre}>'
 

@@ -3,8 +3,10 @@ import { User, Mail, Key, LogOut } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/BottomNavbar";
+import PrendasUsaurio from "./PrendasUsuario";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import { putData } from "../utils/api";
+import Loading from "../components/Loading";
 
 export default function Perfil() {
   const navigate = useNavigate();
@@ -25,11 +27,7 @@ export default function Perfil() {
 
   if (loading || !usuario) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-        <p className="text-blue-600 dark:text-blue-300 font-medium">
-          Cargando perfil...
-        </p>
-      </div>
+      <Loading />      
     );
   }
 
@@ -84,7 +82,6 @@ export default function Perfil() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
       <div className="flex-grow flex flex-col items-center px-4 py-8 pb-24">
-
         {/* Tarjeta principal */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 w-full max-w-md text-center border border-blue-100 dark:border-slate-800">
           {/* Avatar */}
@@ -151,6 +148,8 @@ export default function Perfil() {
                 </span>
               </div>
             )}
+
+            <PrendasUsaurio />
           </div>
 
           {/* Botón Cambiar contraseña */}
