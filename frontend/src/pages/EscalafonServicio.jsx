@@ -188,8 +188,8 @@ export default function EscalafonServicio() {
             existente.tipo === "licencia"
               ? `licencias/${existente.id}`
               : existente.tipo === "licencia_medica"
-              ? `licencias-medicas/${existente.id}`
-              : `guardias/${existente.id}`;
+                ? `licencias-medicas/${existente.id}`
+                : `guardias/${existente.id}`;
           await deleteData(endpoint, token);
         }
 
@@ -232,8 +232,8 @@ export default function EscalafonServicio() {
               existente.tipo === "licencia"
                 ? `licencias/${existente.id}`
                 : existente.tipo === "licencia_medica"
-                ? `licencias-medicas/${existente.id}`
-                : `guardias/${existente.id}`;
+                  ? `licencias-medicas/${existente.id}`
+                  : `guardias/${existente.id}`;
             await deleteData(endpoint, token);
           }
 
@@ -434,13 +434,24 @@ export default function EscalafonServicio() {
         </div>
         {(usuario?.rol_jerarquico === "JEFE_DEPENDENCIA" ||
           usuario?.is_admin) && (
-          <button
-            onClick={() => imprimirFuncionariosPorTurno(startDate)}
-            className="bg-blue-600 text-white px-3 py-2 rounded ml-2"
-          >
-            Verificar
-          </button>
-        )}
+            <button
+              onClick={() => imprimirFuncionariosPorTurno(startDate)}
+              className="bg-blue-600 text-white px-3 py-2 rounded ml-2"
+            >
+              Verificar
+            </button>
+          )}
+
+        <button
+          onClick={() =>
+            navigate("/planilla-diaria", {
+              state: { fecha: startDate.format("YYYY-MM-DD") },
+            })
+          }
+          className="bg-blue-600 text-white px-3 py-2 rounded ml-2"
+        >
+          Planilla Diaria
+        </button>
 
         <div className="ml-auto">
           <button
@@ -529,14 +540,13 @@ export default function EscalafonServicio() {
                             return (
                               <td
                                 key={d.format("YYYY-MM-DD")}
-                                className={`border py-1 relative group ${
-                                  turno?.nombre === "BROU"
+                                className={`border py-1 relative group ${turno?.nombre === "BROU"
                                     ? clase
                                     : contenido === "BROU"
                                       ? "text-xs text-white bg-blue-600"
                                       : clase
-                                }`}
-                                
+                                  }`}
+
                               >
                                 {contenido}
                                 {puedeEditar && (

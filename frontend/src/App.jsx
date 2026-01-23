@@ -27,6 +27,7 @@ import CrearDependencia from "./pages/CrearDependencia";
 import CrearTurno from "./pages/CrearTurno";
 import CrearExtraordinaria from "./pages/CrearExtraordinaria";
 import CrearLicencia from "./pages/CrearLicencia";
+import PlanillaDiaria from "./pages/PlanillaDiaria"
 
 
 
@@ -113,6 +114,7 @@ function App() {
           <Route path="/crear-turno" element={<CrearTurno />} />
           <Route path="/crear-extraordinaria" element={<CrearExtraordinaria />} />
           <Route path="/crear-licencia/:year" element={<CrearLicencia />} />
+          <Route path="/planilla-diaria" element={<PlanillaDiaria />} />
         </Routes>
       </BrowserRouter>
 

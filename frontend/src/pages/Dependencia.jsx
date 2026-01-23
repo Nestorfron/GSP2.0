@@ -22,6 +22,7 @@ dayjs.extend(utc);
 import IconButton from "../components/IconButton";
 import Logo from "../assets/logo.png";
 
+
 const Dependencia = () => {
   const navigate = useNavigate();
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
@@ -42,6 +43,7 @@ const Dependencia = () => {
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
   const [guardiaAEliminar, setGuardiaAEliminar] = useState(null);
   const [verTodas, setVerTodas] = useState(false);
+
 
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) {
@@ -228,6 +230,16 @@ const Dependencia = () => {
               >
                 <Home size={20} />
               </button>
+              <button
+                onClick={() =>
+                  navigate("/planilla-diaria", {
+                    state: { fecha: fechaSeleccionada },
+                  })
+                }
+                className="px-3 py-1 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+              >
+                Planilla Diaria
+              </button>
             </div>
 
             {/* ================= Extraordinarias ================= */}
@@ -257,7 +269,7 @@ const Dependencia = () => {
               </div>
 
               {(verTodas ? extraordinarias : extraordinariasDesdeHoy).length >
-              0 ? (
+                0 ? (
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">
                   <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl">
                     <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
@@ -301,11 +313,11 @@ const Dependencia = () => {
                                 .format("DD/MM HH:mm")}{" "}
                               -{" "}
                               {dayjs(g.fecha_inicio).utc().format("DD/MM") ===
-                              dayjs(g.fecha_fin).utc().format("DD/MM")
+                                dayjs(g.fecha_fin).utc().format("DD/MM")
                                 ? dayjs(g.fecha_fin).utc().format("HH:mm")
                                 : dayjs(g.fecha_fin)
-                                    .utc()
-                                    .format("DD/MM HH:mm")}
+                                  .utc()
+                                  .format("DD/MM HH:mm")}
                             </td>
                             <td className="border px-4 py-2 text-sm text-center">
                               {g.tipo} - {g.comentario}
@@ -389,7 +401,7 @@ const Dependencia = () => {
                               </th>
                               <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
                                 {fechaSeleccionada ===
-                                dayjs().format("YYYY-MM-DD")
+                                  dayjs().format("YYYY-MM-DD")
                                   ? "Hoy"
                                   : dayjs(fechaSeleccionada).format("DD/MM")}
                               </th>
@@ -413,13 +425,12 @@ const Dependencia = () => {
                                       {abreviarNombre(f.nombre)}
                                     </td>
                                     <td
-                                      className={`border px-4 py-1 text-sm text-center py-1 relative group ${
-                                        turnoPorFuncionario?.nombre === "BROU"
-                                          ? clase
-                                          : contenido === "BROU"
+                                      className={`border px-4 py-1 text-sm text-center py-1 relative group ${turnoPorFuncionario?.nombre === "BROU"
+                                        ? clase
+                                        : contenido === "BROU"
                                           ? "text-xs text-white bg-blue-600"
                                           : clase
-                                      }`}
+                                        }`}
                                     >
                                       {contenido}
                                     </td>
@@ -598,6 +609,8 @@ const Dependencia = () => {
             Tenés acceso limitado a la información.
           </p>
         )}
+        
+
         {/* Modal confirmación eliminar */}
         <AnimatePresence>
           {confirmarBorrado && (
