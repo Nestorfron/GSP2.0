@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
-//import dayjs from "dayjs";
+import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import html2pdf from "html2pdf.js";
 import BottomNavbar from "../components/BottomNavbar"
+import { toPng } from "html-to-image";
+import jsPDF from "jspdf";
 
 dayjs.extend(utc);
 
@@ -26,8 +28,7 @@ const PlanillaDiaria = () => {
   /* ================= DEPENDENCIA ================= */
   const miDependencia = dependencias.find((dep) =>
     dep.usuarios?.some(
-      (u) => u.id === usuario.id && u.rol_jerarquico === "JEFE_DEPENDENCIA"
-    )
+      (u) => u.id === usuario.id)
   );
   if (!miDependencia) return null;
 
@@ -123,7 +124,7 @@ const PlanillaDiaria = () => {
     if (hoy >= ini && hoy <= fin) {
       estadoPorFuncionario[l.usuario_id] = {
         funcion: getFuncion(l.tipo),
-        fechaFin: dayjs(l.fecha_fin).format("DD/MM/YYYY"),
+        fechaFin: dayjs(l.fecha_fin).utc().format("DD/MM/YYYY"),
       };
     }
   });
@@ -142,7 +143,7 @@ const PlanillaDiaria = () => {
   const totalFuncionarios = miDependencia.usuarios.length;
 
   const deducidos = miDependencia.usuarios.filter((u) => {
-    const estado = estadoPorFuncionario[u.id]?.funcion.toUpperCase() || "";
+    const estado = estadoPorFuncionario[u.id]?.funcion?.toUpperCase() || "";
     return (
       estado.includes("LICENCIA MÉDICA") ||
       estado.includes("LICENCIA ANUAL") ||
@@ -155,17 +156,61 @@ const PlanillaDiaria = () => {
   const enServicio = totalFuncionarios - deducidos;
 
   /* ================= PDF ================= */
-  const exportarPDF = () => {
-    html2pdf()
-      .set({
-        margin: 5,
-        filename: `Planilla_${miDependencia.nombre}_${fechaSeleccionada}.pdf`,
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+  const capturar = () => {
+    const elemento = document.getElementById("planilla-pdf");
+
+    const originalWidth = elemento.style.width;
+    const originalHeight = elemento.style.height;
+    const originalPadding = elemento.style.padding;
+
+    elemento.style.padding = "20px";
+    elemento.style.width = elemento.scrollWidth + 40 + "px";
+    elemento.style.height = elemento.scrollHeight + 40 + "px";
+
+    toPng(elemento, {
+      cacheBust: true,
+      width: elemento.scrollWidth + 40,
+      height: elemento.scrollHeight + 40,
+      pixelRatio: 2, // 🔥 más nitidez
+    })
+      .then((dataUrl) => {
+        // restaurar estilos
+        elemento.style.width = originalWidth;
+        elemento.style.height = originalHeight;
+        elemento.style.padding = originalPadding;
+
+        // crear PDF
+        const pdf = new jsPDF({
+          orientation: "landscape",
+          unit: "px",
+          format: [
+            elemento.scrollWidth + 40,
+            elemento.scrollHeight + 40,
+          ],
+        });
+
+        pdf.addImage(
+          dataUrl,
+          "PNG",
+          0,
+          0,
+          elemento.scrollWidth + 40,
+          elemento.scrollHeight + 40
+        );
+
+        pdf.save("Fuerza efectiva " + dayjs(fechaSeleccionada).format("DD/MM/YY") + ".pdf");
       })
-      .from(document.getElementById("planilla-pdf"))
-      .save();
+      .catch((err) => {
+        console.error("Error capturando pantalla:", err);
+
+        elemento.style.width = originalWidth;
+        elemento.style.height = originalHeight;
+        elemento.style.padding = originalPadding;
+      });
   };
+
+
+
 
   return (
     <div className="min-h-screen p-4">
@@ -178,7 +223,7 @@ const PlanillaDiaria = () => {
           className="border px-2 py-1 text-sm"
         />
         <button
-          onClick={exportarPDF}
+          onClick={capturar}
           className="px-3 py-1 bg-blue-600 text-white text-sm"
         >
           Exportar PDF
@@ -222,7 +267,7 @@ const PlanillaDiaria = () => {
                 <td className="border text-center">{encargado.grado}</td>
                 <td className="border">{encargado.nombre}</td>
                 <td className="border">
-                  {estadoPorFuncionario[encargado.id] ||
+                  {estadoPorFuncionario[encargado.id]?.funcion ||
                     "ENCARGADO DEPENDENCIA"}
                 </td>
                 <td className="border text-center">FULL TIME</td>
@@ -290,7 +335,7 @@ const PlanillaDiaria = () => {
                       {turno.nombre === "Destacados" ? "24hs" : formatHorario(turno.hora_inicio, turno.hora_fin)}
                     </td>
                     <td className="border text-center">{turno.nombre === "Destacados" ? "FULL TIME" : "8 horas"} </td>
-                    <td className="border">{estadoPorFuncionario[f.id]?.funcion === "Licencia Médica" || estadoPorFuncionario[f.id]?.funcion === "Licencia Anual"  ? "Hasta " + estadoPorFuncionario[f.id]?.fechaFin.slice(0, 5) : ""}</td>
+                    <td className="border">{estadoPorFuncionario[f.id]?.funcion === "Licencia Médica" || estadoPorFuncionario[f.id]?.funcion === "Licencia Anual" ? "Hasta " + estadoPorFuncionario[f.id]?.fechaFin?.slice(0, 5) : ""}</td>
                   </tr>
                 ))}
               </tbody>
