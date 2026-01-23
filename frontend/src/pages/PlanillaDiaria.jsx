@@ -14,6 +14,7 @@ const PlanillaDiaria = () => {
   const location = useLocation();
   const fechaInicial = location.state?.fecha || dayjs().format("YYYY-MM-DD");
   const [fechaSeleccionada, setFechaSeleccionada] = useState(fechaInicial);
+  const [funcionesEditadas, setFuncionesEditadas] = useState({});
 
   const {
     usuario,
@@ -40,6 +41,29 @@ const PlanillaDiaria = () => {
     if (!inicio || !fin) return "FULL TIME";
     return `${inicio.slice(0, 2)} A ${fin.slice(0, 2)}`;
   };
+
+
+  const funcionesTurnoT = [
+    "Agregar función",
+    "Chofer de Servicio",
+    "Acompañante de Móvil",
+    "Atención al Público",
+    "Oficina Jurídica",
+    "Egdo Turno/Chofer",
+    "Egdo Turno/Acomp.Móvil",
+  ];
+
+  const obtenerFuncion = (f) => {
+    const estado = estadoPorFuncionario[f.id]?.funcion;
+
+    if (estado === "T") {
+      return funcionesEditadas[f.id] || "Agregar función";
+    }
+
+    return estado || "Servicio";
+  };
+
+
 
   /* ================= TURNOS ================= */
   const ordenTurnos = [
@@ -135,6 +159,12 @@ const PlanillaDiaria = () => {
   const encargado = miDependencia.usuarios.find(
     (u) => u.rol_jerarquico === "JEFE_DEPENDENCIA"
   );
+
+  const estadoEncargado = estadoPorFuncionario[encargado?.id]?.funcion || "ENCARGADO DEPENDENCIA";
+
+  const fechaFinEncargado =
+    estadoPorFuncionario[encargado?.id]?.fechaFin || null;
+
 
   /* ================= CONTADOR GLOBAL ================= */
   let nro = 1;
@@ -249,13 +279,13 @@ const PlanillaDiaria = () => {
 
         {/* ================= ENCARGADO ================= */}
         {encargado && (
-          <table className="w-full bg-white border border-black border-collapse mb-3">
+          <table className="w-full bg-white border mb-3 table-fixed">
             <thead>
               <tr>
                 <th className="border w-[30px]">Nro.</th>
-                <th className="border w-[50px]">GRADO</th>
-                <th className="border w-[300px]">NOMBRE</th>
-                <th className="border w-[300px]">FUNCIÓN</th>
+                <th className="border w-[60px]">GRADO</th>
+                <th className="border min-w-[300px]">NOMBRE</th>
+                <th className="border min-w-[200px]">FUNCIÓN</th>
                 <th className="border w-[90px]">HORARIO</th>
                 <th className="border w-[80px]">RÉGIMEN</th>
                 <th className="border">OBSERVACIONES</th>
@@ -263,20 +293,27 @@ const PlanillaDiaria = () => {
             </thead>
             <tbody>
               <tr>
-                <td className="border text-center">{nro++}</td>
-                <td className="border text-center">{encargado.grado}</td>
-                <td className="border">{encargado.nombre}</td>
-                <td className="border">
-                  {estadoPorFuncionario[encargado.id]?.funcion ||
-                    "ENCARGADO DEPENDENCIA"}
+                <td className="border text-center align-middle">{nro++}</td>
+                <td className="border text-center align-middle">
+                  {encargado.grado}
                 </td>
-                <td className="border text-center">FULL TIME</td>
-                <td className="border text-center">24hs</td>
-                <td className="border"></td>
+                <td className="border align-middle break-words whitespace-normal">
+                  {encargado.nombre}
+                </td>
+                <td className="border align-middle break-words whitespace-normal">
+                  {estadoEncargado}
+                </td>
+                <td className="border text-center align-middle">FULL TIME</td>
+                <td className="border text-center align-middle">24hs</td>
+                <td className="border align-middle break-words whitespace-normal">
+                  {fechaFinEncargado ? `Hasta ${fechaFinEncargado.slice(0, 5)}` : ""}
+                </td>
               </tr>
             </tbody>
           </table>
         )}
+
+
 
         {/* ================= TURNOS ================= */}
         {misTurnos.map((turno) => {
@@ -329,8 +366,28 @@ const PlanillaDiaria = () => {
                     <td className="border text-center">{f.grado}</td>
                     <td className="border">{f.nombre}</td>
                     <td className="border">
-                      {estadoPorFuncionario[f.id]?.funcion || "Servicio"}
+                      {estadoPorFuncionario[f.id]?.funcion === "T" ? (
+                        <select
+                          value={funcionesEditadas[f.id] || "Agregar función"}
+                          onChange={(e) =>
+                            setFuncionesEditadas((prev) => ({
+                              ...prev,
+                              [f.id]: e.target.value,
+                            }))
+                          }
+                          className="w-full text-xs bg-transparent outline-none"
+                        >
+                          {funcionesTurnoT.map((opcion) => (
+                            <option key={opcion} value={opcion}>
+                              {opcion}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        obtenerFuncion(f)
+                      )}
                     </td>
+
                     <td className="border text-center">
                       {turno.nombre === "Destacados" ? "24hs" : formatHorario(turno.hora_inicio, turno.hora_fin)}
                     </td>
