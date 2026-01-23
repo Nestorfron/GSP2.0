@@ -164,13 +164,13 @@ const PlanillaDiaria = () => {
     const originalPadding = elemento.style.padding;
 
     elemento.style.padding = "20px";
-    elemento.style.width = elemento.scrollWidth + 40 + "px";
-    elemento.style.height = elemento.scrollHeight + 40 + "px";
+    elemento.style.width = elemento.scrollWidth + 20 + "px";
+    elemento.style.height = elemento.scrollHeight + 20 + "px";
 
     toPng(elemento, {
       cacheBust: true,
-      width: elemento.scrollWidth + 40,
-      height: elemento.scrollHeight + 40,
+      width: elemento.scrollWidth + 20,
+      height: elemento.scrollHeight + 20,
       pixelRatio: 2, // 🔥 más nitidez
     })
       .then((dataUrl) => {
@@ -184,8 +184,8 @@ const PlanillaDiaria = () => {
           orientation: "landscape",
           unit: "px",
           format: [
-            elemento.scrollWidth + 40,
-            elemento.scrollHeight + 40,
+            elemento.scrollWidth + 20,
+            elemento.scrollHeight + 20,
           ],
         });
 
@@ -194,8 +194,8 @@ const PlanillaDiaria = () => {
           "PNG",
           0,
           0,
-          elemento.scrollWidth + 40,
-          elemento.scrollHeight + 40
+          elemento.scrollWidth + 20,
+          elemento.scrollHeight + 20
         );
 
         pdf.save("Fuerza efectiva " + dayjs(fechaSeleccionada).format("DD/MM/YY") + ".pdf");
@@ -213,7 +213,7 @@ const PlanillaDiaria = () => {
 
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4">
       {/* CONTROLES */}
       <div className="flex gap-3 mb-4">
         <input
