@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from flask_mail import Message # type: ignore
 from extensions import mail
 from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
-from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda
+from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion
 import secrets
 from datetime import datetime, timedelta
 from .utils.email_utils import send_email
@@ -797,3 +797,44 @@ def eliminar_prenda(id):
     db.session.commit()
     return jsonify({'status': 'ok'}), 200  
 
+
+# -------------------------------------------------------------------
+# FUNCION
+# -------------------------------------------------------------------
+@api.route('/funcion', methods=['GET'])
+def listar_funcion():
+    data = Funcion.query.all()
+    return jsonify([x.serialize() for x in data]), 200
+
+@api.route('/funcion', methods=['POST'])
+@jwt_required()
+def crear_funcion():
+    body = request.json
+    descripcion = body.get("descripcion")
+
+    nueva = Funcion(descripcion=descripcion)
+    db.session.add(nueva)
+    db.session.commit()
+    return jsonify(nueva.serialize()), 201
+
+@api.route('/funcion/<int:id>', methods=['PUT'])
+@jwt_required()
+def actualizar_funcion(id):
+    body = request.json
+    funcion = Funcion.query.get(id)
+    if not funcion:
+        return jsonify({"error": "Funcion no encontrada"}), 404
+
+  
+    funcion.descripcion = body.get("descripcion", funcion.descripcion)
+
+    db.session.commit()
+    return jsonify(funcion.serialize()), 200
+
+@api.route('/funcion/<int:id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_funcion(id):
+    funcion = Funcion.query.get(id)
+    db.session.delete(funcion)
+    db.session.commit()
+    return jsonify({'status': 'ok'}), 200  

@@ -111,6 +111,8 @@ class Usuario(db.Model):
 
     turno_id = db.Column(db.Integer, db.ForeignKey('turnos.id'), nullable=True)
 
+    funcion_id = db.Column(db.Integer, db.ForeignKey('funcion.id'), nullable=True)
+
     estado = db.Column(db.String(50), nullable=True)
     
     zona = db.relationship('Zona', backref='usuarios', foreign_keys=[zona_id])
@@ -122,6 +124,8 @@ class Usuario(db.Model):
     suscripciones = db.relationship('Suscripcion', backref='usuario', lazy=True)
 
     prendas = db.relationship('Prenda', backref='usuario', lazy=True)
+
+    
 
     def serialize(self):
         return {
@@ -136,7 +140,8 @@ class Usuario(db.Model):
             'turno_id': self.turno_id,
             'estado': self.estado,
             'is_admin': self.is_admin,
-            'prendas': [p.serialize() for p in self.prendas]
+            'prendas': [p.serialize() for p in self.prendas],
+            'funcion': self.funcion_id
         }
 
 
@@ -317,4 +322,23 @@ class Prenda(db.Model):
 
     def __repr__(self):
         return f'<Prenda {self.nombre}>'
+
+# -------------------------
+# FUNCIÓN
+# -------------------------
+class Funcion(db.Model):
+    __tablename__ = 'funcion'
+    id = db.Column(db.Integer, primary_key=True)
+    descripcion = db.Column(db.Text)
+    
+
+    def serialize(self):
+        return {
+            'id': self.id,          
+            'descripcion': self.descripcion,
+            }
+
+    def __repr__(self):
+        return f'<Prenda {self.nombre}>'
+
 
