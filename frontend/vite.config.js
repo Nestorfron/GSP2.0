@@ -7,7 +7,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      strategies: 'injectManifest',       // <-- IMPORTANTE
+      strategies: "injectManifest",
+      injectManifest: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+      },
       srcDir: 'src',                      // <-- dónde está tu sw.js
       filename: 'sw.js',                  // <-- nombre del SW real
       registerType: 'autoUpdate',
