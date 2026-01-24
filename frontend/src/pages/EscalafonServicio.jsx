@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { Camera } from "lucide-react";
+import { Camera, CheckCircle, ClipboardList } from "lucide-react";
 import Loading from "../components/Loading";
 import BottomNavbar from "../components/BottomNavbar";
 import ModalAgregarGuardia from "../components/ModalAgregarGuardia";
@@ -188,8 +188,8 @@ export default function EscalafonServicio() {
             existente.tipo === "licencia"
               ? `licencias/${existente.id}`
               : existente.tipo === "licencia_medica"
-                ? `licencias-medicas/${existente.id}`
-                : `guardias/${existente.id}`;
+              ? `licencias-medicas/${existente.id}`
+              : `guardias/${existente.id}`;
           await deleteData(endpoint, token);
         }
 
@@ -232,8 +232,8 @@ export default function EscalafonServicio() {
               existente.tipo === "licencia"
                 ? `licencias/${existente.id}`
                 : existente.tipo === "licencia_medica"
-                  ? `licencias-medicas/${existente.id}`
-                  : `guardias/${existente.id}`;
+                ? `licencias-medicas/${existente.id}`
+                : `guardias/${existente.id}`;
             await deleteData(endpoint, token);
           }
 
@@ -434,13 +434,15 @@ export default function EscalafonServicio() {
         </div>
         {(usuario?.rol_jerarquico === "JEFE_DEPENDENCIA" ||
           usuario?.is_admin) && (
-            <button
-              onClick={() => imprimirFuncionariosPorTurno(startDate)}
-              className="bg-blue-600 text-white px-3 py-2 rounded ml-2"
-            >
-              Verificar
-            </button>
-          )}
+          <button
+            onClick={() => imprimirFuncionariosPorTurno(startDate)}
+            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg ml-2
+             flex items-center justify-center transition"
+            title="Verificar"
+          >
+            <CheckCircle className="w-5 h-5" />
+          </button>
+        )}
 
         <button
           onClick={() =>
@@ -448,15 +450,18 @@ export default function EscalafonServicio() {
               state: { fecha: startDate.format("YYYY-MM-DD") },
             })
           }
-          className="bg-blue-600 text-white px-3 py-2 rounded ml-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded ml-2
+             flex items-center gap-2 transition"
+             title="Planilla Diaria"
         >
-          Planilla Diaria
+          <ClipboardList className="w-5 h-5" />
         </button>
 
         <div className="ml-auto">
           <button
             onClick={capturar}
             className="bg-green-500 hover:bg-green-300 text-white px-4 py-2 rounded shadow flex items-center gap-2"
+            title="Capturar"
           >
             <Camera className="w-5 h-5" />
           </button>
@@ -540,13 +545,13 @@ export default function EscalafonServicio() {
                             return (
                               <td
                                 key={d.format("YYYY-MM-DD")}
-                                className={`border py-1 relative group ${turno?.nombre === "BROU"
+                                className={`border py-1 relative group ${
+                                  turno?.nombre === "BROU"
                                     ? clase
                                     : contenido === "BROU"
-                                      ? "text-xs text-white bg-blue-600"
-                                      : clase
-                                  }`}
-
+                                    ? "text-xs text-white bg-blue-600"
+                                    : clase
+                                }`}
                               >
                                 {contenido}
                                 {puedeEditar && (
