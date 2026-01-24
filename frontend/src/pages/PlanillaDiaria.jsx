@@ -52,6 +52,7 @@ const PlanillaDiaria = () => {
     "Acompañante de Móvil",
     "Atención al Público",
     "Oficina Jurídica",
+    "Encargado de Turno",
     "Egdo Turno/Chofer",
     "Egdo Turno/Acomp.Móvil",
     "Custodia",
@@ -239,7 +240,6 @@ const PlanillaDiaria = () => {
             unit: "px",
             format: [elemento.scrollWidth + 20, elemento.scrollHeight + 20],
           });
-
           pdf.addImage(
             dataUrl,
             "PNG",
@@ -270,7 +270,7 @@ const PlanillaDiaria = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4">
+    <div className="min-h-screen  bg-gradient-to-b from-blue-50 to-white p-4">
       {/* CONTROLES */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <input
@@ -287,7 +287,7 @@ const PlanillaDiaria = () => {
         </button>
       </div>
 
-      <div className="w-full overflow-x-auto">
+      <div className="max-w-screen-lg w-full overflow-x-auto m-auto">
         <div
           id="planilla-pdf"
           className="bg-gray-300 p-4 text-xs text-black mb-4 min-w-[1000px]"
