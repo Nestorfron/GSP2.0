@@ -16,6 +16,7 @@ export const AppProvider = ({ children }) => {
   const [licenciasPendientes, setLicenciasPendientes] = useState([]);
   const [licenciasRechazadas, setLicenciasRechazadas] = useState([]);
   const [notificaciones, setNotificaciones ] = useState([]);
+  const [vehiculos, setVehiculos] = useState([]);
   
 
 
@@ -32,26 +33,29 @@ export const AppProvider = ({ children }) => {
       setUsuario(usuarioData);
 
       if (usuarioData?.rol_jerarquico === "ADMINISTRADOR" || usuarioData?.rol_jerarquico === "JEFE_ZONA") {
-        const [jefaturasData, dependenciasData, guardiasData, licenciasData, notificacionesData] = await Promise.all([
+        const [jefaturasData, dependenciasData, guardiasData, licenciasData, notificacionesData, vehiculosData] = await Promise.all([
           fetchData("/jefaturas"),
           fetchData("/dependencias"),
           fetchData("/guardias"),
           fetchData("/licencias"),
-          fetchData("/notificaciones")
+          fetchData("/notificaciones"),
+          fetchData("/vehiculos")
         ]);
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
         setGuardias(guardiasData || []);
         setLicencias(licenciasData || []);
         setNotificaciones(notificacionesData || []);
+        setVehiculos(vehiculosData || []);
       } else if (usuarioData?.rol_jerarquico === "JEFE_DEPENDENCIA" || usuarioData?.rol_jerarquico === "FUNCIONARIO") {
-        const [jefaturasData, dependenciasData, turnosData, guardiasData, licenciasData, notificacionesData ] = await Promise.all([
+        const [jefaturasData, dependenciasData, turnosData, guardiasData, licenciasData, notificacionesData, vehiculosData ] = await Promise.all([
           fetchData("/jefaturas"),
           fetchData("/dependencias"),
           fetchData("/turnos"),
           fetchData("/guardias"),
           fetchData("/licencias"),
-          fetchData("/notificaciones")
+          fetchData("/notificaciones"),
+          fetchData("/vehiculos")
         ]);
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
@@ -67,6 +71,7 @@ export const AppProvider = ({ children }) => {
         const licenciasRechazadas = licenciasData.filter(l => l.estado === "rechazada");
         setLicenciasRechazadas(licenciasRechazadas || []);
         setNotificaciones(notificacionesData || []);
+        setVehiculos(vehiculosData || []);
       }
     } catch (error) {
       console.error("Error cargando datos de la app:", error);
@@ -131,6 +136,7 @@ export const AppProvider = ({ children }) => {
     setLicenciasPendientes([]);
     setLicenciasRechazadas([]);
     setNotificaciones([]);
+    setVehiculos([]);
     setUsuario(null);
 
   };
@@ -176,6 +182,7 @@ export const AppProvider = ({ children }) => {
         licenciasPendientes,
         licenciasRechazadas,
         notificaciones,
+        vehiculos,
         token,
         loading,
         setNewToken,
