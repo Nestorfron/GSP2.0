@@ -7,6 +7,8 @@ import BottomNavbar from "../components/BottomNavbar";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
 import Loading from "../components/Loading";
+import { ArrowDown } from "lucide-react";
+import IconButtom from "../components/IconButton";
 
 dayjs.extend(utc);
 
@@ -17,6 +19,18 @@ const PlanillaDiaria = () => {
   const [funcionesEditadas, setFuncionesEditadas] = useState({});
   const [situacionesEditadas, setSituacionesEditadas] = useState({});
   const [exportando, setExportando] = useState(false);
+  const [funcionesTurnoT, setFuncionesTurnoT] = useState([
+    "Chofer de Servicio",
+    "Acompañante de Móvil",
+    "Atención al Público",
+    "Oficina Jurídica",
+    "Encargado de Turno",
+    "Egdo Turno/Chofer",
+    "Egdo Turno/Acomp.Móvil",
+    "Custodia",
+    "Servicio Exterior",
+    "Curso",
+  ]);
 
   const {
     usuario,
@@ -26,6 +40,7 @@ const PlanillaDiaria = () => {
     licencias,
     extraordinarias,
     vehiculos,
+    funciones,
     loading,
   } = useAppContext();
 
@@ -46,19 +61,7 @@ const PlanillaDiaria = () => {
 
   const situacionVehiculo = ["FUERA DE SERVICIO"];
 
-  const funcionesTurnoT = [
-    "Agregar función",
-    "Chofer de Servicio",
-    "Acompañante de Móvil",
-    "Atención al Público",
-    "Oficina Jurídica",
-    "Encargado de Turno",
-    "Egdo Turno/Chofer",
-    "Egdo Turno/Acomp.Móvil",
-    "Custodia",
-    "Servicio Exterior",
-    "Curso",
-  ];
+  const nombreFuncion = (id) => funciones.find((f) => f.id === id)?.descripcion;
 
   const gradosEquivalencia = {
     1: "Agente",
@@ -72,17 +75,13 @@ const PlanillaDiaria = () => {
     9: "Comisario Mayor",
   };
 
-  const obtenerGrado = (grado) =>
-    gradosEquivalencia[grado] ?? grado;
-  
+  const obtenerGrado = (grado) => gradosEquivalencia[grado] ?? grado;
 
   const obtenerFuncion = (f) => {
-    const estado = estadoPorFuncionario[f.id]?.funcion;
-
+    const estado = estadoPorFuncionario[f.id]?.tipo;
     if (estado === "T") {
       return funcionesEditadas[f.id] || "Agregar función";
     }
-
     return estado || "Servicio";
   };
 
@@ -160,7 +159,7 @@ const PlanillaDiaria = () => {
     )
     .forEach((g) => {
       estadoPorFuncionario[g.usuario_id] = {
-        funcion: getFuncion(g.tipo),
+        tipo: getFuncion(g.tipo),
         fechaFin: null,
       };
     });
@@ -172,7 +171,7 @@ const PlanillaDiaria = () => {
 
     if (hoy >= ini && hoy <= fin) {
       estadoPorFuncionario[l.usuario_id] = {
-        funcion: getFuncion(l.tipo),
+        tipo: getFuncion(l.tipo),
         fechaFin: dayjs(l.fecha_fin).utc().format("DD/MM/YYYY"),
       };
     }
@@ -184,7 +183,7 @@ const PlanillaDiaria = () => {
   );
 
   const estadoEncargado =
-    estadoPorFuncionario[encargado?.id]?.funcion || "ENCARGADO DEPENDENCIA";
+    estadoPorFuncionario[encargado?.id]?.tipo || "ENCARGADO DEPENDENCIA";
 
   const fechaFinEncargado =
     estadoPorFuncionario[encargado?.id]?.fechaFin || null;
@@ -196,7 +195,7 @@ const PlanillaDiaria = () => {
   const totalFuncionarios = miDependencia.usuarios.length;
 
   const deducidos = miDependencia.usuarios.filter((u) => {
-    const estado = estadoPorFuncionario[u.id]?.funcion?.toUpperCase() || "";
+    const estado = estadoPorFuncionario[u.id]?.tipo?.toUpperCase() || "";
     return (
       estado.includes("LICENCIA MÉDICA") ||
       estado.includes("LICENCIA ANUAL") ||
@@ -279,12 +278,16 @@ const PlanillaDiaria = () => {
           onChange={(e) => setFechaSeleccionada(e.target.value)}
           className="border px-2 py-1 text-sm"
         />
-        <button
-          onClick={capturar}
-          className="px-3 py-1 bg-blue-600 text-white text-sm"
-        >
-          Exportar PDF
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={capturar}
+            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg ml-2
+             flex items-center justify-center transition"
+            title="Exportar PDF"
+          >
+            <ArrowDown className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       <div className="max-w-screen-lg w-full overflow-x-auto m-auto">
@@ -388,13 +391,16 @@ const PlanillaDiaria = () => {
                         ></td>
                       )}
                       <td className="border text-center">{nro++}</td>
-                      <td className="border text-center">{obtenerGrado(f.grado)}</td>
+                      <td className="border text-center">
+                        {obtenerGrado(f.grado)}
+                      </td>
                       <td className="border">{f.nombre}</td>
                       <td className="border px-2">
-                        {estadoPorFuncionario[f.id]?.funcion === "T" ? (
+                        {estadoPorFuncionario[f.id]?.tipo === "T" ? (
                           exportando ? (
                             <span className="block text-xs">
-                              {funcionesEditadas[f.id] ?? obtenerFuncion(f)}
+                              {funcionesEditadas[f.id] ??
+                                nombreFuncion(f.funcion_id)}
                             </span>
                           ) : (
                             <select
@@ -409,11 +415,11 @@ const PlanillaDiaria = () => {
                               }
                               className="w-full text-xs bg-transparent outline-none"
                             >
-                              <option value="Agregar función" disabled>
-                                Agregar función
+                              <option value={f.funcion_id}>
+                                {nombreFuncion(f.funcion_id)}
                               </option>
-                              {funcionesTurnoT.map((opcion) => (
-                                <option key={opcion} value={opcion}>
+                              {funcionesTurnoT.map((opcion, index) => (
+                                <option key={index} value={opcion}>
                                   {opcion}
                                 </option>
                               ))}
@@ -437,9 +443,9 @@ const PlanillaDiaria = () => {
                           : "8 horas"}{" "}
                       </td>
                       <td className="border px-1">
-                        {estadoPorFuncionario[f.id]?.funcion ===
+                        {estadoPorFuncionario[f.id]?.tipo ===
                           "Licencia Médica" ||
-                        estadoPorFuncionario[f.id]?.funcion === "Licencia Anual"
+                        estadoPorFuncionario[f.id]?.tipo === "Licencia Anual"
                           ? "Hasta " +
                             estadoPorFuncionario[f.id]?.fechaFin?.slice(0, 5)
                           : ""}

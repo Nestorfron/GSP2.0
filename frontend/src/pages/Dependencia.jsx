@@ -599,25 +599,24 @@ const Dependencia = () => {
             </div>
             {/* ================= Vehiculos ================= */}
             <div>
-              <IconButton
-                className="ms-auto"
-                icon={PlusCircle}
-                tooltip="Agregar vehículo"
-                onClick={() =>
-                  navigate(`/crear-vehiculo`, {
-                    state: { depId: miDependencia?.id },
-                  })
-                }
-                size="sm"
-              />
-
               {dependneciaVehiculos.length > 0 ? (
                 <div className="my-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">
                   {/* Título */}
                   <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl">
                     <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
-                      Vehículos de la dependencia
+                      Vehículos
                     </h3>
+                    <IconButton
+                      className="ms-auto"
+                      icon={PlusCircle}
+                      tooltip="Agregar vehículo"
+                      onClick={() =>
+                        navigate(`/crear-vehiculo`, {
+                          state: { depId: miDependencia?.id },
+                        })
+                      }
+                      size="sm"
+                    />
                   </div>
 
                   <div className="overflow-x-auto">

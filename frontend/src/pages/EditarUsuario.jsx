@@ -11,7 +11,7 @@ import BackButton from "../components/BackButton";
 export default function EditarUsuario() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { token, jefaturas, recargarDatos } = useAppContext();
+  const { token, jefaturas, funciones, recargarDatos } = useAppContext();
 
   const usuarioData = location.state?.usuario;
 
@@ -30,6 +30,7 @@ export default function EditarUsuario() {
       dependencia_id: "",
       zona_id: "",
       turno_id: null,
+      funcion_id: null,
       estado: "",
       is_admin: false,
     }
@@ -181,6 +182,26 @@ export default function EditarUsuario() {
               {turnosFiltrados.map((turno) => (
                 <option key={turno.id} value={turno.id}>
                   {turno.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Select Funcion */}
+          <div>
+            <label className="block text-sm font-medium text-blue-800 dark:text-blue-300 mb-1">
+              Función
+            </label>
+            <select
+              name="funcion_id"
+              value={formData.funcion_id || ""}
+              onChange={handleChange}
+              className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            >
+              <option value="">Seleccionar función</option>
+              {funciones.map((funcion) => (
+                <option key={funcion.id} value={funcion.id}>
+                  {funcion.descripcion}
                 </option>
               ))}
             </select>

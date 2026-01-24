@@ -96,7 +96,7 @@ export default function EditarVehiculo() {
             { name: "marca", placeholder: "Marca" },
             { name: "modelo", placeholder: "Modelo" },
             { name: "anio", placeholder: "Año", type: "number" },
-            { name: "estado", placeholder: "Estado" },
+            { name: "estado", placeholder: "Situacion" },
           ].map(({ name, placeholder, type = "text" }) => (
             <div key={name}>
               <input

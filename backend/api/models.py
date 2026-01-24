@@ -145,7 +145,7 @@ class Usuario(db.Model):
             'estado': self.estado,
             'is_admin': self.is_admin,
             'prendas': [p.serialize() for p in self.prendas],
-            'funcion': self.funcion_id
+            'funcion_id': self.funcion_id
         }
 
 

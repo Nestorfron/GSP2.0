@@ -432,35 +432,37 @@ export default function EscalafonServicio() {
             }
           />
         </div>
-        {(usuario?.rol_jerarquico === "JEFE_DEPENDENCIA" ||
-          usuario?.is_admin) && (
+
+        <div className="flex ms-auto">
+          {(usuario?.rol_jerarquico === "JEFE_DEPENDENCIA" ||
+            usuario?.is_admin) && (
+            <button
+              onClick={() => imprimirFuncionariosPorTurno(startDate)}
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg ml-2
+             flex items-center justify-center transition"
+              title="Verificar"
+            >
+              <CheckCircle className="w-5 h-5" />
+            </button>
+          )}
+
           <button
-            onClick={() => imprimirFuncionariosPorTurno(startDate)}
+            onClick={() =>
+              navigate("/planilla-diaria", {
+                state: { fecha: startDate.format("YYYY-MM-DD") },
+              })
+            }
             className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg ml-2
              flex items-center justify-center transition"
-            title="Verificar"
+            title="Planilla Diaria"
           >
-            <CheckCircle className="w-5 h-5" />
+            <ClipboardList className="w-5 h-5" />
           </button>
-        )}
 
-        <button
-          onClick={() =>
-            navigate("/planilla-diaria", {
-              state: { fecha: startDate.format("YYYY-MM-DD") },
-            })
-          }
-          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded ml-2
-             flex items-center gap-2 transition"
-             title="Planilla Diaria"
-        >
-          <ClipboardList className="w-5 h-5" />
-        </button>
-
-        <div className="ml-auto">
           <button
             onClick={capturar}
-            className="bg-green-500 hover:bg-green-300 text-white px-4 py-2 rounded shadow flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg ml-2
+             flex items-center justify-center transition"
             title="Capturar"
           >
             <Camera className="w-5 h-5" />

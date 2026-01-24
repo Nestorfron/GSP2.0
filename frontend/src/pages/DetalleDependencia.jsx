@@ -21,10 +21,8 @@ const DetalleDependencia = () => {
   const { usuario, jefaturas, licencias, guardias, token, loading } =
     useAppContext();
 
-
-
-  // ahora guardamos solo el ID cuando se selecciona desde el select
   const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState(null);
+
 
   const dependencias = jefaturas
     ?.flatMap(
@@ -38,13 +36,12 @@ const DetalleDependencia = () => {
       location.state?.dependencia || dependencias[0]
     );
 
-  // dependenciaFinal: usa el state si viene por navigate, si no busca por id en la lista
-
   const handleChange = (e) => {
     const id = Number(e.target.value) || null;
     const dependencia = dependencias.find((d) => d.id === id);
     setDependenciaFinal(dependencia);
   };
+
 
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) {
@@ -356,6 +353,68 @@ const DetalleDependencia = () => {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* ================= Vehículos ================= */} 
+            <div>
+              {dependenciaFinal.vehiculos.length > 0 ? (
+                <div className="my-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">
+                  {/* Título */}
+                  <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl">
+                    <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
+                      Vehículos
+                    </h3>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                      <thead className="bg-blue-50 dark:bg-slate-900">
+                        <tr>
+                          <th className="w-24 px-2 py-2 text-center text-sm font-medium">
+                            Matrícula
+                          </th>
+                          <th className="px-4 py-2 text-left text-sm font-medium">
+                            Marca
+                          </th>
+                          <th className="px-4 py-2 text-center text-sm font-medium">
+                            Modelo
+                          </th>
+                          <th className="px-4 py-2 text-center text-sm font-medium">
+                            Año
+                          </th>
+                          <th className="px-4 py-2 text-center text-sm font-medium">
+                            Situación
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                        {dependenciaFinal.vehiculos.map((v) => (
+                          <tr key={v.id}>
+                            <td className="text-center px-2 py-2 text-sm">
+                              {v.matricula}
+                            </td>
+                            <td className="px-4 py-2 text-sm">{v.marca}</td>
+                            <td className="px-4 py-2 text-sm text-center">
+                              {v.modelo}
+                            </td>
+                            <td className="px-4 py-2 text-sm text-center">
+                              {v.anio}
+                            </td>
+                            <td className="px-4 py-2 text-sm text-center">
+                              {v.estado}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 bg-white dark:bg-slate-800 dark:text-gray-400 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 p-4">
+                  No hay vehículos asignados a esta dependencia.
+                </p>
+              )}
             </div>
           </div>
         ) : (

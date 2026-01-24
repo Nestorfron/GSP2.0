@@ -303,6 +303,7 @@ def crear_usuario():
     estado = body.get("estado")
     is_admin = body.get("is_admin")
     turno_id = body.get("turno_id")
+    funcion_id = body.get("funcion_id")
 
 
     ROLES_VALIDOS = ['JEFE_ZONA', 'ADMINISTRADOR', 'FUNCIONARIO', 'JEFE_DEPENDENCIA']
@@ -351,7 +352,8 @@ def crear_usuario():
         zona_id=zona_id,
         is_admin=is_admin,
         estado=estado,
-        turno_id=turno_id
+        turno_id=turno_id,
+        funcion_id=funcion_id
     )
 
     db.session.add(nuevo_usuario)
@@ -391,13 +393,14 @@ def actualizar_usuario(id):
     zona_id = body.get("zona_id", usuario.zona_id)
     estado = body.get("estado", usuario.estado)
     is_admin = body.get("is_admin", usuario.is_admin)
+    funcion_id = body.get("funcion_id", usuario.funcion_id)
 
     # 🔥 ESTA ES LA PARTE IMPORTANTE
     turno_id = body.get("turno_id", usuario.turno_id)
     if turno_id in ("", None):
         turno_id = None
     else:
-        turno_id = int(turno_id)   # Garantiza entero válido
+        turno_id = int(turno_id)
 
     # -------------------------------
 
@@ -421,6 +424,7 @@ def actualizar_usuario(id):
     usuario.zona_id = zona_id
     usuario.estado = estado
     usuario.turno_id = turno_id
+    usuario.funcion_id = funcion_id
     usuario.is_admin = is_admin
 
     db.session.commit()
@@ -487,7 +491,8 @@ def setup_admin():
         zona_id=None,
         is_admin=True,
         estado="Activo",
-        turno_id=None
+        turno_id=None,
+        funcion_id=None
     )
 
     db.session.add(nuevo_admin)

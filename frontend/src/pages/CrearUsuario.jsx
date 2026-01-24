@@ -11,7 +11,7 @@ import BackButton from "../components/BackButton";
 
 export default function CrearUsuario() {
   const navigate = useNavigate();
-  const { jefaturas, token, usuario, recargarDatos } = useAppContext();
+  const { jefaturas, token, funciones, recargarDatos } = useAppContext();
 
   const dependencias =
     jefaturas?.flatMap((jefatura) =>
@@ -27,6 +27,7 @@ export default function CrearUsuario() {
     fecha_ingreso: dayjs().format("YYYY-MM-DD"),
     dependencia_id: "",
     turno_id: "",
+    funcion_id: "",
     estado: "Activo",
     is_admin: false,
   });
@@ -66,7 +67,7 @@ export default function CrearUsuario() {
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
-      ...(name === "dependencia_id" ? { turno_id: "" } : {}), // limpiar turno al cambiar dependencia
+      ...(name === "dependencia_id" ? { turno_id: "" } : {}), 
     }));
     validate(name, value);
   };
@@ -106,6 +107,7 @@ export default function CrearUsuario() {
       fecha_ingreso: dayjs().format("YYYY-MM-DD"),
       dependencia_id: "",
       turno_id: "",
+      funcion_id: "",
       estado: "Activo",
       is_admin: false,
     });
@@ -213,6 +215,21 @@ export default function CrearUsuario() {
             {turnosFiltrados.map((turno) => (
               <option key={turno.id} value={turno.id}>
                 {turno.nombre}
+              </option>
+            ))}
+          </select>
+
+          {/* Select Funcion */}
+          <select
+            name="funcion_id"
+            value={formData.funcion_id}
+            onChange={handleChange}
+            className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+          >
+            <option value="">Seleccionar función (opcional)</option>
+            {funciones.map((funcion) => (
+              <option key={funcion.id} value={funcion.id}>
+                {funcion.descripcion}
               </option>
             ))}
           </select>

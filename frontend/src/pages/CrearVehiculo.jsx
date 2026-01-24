@@ -104,7 +104,7 @@ export default function CrearVehiculo() {
             { name: "marca", placeholder: "Marca" },
             { name: "modelo", placeholder: "Modelo" },
             { name: "anio", placeholder: "Año", type: "number" },
-            { name: "estado", placeholder: "Estado (Ej: Operativo)" },
+            { name: "estado", placeholder: "Situación (Ej: SECCIONAL O FUERA DE SERVICIO)" },
           ].map(({ name, placeholder, type = "text" }) => (
             <div key={name}>
               <input
