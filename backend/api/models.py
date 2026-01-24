@@ -72,6 +72,7 @@ class Dependencia(db.Model):
 
     usuarios = db.relationship('Usuario', backref='dependencia', lazy=True)
     turnos = db.relationship('Turno', backref='dependencia', lazy=True)
+    vehiculos = db.relationship('Vehiculo', backref='dependencia', lazy=True)
 
     zonas_asignadas = db.relationship(
         'Zona',
@@ -80,6 +81,8 @@ class Dependencia(db.Model):
         foreign_keys='Zona.dependencia_id'
     )
 
+
+
     def serialize(self):
         return {
             'id': self.id,
@@ -87,7 +90,8 @@ class Dependencia(db.Model):
             'descripcion': self.descripcion,
             'zona_id': self.zona_id,
             'usuarios': [u.serialize() for u in self.usuarios],
-            'turnos': [t.serialize() for t in self.turnos]
+            'turnos': [t.serialize() for t in self.turnos],
+            'vehiculos': [v.serialize() for v in self.vehiculos]
         }
 
     def __repr__(self):
@@ -341,4 +345,34 @@ class Funcion(db.Model):
     def __repr__(self):
         return f'<Prenda {self.nombre}>'
 
+# -------------------------
+# VEHICULOS
+# -------------------------
+
+class Vehiculo(db.Model):
+    __tablename__ = 'vehiculos'
+    id = db.Column(db.Integer, primary_key=True)
+    matricula = db.Column(db.String(100), nullable=False)
+    marca = db.Column(db.String(100), nullable=False)
+    modelo = db.Column(db.String(100), nullable=False)
+    anio = db.Column(db.Integer, nullable=False)
+    estado = db.Column(db.String(50), nullable=False)
+
+    dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=False)
+    
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'matricula': self.matricula,
+            'marca': self.marca,
+            'modelo': self.modelo,
+            'anio': self.anio,
+            'estado': self.estado,
+            'dependencia_id': self.dependencia_id
+        }
+
+    def __repr__(self):
+        return f'<Vehiculo {self.matricula}>'
+        
 

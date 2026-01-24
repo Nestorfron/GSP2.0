@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from flask_mail import Message # type: ignore
 from extensions import mail
 from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
-from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion
+from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion, Vehiculo
 import secrets
 from datetime import datetime, timedelta
 from .utils.email_utils import send_email
@@ -838,3 +838,55 @@ def eliminar_funcion(id):
     db.session.delete(funcion)
     db.session.commit()
     return jsonify({'status': 'ok'}), 200  
+
+# -------------------------------------------------------------------
+# VEHICULOS
+# -------------------------------------------------------------------
+@api.route('/vehiculos', methods=['GET'])
+def listar_vehiculos():
+    data = Vehiculo.query.all()
+    return jsonify([x.serialize() for x in data]), 200
+
+@api.route('/vehiculos', methods=['POST'])
+@jwt_required()
+def crear_vehiculo():
+    body = request.json
+    matricula = body.get("matricula")
+    marca = body.get("marca")
+    modelo = body.get("modelo")
+    anio = body.get("anio")
+    estado = body.get("estado")
+    dependencia_id = body.get("dependencia_id")
+
+    nuevo = Vehiculo(matricula=matricula, marca=marca, modelo=modelo, anio=anio, estado=estado, dependencia_id=dependencia_id)
+    db.session.add(nuevo)
+    db.session.commit()
+    return jsonify(nuevo.serialize()), 201
+
+@api.route('/vehiculos/<int:id>', methods=['PUT'])
+@jwt_required()
+def actualizar_vehiculo(id):
+    body = request.json
+    vehiculo = Vehiculo.query.get(id)
+    if not vehiculo:
+        return jsonify({"error": "Vehiculo no encontrado"}), 404
+
+    vehiculo.matricula = body.get("matricula", vehiculo.matricula)
+    vehiculo.marca = body.get("marca", vehiculo.marca)
+    vehiculo.modelo = body.get("modelo", vehiculo.modelo)
+    vehiculo.anio = body.get("anio", vehiculo.anio)
+    vehiculo.estado = body.get("estado", vehiculo.estado)
+    vehiculo.dependencia_id = body.get("dependencia_id", vehiculo.dependencia_id)
+
+    db.session.commit()
+    return jsonify(vehiculo.serialize()), 200
+
+@api.route('/vehiculos/<int:id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_vehiculo(id):
+    vehiculo = Vehiculo.query.get(id)
+    db.session.delete(vehiculo)
+    db.session.commit() 
+    return jsonify({'status': 'ok'}), 200
+
+

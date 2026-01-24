@@ -22,7 +22,6 @@ dayjs.extend(utc);
 import IconButton from "../components/IconButton";
 import Logo from "../assets/logo.png";
 
-
 const Dependencia = () => {
   const navigate = useNavigate();
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
@@ -36,6 +35,7 @@ const Dependencia = () => {
     extraordinarias,
     licencias,
     licenciasPendientes,
+    vehiculos,
     token,
     loading,
     recargarDatos,
@@ -43,7 +43,6 @@ const Dependencia = () => {
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
   const [guardiaAEliminar, setGuardiaAEliminar] = useState(null);
   const [verTodas, setVerTodas] = useState(false);
-
 
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) {
@@ -170,6 +169,10 @@ const Dependencia = () => {
     handleDelete(id);
   };
 
+  const dependneciaVehiculos = vehiculos.filter(
+    (v) => v.dependencia_id === miDependencia?.id
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
       <img
@@ -269,7 +272,7 @@ const Dependencia = () => {
               </div>
 
               {(verTodas ? extraordinarias : extraordinariasDesdeHoy).length >
-                0 ? (
+              0 ? (
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">
                   <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl">
                     <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
@@ -313,11 +316,11 @@ const Dependencia = () => {
                                 .format("DD/MM HH:mm")}{" "}
                               -{" "}
                               {dayjs(g.fecha_inicio).utc().format("DD/MM") ===
-                                dayjs(g.fecha_fin).utc().format("DD/MM")
+                              dayjs(g.fecha_fin).utc().format("DD/MM")
                                 ? dayjs(g.fecha_fin).utc().format("HH:mm")
                                 : dayjs(g.fecha_fin)
-                                  .utc()
-                                  .format("DD/MM HH:mm")}
+                                    .utc()
+                                    .format("DD/MM HH:mm")}
                             </td>
                             <td className="border px-4 py-2 text-sm text-center">
                               {g.tipo} - {g.comentario}
@@ -401,7 +404,7 @@ const Dependencia = () => {
                               </th>
                               <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
                                 {fechaSeleccionada ===
-                                  dayjs().format("YYYY-MM-DD")
+                                dayjs().format("YYYY-MM-DD")
                                   ? "Hoy"
                                   : dayjs(fechaSeleccionada).format("DD/MM")}
                               </th>
@@ -425,12 +428,13 @@ const Dependencia = () => {
                                       {abreviarNombre(f.nombre)}
                                     </td>
                                     <td
-                                      className={`border px-4 py-1 text-sm text-center py-1 relative group ${turnoPorFuncionario?.nombre === "BROU"
-                                        ? clase
-                                        : contenido === "BROU"
+                                      className={`border px-4 py-1 text-sm text-center py-1 relative group ${
+                                        turnoPorFuncionario?.nombre === "BROU"
+                                          ? clase
+                                          : contenido === "BROU"
                                           ? "text-xs text-white bg-blue-600"
                                           : clase
-                                        }`}
+                                      }`}
                                     >
                                       {contenido}
                                     </td>
@@ -603,13 +607,100 @@ const Dependencia = () => {
                 </table>
               </div>
             </div>
+            {/* ================= Vehiculos ================= */}
+            <div>
+              <IconButton
+                className="ms-auto"
+                icon={PlusCircle}
+                tooltip="Agregar vehículo"
+                onClick={() =>
+                  navigate(`/crear-vehiculo`, {
+                    state: { depId: miDependencia?.id },
+                  })
+                }
+                size="sm"
+              />
+
+              {dependneciaVehiculos.length > 0 ? (
+                <div className="my-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">
+                  {/* Título */}
+                  <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl">
+                    <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
+                      Vehículos de la dependencia
+                    </h3>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                      <thead className="bg-blue-50 dark:bg-slate-900">
+                        <tr>
+                          <th className="w-24 px-2 py-2 text-center text-sm font-medium">
+                            Matrícula
+                          </th>
+                          <th className="px-4 py-2 text-left text-sm font-medium">
+                            Marca
+                          </th>
+                          <th className="px-4 py-2 text-center text-sm font-medium">
+                            Modelo
+                          </th>
+                          <th className="px-4 py-2 text-center text-sm font-medium">
+                            Año
+                          </th>
+                          <th className="px-4 py-2 text-center text-sm font-medium">
+                            Situación
+                          </th>
+                          <th className="px-4 py-2 text-center text-sm font-medium">
+                            …
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                        {dependneciaVehiculos.map((v) => (
+                          <tr key={v.id}>
+                            <td className="text-center px-2 py-2 text-sm">
+                              {v.matricula}
+                            </td>
+                            <td className="px-4 py-2 text-sm">{v.marca}</td>
+                            <td className="px-4 py-2 text-sm text-center">
+                              {v.modelo}
+                            </td>
+                            <td className="px-4 py-2 text-sm text-center">
+                              {v.anio}
+                            </td>
+                            <td className="px-4 py-2 text-sm text-center">
+                              {v.estado}
+                            </td>
+                            <td className="px-2 py-2 text-center">
+                              <IconButton
+                                icon={Edit}
+                                tooltip="Editar"
+                                onClick={() =>
+                                  navigate(`/editar-vehiculo`, {
+                                    state: { vehiculo: v },
+                                  })
+                                }
+                                size="sm"
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 bg-white dark:bg-slate-800 dark:text-gray-400 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 p-4">
+                  No hay vehículos asignados a esta dependencia.
+                </p>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-center text-gray-600 dark:text-gray-400">
             Tenés acceso limitado a la información.
           </p>
         )}
-        
 
         {/* Modal confirmación eliminar */}
         <AnimatePresence>
