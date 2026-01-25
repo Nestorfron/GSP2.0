@@ -313,20 +313,22 @@ const PlanillaDiaria = () => {
 
           {/* ================= ENCARGADO ================= */}
           {encargado && (
-            <table className="w-full bg-white border mb-3 table-fixed">
+            <table className="w-full mb-3">
               <thead>
-                <tr>
+                <tr className="bg-white">
+                  <th className="w-[90px] bg-gray-300"></th>
                   <th className="border w-[30px]">Nro.</th>
-                  <th className="border w-[60px]">GRADO</th>
-                  <th className="border min-w-[300px]">NOMBRE</th>
+                  <th className="border w-[50px]">GRADO</th>
+                  <th className="border min-w-[250px]">NOMBRE</th>
                   <th className="border min-w-[200px]">FUNCIÓN</th>
                   <th className="border w-[90px]">HORARIO</th>
                   <th className="border w-[80px]">RÉGIMEN</th>
-                  <th className="border">OBSERVACIONES</th>
+                  <th className="border w-[120px]">OBSERVACIONES</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr className="bg-white">
+                  <td className="bg-gray-300"></td>
                   <td className="border text-center align-middle">{nro++}</td>
                   <td className="border text-center align-middle">
                     {obtenerGrado(encargado.grado)}
@@ -334,7 +336,7 @@ const PlanillaDiaria = () => {
                   <td className="border align-middle break-words whitespace-normal">
                     {encargado.nombre}
                   </td>
-                  <td className="border align-middle break-words whitespace-normal">
+                  <td className="border align-middle break-words whitespace-normal px-1">
                     {estadoEncargado}
                   </td>
                   <td className="border text-center align-middle">FULL TIME</td>
@@ -368,17 +370,17 @@ const PlanillaDiaria = () => {
             const nombreTurno = getNombreTurno(turno.nombre);
 
             return (
-              <table key={turno.id} className="w-full bg-white mb-3">
+              <table key={turno.id} className="w-full mb-3">
                 <thead>
-                  <tr>
-                    <th className=" w-[90px] bg-yellow-300">{nombreTurno}</th>
+                  <tr className="bg-white">
+                    <th className="w-[90px] bg-yellow-300">{nombreTurno}</th>
                     <th className="border w-[30px]">Nro.</th>
                     <th className="border w-[50px]">GRADO</th>
                     <th className="border min-w-[250px]">NOMBRE</th>
                     <th className="border min-w-[200px]">FUNCIÓN</th>
                     <th className="border w-[90px]">HORARIO</th>
                     <th className="border w-[80px]">RÉGIMEN</th>
-                    <th className="border">OBSERVACIONES</th>
+                    <th className="border w-[120px]">OBSERVACIONES</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -390,15 +392,15 @@ const PlanillaDiaria = () => {
                           className="bg-gray-300"
                         ></td>
                       )}
-                      <td className="border text-center">{nro++}</td>
-                      <td className="border text-center">
+                      <td className="border text-center bg-white">{nro++}</td>
+                      <td className="border text-center bg-white">
                         {obtenerGrado(f.grado)}
                       </td>
-                      <td className="border">{f.nombre}</td>
-                      <td className="border px-2">
+                      <td className="border bg-white">{f.nombre}</td>
+                      <td className="border bg-white px-2">
                         {estadoPorFuncionario[f.id]?.tipo === "T" ? (
                           exportando ? (
-                            <span className="block text-xs">
+                            <span className="block bg-white text-xs">
                               {funcionesEditadas[f.id] ??
                                 nombreFuncion(f.funcion_id)}
                             </span>
@@ -413,7 +415,7 @@ const PlanillaDiaria = () => {
                                   [f.id]: e.target.value,
                                 }))
                               }
-                              className="w-full text-xs bg-transparent outline-none"
+                              className="w-full text-xs bg-white outline-none"
                             >
                               <option value={f.funcion_id}>
                                 {nombreFuncion(f.funcion_id)}
@@ -426,23 +428,23 @@ const PlanillaDiaria = () => {
                             </select>
                           )
                         ) : (
-                          <span className="block  text-xs">
+                          <span className="block bg-white text-xs">
                             {obtenerFuncion(f)}
                           </span>
                         )}
                       </td>
 
-                      <td className="border text-center">
+                      <td className="border bg-white text-center">
                         {turno.nombre === "Destacados"
                           ? "24hs"
                           : formatHorario(turno.hora_inicio, turno.hora_fin)}
                       </td>
-                      <td className="border text-center">
+                      <td className="border bg-white text-center">
                         {turno.nombre === "Destacados"
                           ? "FULL TIME"
                           : "8 horas"}{" "}
                       </td>
-                      <td className="border px-1">
+                      <td className="border bg-white px-1">
                         {estadoPorFuncionario[f.id]?.tipo ===
                           "Licencia Médica" ||
                         estadoPorFuncionario[f.id]?.tipo === "Licencia Anual"
@@ -481,7 +483,7 @@ const PlanillaDiaria = () => {
                   <tr key={m.id}>
                     <td className="border text-center">{index + 1}</td>
 
-                    <td className="border text-center font-semibold">
+                    <td className="border text-center">
                       {m.matricula}
                     </td>
 

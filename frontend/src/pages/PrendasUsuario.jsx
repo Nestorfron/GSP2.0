@@ -41,7 +41,7 @@ const PrendasUsuario = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded shadow p-2 w-full max-w-md border border-blue-100 dark:border-slate-800 mt-2">
+    <div className="bg-white dark:bg-slate-900 rounded shadow p-2 w-full border border-blue-100 dark:border-slate-800 mt-2">
 
       {/* Header */}
       <div className="flex justify-between items-center mb-3">

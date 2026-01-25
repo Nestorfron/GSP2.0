@@ -60,10 +60,10 @@ export default function CrearJefatura() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-      <div className="flex-grow flex flex-col items-center p-4 pb-24">
+      <div className="flex-grow flex flex-col items-center p-4 pb-24 flex-grow flex flex-col items-center p-4 pb-24 dark:bg-slate-900  p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4"
+          className="w-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <PlusCircle

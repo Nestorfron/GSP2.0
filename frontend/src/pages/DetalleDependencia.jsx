@@ -123,7 +123,7 @@ const DetalleDependencia = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-      <main className="flex-1 px-6 py-8 space-y-6 mb-14">
+      <main className="flex-1 px-6 py-8 space-y-6 mb-14 bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto border border-blue-100 dark:border-slate-800">
         <div className="flex flex-col items-center justify-center gap-2 mb-4">
           <select
             name="dependencia"
@@ -214,7 +214,7 @@ const DetalleDependencia = () => {
                   return (
                     <div
                       key={t.id}
-                      className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto"
+                      className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto my-4"
                     >
                       {/* Título del turno */}
                       <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl">

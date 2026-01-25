@@ -64,7 +64,7 @@ const Zona = () => {
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
              w-72 opacity-5 blur-sm pointer-events-none"
       />
-      <main className="flex-1 px-6 py-8 space-y-8 mb-20">
+      <main className="flex-1 px-6 py-8 space-y-8 mb-20 bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto border border-blue-100 dark:border-slate-800">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
             Bienvenido, {usuario.nombre}
