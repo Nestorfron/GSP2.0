@@ -141,11 +141,11 @@ const PlanillaDiaria = () => {
       case "D":
         return "Licencia Semanal";
       case "1ER":
-        return "Primer Turno";
+        return "Primer Turno (06 a 14)";
       case "2DO":
-        return "Segundo Turno";
+        return "Segundo Turno (14 a 22)";
       case "3ER":
-        return "Tercer Turno";
+        return "Tercer Turno (22 a 06)";
       default:
         return funcion;
     }
@@ -320,10 +320,10 @@ const PlanillaDiaria = () => {
                   <th className="border w-[30px]">Nro.</th>
                   <th className="border w-[50px]">GRADO</th>
                   <th className="border min-w-[250px]">NOMBRE</th>
-                  <th className="border min-w-[200px]">FUNCIÓN</th>
+                  <th className="border min-w-[180px]">FUNCIÓN</th>
                   <th className="border w-[90px]">HORARIO</th>
                   <th className="border w-[80px]">RÉGIMEN</th>
-                  <th className="border w-[120px]">OBSERVACIONES</th>
+                  <th className="border w-[150px]">OBSERVACIONES</th>
                 </tr>
               </thead>
               <tbody>
@@ -377,10 +377,10 @@ const PlanillaDiaria = () => {
                     <th className="border w-[30px]">Nro.</th>
                     <th className="border w-[50px]">GRADO</th>
                     <th className="border min-w-[250px]">NOMBRE</th>
-                    <th className="border min-w-[200px]">FUNCIÓN</th>
+                    <th className="border min-w-[180px]">FUNCIÓN</th>
                     <th className="border w-[90px]">HORARIO</th>
                     <th className="border w-[80px]">RÉGIMEN</th>
-                    <th className="border w-[120px]">OBSERVACIONES</th>
+                    <th className="border w-[150px]">OBSERVACIONES</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -451,6 +451,46 @@ const PlanillaDiaria = () => {
                           ? "Hasta " +
                             estadoPorFuncionario[f.id]?.fechaFin?.slice(0, 5)
                           : ""}
+                        {turno.nombre === "Destacados" &&
+                        estadoPorFuncionario[f.id]?.tipo !==
+                          "Licencia Semanal" &&
+                        estadoPorFuncionario[f.id]?.tipo !==
+                          "Licencia Médica" &&
+                        estadoPorFuncionario[f.id]?.tipo !== 
+                        "Licencia Anual" &&
+                        estadoPorFuncionario[f.id]?.tipo !== "T" ? (
+                          exportando ? (
+                            <span className="block bg-white text-xs">
+                              {funcionesEditadas[f.id] ??
+                                nombreFuncion(f.funcion_id)}
+                            </span>
+                          ) : (
+                            <select
+                              value={
+                                funcionesEditadas[f.id] ?? "Agregar función"
+                              }
+                              onChange={(e) =>
+                                setFuncionesEditadas((prev) => ({
+                                  ...prev,
+                                  [f.id]: e.target.value,
+                                }))
+                              }
+                              className="w-full text-xs bg-white outline-none"
+                            >
+                              <option value={f.funcion_id}>
+                                {nombreFuncion(f.funcion_id)}
+                              </option>
+                              {funcionesTurnoT.map((opcion, index) => (
+                                <option key={index} value={opcion}>
+                                  {opcion}
+                                </option>
+                              ))}
+                            </select>
+                          )
+                        ) : (
+                          ""
+                        )}
+                        {""}
                       </td>
                     </tr>
                   ))}
@@ -483,9 +523,7 @@ const PlanillaDiaria = () => {
                   <tr key={m.id}>
                     <td className="border text-center">{index + 1}</td>
 
-                    <td className="border text-center">
-                      {m.matricula}
-                    </td>
+                    <td className="border text-center">{m.matricula}</td>
 
                     <td className="border px-2">
                       {exportando ? (
