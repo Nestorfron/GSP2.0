@@ -6,9 +6,11 @@ import {
   Package,
   PlusCircle,
   Pencil,
+  Trash,
 } from "lucide-react";
 import IconButton from "../components/IconButton";
 import ModalAgregarPrenda from "../components/ModalAgregarPrenda";
+import { deleteData } from "../utils/api";
 
 /* Utils */
 const iconoPorPrenda = (nombre) => {
@@ -19,7 +21,7 @@ const iconoPorPrenda = (nombre) => {
 };
 
 const PrendasUsuario = () => {
-  const { usuario } = useAppContext();
+  const { usuario, token } = useAppContext();
 
   const [prendas, setPrendas] = useState(usuario?.prendas ?? []);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -28,6 +30,15 @@ const PrendasUsuario = () => {
   if (!usuario) return null;
 
   const sinPrendas = prendas.length === 0;
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteData(`/prendas/${id}`, token);
+      setPrendas((prev) => prev.filter((p) => p.id !== id));
+    } catch (error) {
+      alert("No se pudo eliminar la prenda.");
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded shadow p-2 w-full max-w-md border border-blue-100 dark:border-slate-800 mt-2">
@@ -96,6 +107,13 @@ const PrendasUsuario = () => {
                           setPrendaEditar(p);
                           setMostrarModal(true);
                         }}
+                      />
+                      <IconButton
+                        icon={Trash}
+                        tooltip="Eliminar"
+                        size="xs"
+                        className="ms-3 text-red-600"
+                        onClick={() => handleDelete(p.id)}
                       />
                     </td>
                   </tr>

@@ -12,6 +12,7 @@ export default function ModalAgregarPrenda({
   const [talle, setTalle] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const { recargarDatos, token } = useAppContext();
+  const esBotas = nombre === "Botas";
 
   const esEdicion = Boolean(prenda);
 
@@ -70,22 +71,34 @@ export default function ModalAgregarPrenda({
           <option value="Pantalón">Pantalón</option>
           <option value="Buzo">Buzo</option>
           <option value="Campera">Campera</option>
+          <option value="Kepi">Kepi</option>
+          <option value="Botas">Botas</option>
           <option value="Chaleco balístico">Chaleco balístico</option>
         </select>
 
         {/* Talle */}
-        <select
-          value={talle}
-          onChange={(e) => setTalle(e.target.value)}
-          className="w-full mb-3 border rounded px-2 py-1 dark:bg-slate-700 dark:text-gray-200"
-        >
-          <option value="">Seleccionar talle</option>
-          {TALLES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+        {esBotas ? (
+          <input
+            type="text"
+            value={talle}
+            onChange={(e) => setTalle(e.target.value)}
+            placeholder="Ingrese talle de calzado"
+            className="w-full mb-3 border rounded px-2 py-1 dark:bg-slate-700 dark:text-gray-200"
+          />
+        ) : (
+          <select
+            value={talle}
+            onChange={(e) => setTalle(e.target.value)}
+            className="w-full mb-3 border rounded px-2 py-1 dark:bg-slate-700 dark:text-gray-200"
+          >
+            <option value="">Seleccionar talle</option>
+            {TALLES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        )}
 
         {/* Observaciones */}
         <textarea
