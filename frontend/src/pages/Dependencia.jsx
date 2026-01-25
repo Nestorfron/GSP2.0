@@ -182,7 +182,7 @@ const Dependencia = () => {
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
              w-72 opacity-5 blur-sm pointer-events-none"
       />
-      <main className="flex-1 px-6 py-8 space-y-6 mb-14 flex-grow lg:w-1/2 xl:max-w-3xl mx-auto">
+      <main className="flex-1 px-6 py-8 space-y-6 p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto">
         {/* Encabezado */}
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
@@ -518,7 +518,7 @@ const Dependencia = () => {
                               "-"}
                           </td>
                           <td className="px-2 py-2 text-center">
-                            <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-center justify-center">
+                            <div className="flex  sm:flex-row gap-1 sm:gap-2 items-center justify-center">
                               {/* Botón Licencias */}
                               <div className="relative group">
                                 <button
