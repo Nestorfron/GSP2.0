@@ -11,7 +11,7 @@ export default function ModalAgregarPrenda({
   const [nombre, setNombre] = useState("");
   const [talle, setTalle] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const { recargarDatos, token } = useAppContext();
+  const { recargarPrendas, token } = useAppContext();
   const esBotas = nombre === "Botas";
 
   const esEdicion = Boolean(prenda);
@@ -45,7 +45,7 @@ export default function ModalAgregarPrenda({
         : await postData("/prendas", payload, token);
 
       onPrendaGuardada?.(data);
-      recargarDatos();
+      recargarPrendas();
       onCerrar();
     } catch (error) {
       alert("No se pudo guardar la prenda.");

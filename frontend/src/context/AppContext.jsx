@@ -6,6 +6,7 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [usuario, setUsuario] = useState(null);
+  const [usuarios, setUsuarios] = useState([]);
   const [jefaturas, setJefaturas] = useState([]);
   const [zonas, setZonas] = useState([]);
   const [dependencias, setDependencias] = useState([]);
@@ -18,6 +19,7 @@ export const AppProvider = ({ children }) => {
   const [notificaciones, setNotificaciones ] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [funciones, setFunciones] = useState([]);
+  const [servicios, setServicios] = useState([]);
   
 
 
@@ -34,14 +36,15 @@ export const AppProvider = ({ children }) => {
       setUsuario(usuarioData);
 
       if (usuarioData?.rol_jerarquico === "ADMINISTRADOR" || usuarioData?.rol_jerarquico === "JEFE_ZONA") {
-        const [jefaturasData, dependenciasData, guardiasData, licenciasData, notificacionesData, vehiculosData, funcionesData] = await Promise.all([
+        const [jefaturasData, dependenciasData, guardiasData, licenciasData, notificacionesData, vehiculosData, funcionesData, serviciosData] = await Promise.all([
           fetchData("/jefaturas"),
           fetchData("/dependencias"),
           fetchData("/guardias"),
           fetchData("/licencias"),
           fetchData("/notificaciones"),
           fetchData("/vehiculos"),
-          fetchData("/funcion")
+          fetchData("/funcion"),
+          fetchData("/servicios"),
         ]);
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
@@ -50,8 +53,9 @@ export const AppProvider = ({ children }) => {
         setNotificaciones(notificacionesData || []);
         setVehiculos(vehiculosData || []);
         setFunciones(funcionesData || []);
+        setServicios(serviciosData || []);
       } else if (usuarioData?.rol_jerarquico === "JEFE_DEPENDENCIA" || usuarioData?.rol_jerarquico === "FUNCIONARIO") {
-        const [jefaturasData, dependenciasData, turnosData, guardiasData, licenciasData, notificacionesData, vehiculosData, funcionesData ] = await Promise.all([
+        const [jefaturasData, dependenciasData, turnosData, guardiasData, licenciasData, notificacionesData, vehiculosData, funcionesData, serviciosData ] = await Promise.all([
           fetchData("/jefaturas"),
           fetchData("/dependencias"),
           fetchData("/turnos"),
@@ -59,7 +63,8 @@ export const AppProvider = ({ children }) => {
           fetchData("/licencias"),
           fetchData("/notificaciones"),
           fetchData("/vehiculos"),
-          fetchData("/funcion")
+          fetchData("/funcion"),
+          fetchData("/servicios"),
         ]);
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
@@ -77,6 +82,7 @@ export const AppProvider = ({ children }) => {
         setNotificaciones(notificacionesData || []);
         setVehiculos(vehiculosData || []);
         setFunciones(funcionesData || []);
+        setServicios(serviciosData || []);
       }
     } catch (error) {
       console.error("Error cargando datos de la app:", error);
@@ -143,6 +149,7 @@ export const AppProvider = ({ children }) => {
     setNotificaciones([]);
     setVehiculos([]);
     setFunciones([]);
+    setServicios([]);
     setUsuario(null);
 
   };
@@ -170,6 +177,50 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const recargarUsuarios = async () => {
+    try {
+      const usuariosData = await fetchData("/usuarios");
+      setUsuarios(usuariosData || []);
+    } catch (error) {
+      console.error("Error cargando datos de usuarios:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const recargarVehiculos = async () => {
+    try {
+      const vehiculosData = await fetchData("/vehiculos");
+      setVehiculos(vehiculosData || []);
+    } catch (error) {
+      console.error("Error cargando datos de vehiculos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const recargarServicios = async () => {
+    try {
+      const serviciosData = await fetchData("/servicios");
+      setServicios(serviciosData || []);
+    } catch (error) {
+      console.error("Error cargando datos de servicios:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const recargarPrendas = async () => {
+    try {
+      const prendasData = await fetchData("/prendas");
+      setPrendas(prendasData || []);
+    } catch (error) {
+      console.error("Error cargando datos de prendas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const recargarDatos = async () => {
     await fetchAppData();
   };
@@ -190,6 +241,7 @@ export const AppProvider = ({ children }) => {
         notificaciones,
         vehiculos,
         funciones,
+        servicios,
         token,
         loading,
         setNewToken,
@@ -199,6 +251,10 @@ export const AppProvider = ({ children }) => {
         recargarGuaridas,
         recargarNotificaciones,
         setUsuario,
+        recargarUsuarios,
+        recargarVehiculos,
+        recargarServicios,
+        recargarPrendas,
       }}
     >
       {children}

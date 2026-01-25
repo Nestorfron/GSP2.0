@@ -11,7 +11,7 @@ import BackButton from "../components/BackButton";
 export default function EditarUsuario() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { token, jefaturas, funciones, recargarDatos } = useAppContext();
+  const { token, jefaturas, funciones, recargarUsuarios } = useAppContext();
 
   const usuarioData = location.state?.usuario;
 
@@ -74,7 +74,7 @@ export default function EditarUsuario() {
     try {
       await putData(`usuarios/${formData.id}`, formData, token);
       setSuccess(true);
-      recargarDatos();
+      recargarUsuarios();
     } catch (err) {
       alert(`❌ Error al actualizar: ${err.message}`);
     } finally {

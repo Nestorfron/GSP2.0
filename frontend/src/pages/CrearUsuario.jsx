@@ -11,7 +11,7 @@ import BackButton from "../components/BackButton";
 
 export default function CrearUsuario() {
   const navigate = useNavigate();
-  const { jefaturas, token, funciones, recargarDatos } = useAppContext();
+  const { jefaturas, token, funciones, recargarUsuarios } = useAppContext();
 
   const dependencias =
     jefaturas?.flatMap((jefatura) =>
@@ -89,7 +89,7 @@ export default function CrearUsuario() {
 
       const data = await postData("usuarios", payload, token);
       if (data) setSuccess(true);
-      recargarDatos();
+      recargarUsuarios();
     } catch (err) {
       alert(`❌ Error: ${err.message}`);
     } finally {

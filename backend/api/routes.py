@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from flask_mail import Message # type: ignore
 from extensions import mail
 from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
-from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion, Vehiculo
+from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion, Vehiculo, Servicio
 import secrets
 from datetime import datetime, timedelta
 from .utils.email_utils import send_email
@@ -861,9 +861,10 @@ def crear_vehiculo():
     modelo = body.get("modelo")
     anio = body.get("anio")
     estado = body.get("estado")
+    proximo_servicio = body.get("proximo_servicio")
     dependencia_id = body.get("dependencia_id")
 
-    nuevo = Vehiculo(matricula=matricula, marca=marca, modelo=modelo, anio=anio, estado=estado, dependencia_id=dependencia_id)
+    nuevo = Vehiculo(matricula=matricula, marca=marca, modelo=modelo, anio=anio, estado=estado, dependencia_id=dependencia_id, proximo_servicio=proximo_servicio)
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.serialize()), 201
@@ -881,6 +882,7 @@ def actualizar_vehiculo(id):
     vehiculo.modelo = body.get("modelo", vehiculo.modelo)
     vehiculo.anio = body.get("anio", vehiculo.anio)
     vehiculo.estado = body.get("estado", vehiculo.estado)
+    vehiculo.proximo_servicio = body.get("proximo_servicio", vehiculo.proximo_servicio)
     vehiculo.dependencia_id = body.get("dependencia_id", vehiculo.dependencia_id)
 
     db.session.commit()
@@ -895,3 +897,47 @@ def eliminar_vehiculo(id):
     return jsonify({'status': 'ok'}), 200
 
 
+# -------------------------------------------------------------------
+# SERVICIOS
+# -------------------------------------------------------------------
+@api.route('/servicios', methods=['GET'])
+def listar_servicios():
+    data = Servicio.query.all()
+    return jsonify([x.serialize() for x in data]), 200
+
+@api.route('/servicios', methods=['POST'])
+@jwt_required()
+def crear_servicio():
+    body = request.json
+    nombre = body.get("nombre")
+    descripcion = body.get("descripcion")
+    fecha = body.get("fecha")
+    vehiculo_id = body.get("vehiculo_id")
+
+    nuevo = Servicio(nombre=nombre, descripcion=descripcion, fecha=fecha, vehiculo_id=vehiculo_id)
+    db.session.add(nuevo)
+    db.session.commit()
+    return jsonify(nuevo.serialize()), 201
+
+@api.route('/servicios/<int:id>', methods=['PUT'])
+@jwt_required()
+def actualizar_servicio(id):
+    body = request.json
+    servicio = Servicio.query.get(id)
+    if not servicio:
+        return jsonify({"error": "Servicio no encontrado"}), 404
+
+    servicio.nombre = body.get("nombre", servicio.nombre)
+    servicio.descripcion = body.get("descripcion", servicio.descripcion)
+    servicio.fecha = body.get("fecha", servicio.fecha)
+
+    db.session.commit()
+    return jsonify(servicio.serialize()), 200
+
+@api.route('/servicios/<int:id>', methods=['DELETE'])    
+@jwt_required()
+def eliminar_servicio(id):
+    servicio = Servicio.query.get(id)
+    db.session.delete(servicio)
+    db.session.commit()
+    return jsonify({'status': 'ok'}), 200
