@@ -85,6 +85,55 @@ const PlanillaDiaria = () => {
     return estado || "Servicio";
   };
 
+  const getNomobreSeccional = (nombre) => {
+    switch (nombre) {
+      case "SECCIONAL 1":
+        return "PRIMERA";
+      case "SECCIONAL 2":
+        return "SEGUNDA";
+      case "SECCIONAL 3":
+        return "TERCERA";
+      case "SECCIONAL 4":
+        return "CUARTA";
+      case "SECCIONAL 5":
+        return "QUINTA";
+      case "SECCIONAL 6":
+        return "SEXTA";
+      case "SECCIONAL 7":
+        return "SÉPTIMA";
+      case "SECCIONAL 8":
+        return "OCTAVA";
+      case "SECCIONAL 9":
+        return "NOVENA";
+      case "SECCIONAL 10":
+        return "DÉCIMA";
+      case "SECCIONAL 11":
+        return "DECIMOPRIMERA";
+      default:
+        return nombre;
+    }
+  };
+
+  const getFuncion = (funcion = "") => {
+    switch (normalizar(funcion)) {
+      case "REGLAMENTARIA":
+        return "Licencia Anual";
+      case "MEDICA":
+        return "Licencia Médica";
+      case "DESCANSO":
+      case "D":
+        return "Licencia Semanal";
+      case "1ER":
+        return "Primer Turno (06 a 14)";
+      case "2DO":
+        return "Segundo Turno (14 a 22)";
+      case "3ER":
+        return "Tercer Turno (22 a 06)";
+      default:
+        return funcion;
+    }
+  };
+
   /* ================= VEHICULOS ================= */
   const dependenciaVehiculos = vehiculos.filter(
     (v) => v.dependencia_id === miDependencia.id
@@ -130,26 +179,6 @@ const PlanillaDiaria = () => {
   /* ================= ESTADOS ================= */
 
   const estadoPorFuncionario = {};
-
-  const getFuncion = (funcion = "") => {
-    switch (normalizar(funcion)) {
-      case "REGLAMENTARIA":
-        return "Licencia Anual";
-      case "MEDICA":
-        return "Licencia Médica";
-      case "DESCANSO":
-      case "D":
-        return "Licencia Semanal";
-      case "1ER":
-        return "Primer Turno (06 a 14)";
-      case "2DO":
-        return "Segundo Turno (14 a 22)";
-      case "3ER":
-        return "Tercer Turno (22 a 06)";
-      default:
-        return funcion;
-    }
-  };
 
   /* ===== GUARDIAS (fecha exacta) ===== */
   guardias
@@ -296,13 +325,14 @@ const PlanillaDiaria = () => {
           className="bg-gray-300 p-4 text-xs text-black mb-4 min-w-[1000px]"
         >
           {/* ENCABEZADO */}
-          <table className="w-full mb-3 bg-white border border-black">
+          <table className="w-1/2 mb-3">
             <tbody>
-              <tr>
+              <tr className="bg-white text-center">
                 <td className="border font-bold w-32">SECCIONAL:</td>
-                <td className="border font-bold">
-                  {miDependencia.nombre.toUpperCase()}
+                <td className="border font-bold w-32">
+                 {getNomobreSeccional(miDependencia.nombre.toUpperCase())}
                 </td>
+                <td className="bg-gray-300 w-32"></td>
                 <td className="border font-bold w-24">FECHA:</td>
                 <td className="border font-bold w-32">
                   {dayjs(fechaSeleccionada).format("DD/MM/YY")}
