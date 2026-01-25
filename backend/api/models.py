@@ -357,8 +357,12 @@ class Vehiculo(db.Model):
     modelo = db.Column(db.String(100), nullable=False)
     anio = db.Column(db.Integer, nullable=False)
     estado = db.Column(db.String(50), nullable=False)
+    proximo_servicio = db.Column(db.Date, nullable=True)
+
 
     dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=False)
+
+    servicios = db.relationship('Servicio', backref='vehiculo', lazy=True)
     
 
     def serialize(self):
@@ -369,10 +373,38 @@ class Vehiculo(db.Model):
             'modelo': self.modelo,
             'anio': self.anio,
             'estado': self.estado,
-            'dependencia_id': self.dependencia_id
+            'dependencia_id': self.dependencia_id,
+            'proximo_servicio': self.proximo_servicio,
+            'servicios': [s.serialize() for s in self.servicios]
+
         }
 
     def __repr__(self):
         return f'<Vehiculo {self.matricula}>'
         
 
+# -------------------------
+# SERVICIOS
+# -------------------------
+
+class Servicio(db.Model):
+    __tablename__ = 'servicios'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    descripcion = db.Column(db.Text)
+    fecha = db.Column(db.Date, nullable=False)
+
+    vehiculo_id = db.Column(db.Integer, db.ForeignKey('vehiculos.id'), nullable=False)
+    
+
+    def serialize(self):
+        return {
+            'id': self.id,          
+            'nombre': self.nombre,
+            'descripcion': self.descripcion,
+            'fecha': self.fecha,
+            'vehiculo_id': self.vehiculo_id
+            }
+
+    def __repr__(self):
+        return f'<Servicio {self.nombre}>'

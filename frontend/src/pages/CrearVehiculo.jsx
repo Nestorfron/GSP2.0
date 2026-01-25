@@ -11,7 +11,7 @@ import BackButton from "../components/BackButton";
 export default function CrearVehiculo() {
   const depId = useLocation().state?.depId;
   const navigate = useNavigate();
-  const { token, recargarDatos, dependencias } = useAppContext();
+  const { token, recargarVehiculos, dependencias } = useAppContext();
 
   const [formData, setFormData] = useState({
     matricula: "",
@@ -19,6 +19,7 @@ export default function CrearVehiculo() {
     modelo: "",
     anio: "",
     estado: "",
+    proximo_servicio: "",
     dependencia_id: depId || "",
   });
 
@@ -57,7 +58,7 @@ export default function CrearVehiculo() {
 
       const data = await postData("vehiculos", payload, token);
       if (data) setSuccess(true);
-      recargarDatos();
+      recargarVehiculos();
     } catch (err) {
       alert(`❌ Error: ${err.message}`);
     } finally {
@@ -72,6 +73,7 @@ export default function CrearVehiculo() {
       modelo: "",
       anio: "",
       estado: "",
+      proximo_servicio: "",
       dependencia_id: depId || "",
     });
     setErrors({});
@@ -105,6 +107,7 @@ export default function CrearVehiculo() {
             { name: "modelo", placeholder: "Modelo" },
             { name: "anio", placeholder: "Año", type: "number" },
             { name: "estado", placeholder: "Situación (Ej: SECCIONAL O FUERA DE SERVICIO)" },
+            { name: "proximo_servicio", placeholder: "Proximo servicio", type: "date" },
           ].map(({ name, placeholder, type = "text" }) => (
             <div key={name}>
               <input

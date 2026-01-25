@@ -30,6 +30,9 @@ import CrearLicencia from "./pages/CrearLicencia";
 import PlanillaDiaria from "./pages/PlanillaDiaria";
 import CrearVehiculo from "./pages/CrearVehiculo";
 import EditarVehiculo from "./pages/EditarVehiculo";
+import ServiciosVehiculo from "./pages/ServiciosVehiculo";
+import CrearServicio from "./pages/CrearServicio";
+import EditarServicio  from "./pages/EditarServicio";
 
 
 
@@ -119,6 +122,10 @@ function App() {
           <Route path="/planilla-diaria" element={<PlanillaDiaria />} />
           <Route path="/crear-vehiculo" element={<CrearVehiculo />} />
           <Route path="/editar-vehiculo" element={<EditarVehiculo />} />
+          <Route path="/servicios-vehiculo" element={<ServiciosVehiculo />} />
+          <Route path="/crear-servicio" element={<CrearServicio />} />
+          <Route path="/editar-servicio" element={<EditarServicio />} />
+
         </Routes>
       </BrowserRouter>
 

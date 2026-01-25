@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   BarChart2,
   Shirt,
+  Wrench,
 } from "lucide-react";
 import { deleteData } from "../utils/api";
 import dayjs from "dayjs";
@@ -661,16 +662,29 @@ const Dependencia = () => {
                               {v.estado}
                             </td>
                             <td className="px-2 py-2 text-center">
-                              <IconButton
-                                icon={Edit}
-                                tooltip="Editar"
-                                onClick={() =>
-                                  navigate(`/editar-vehiculo`, {
-                                    state: { vehiculo: v },
-                                  })
-                                }
-                                size="sm"
-                              />
+                              <div className="flex items-center justify-center gap-2">
+                                <IconButton
+                                  icon={Edit}
+                                  tooltip="Editar"
+                                  onClick={() =>
+                                    navigate(`/editar-vehiculo`, {
+                                      state: { vehiculo: v },
+                                    })
+                                  }
+                                  size="sm"
+                                />
+
+                                <IconButton
+                                  icon={Wrench}
+                                  tooltip="Servicios"
+                                  onClick={() =>
+                                    navigate("/servicios-vehiculo", {
+                                      state: { vehiculoId: v.id },
+                                    })
+                                  }
+                                  size="sm"
+                                />
+                              </div>
                             </td>
                           </tr>
                         ))}
