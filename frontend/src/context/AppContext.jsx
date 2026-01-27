@@ -229,12 +229,12 @@ export const AppProvider = ({ children }) => {
     1: "Agente",
     2: "Cabo",
     3: "Sargento",
-    4: "Sub Oficial Mayor",
-    5: "Oficial Ayudante",
-    6: "Oficial Principal",
-    7: "Sub Comisario",
+    4: "S.O.M.",
+    5: "Ofl. Ayte.",
+    6: "Ofl. Ppal.",
+    7: "Sub Crio.",
     8: "Comisario",
-    9: "Comisario Mayor",
+    9: "Crio. Mayor",
   };
 
   const gradosAbreviadosEquivalencia = {
