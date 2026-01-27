@@ -58,12 +58,7 @@ const Zona = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-     <img
-        src={Logo}
-        alt="Logo"
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-             w-72 opacity-5 blur-sm pointer-events-none"
-      />
+    
       <main className="flex-1 px-6 py-8 space-y-8 bg-white dark:bg-slate-900  p-6 w-full lg:w-3/4 xl:max-w-4xl mx-auto  mb-10">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">

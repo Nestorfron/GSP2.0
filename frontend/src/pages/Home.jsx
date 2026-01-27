@@ -34,12 +34,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-     <img
-        src={Logo}
-        alt="Logo"
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-             w-72 opacity-5 blur-sm pointer-events-none"
-      />
+    
       <main className="flex-1 px-6 py-8 space-y-6 ">
         {/* Encabezado */}
         <div className="text-center">
