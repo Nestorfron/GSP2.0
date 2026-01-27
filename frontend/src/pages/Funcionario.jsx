@@ -128,7 +128,7 @@ const Funcionario = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-blue-900 dark:text-blue-400">
             Bienvenido,
-            <br />G{usuario.grado} {usuario.nombre}
+            <br />{obtenerGrado(usuario.grado)} {usuario.nombre}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Funcionario de {miDependencia?.nombre}
