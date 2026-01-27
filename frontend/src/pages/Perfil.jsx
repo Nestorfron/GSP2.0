@@ -10,7 +10,7 @@ import Loading from "../components/Loading";
 
 export default function Perfil() {
   const navigate = useNavigate();
-  const { usuario, token, dependencias, loading, logout } = useAppContext();
+  const { usuario, token, dependencias, loading, logout, obtenerGrado } = useAppContext();
 
   const [mostrarCambioPass, setMostrarCambioPass] = useState(false);
   const [currentPass, setCurrentPass] = useState("");
@@ -79,9 +79,10 @@ export default function Perfil() {
     navigate("/login");
   };
 
+ 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-      <div className="flex-grow flex flex-col items-center px-4 py-8 pb-24">
+      <div className="flex-grow flex flex-col items-center px-4 py-8 pb-10">
         {/* Tarjeta principal */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto text-center border border-blue-100 dark:border-slate-800">
           {/* Avatar */}
@@ -127,7 +128,7 @@ export default function Perfil() {
                   Grado:
                 </span>
                 <span className="text-sm text-blue-900 dark:text-blue-200">
-                  {usuario.grado}
+                  {obtenerGrado(usuario.grado)}
                 </span>
               </div>
             )}

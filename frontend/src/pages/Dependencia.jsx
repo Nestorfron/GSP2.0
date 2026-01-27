@@ -40,6 +40,8 @@ const Dependencia = () => {
     token,
     loading,
     recargarDatos,
+    obtenerGrado,
+    obtenerGradoAbreviado,
   } = useAppContext();
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
   const [guardiaAEliminar, setGuardiaAEliminar] = useState(null);
@@ -137,7 +139,7 @@ const Dependencia = () => {
 
   const usuarioExtraordinaria = (id) => {
     const usuario = miDependencia.usuarios.find((u) => u.id === id);
-    return "G" + usuario.grado + " " + abreviarNombre(usuario.nombre);
+    return obtenerGrado(usuario.grado) + " " + abreviarNombre(usuario.nombre);
   };
 
   const handleDelete = async (id) => {
@@ -182,12 +184,12 @@ const Dependencia = () => {
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
              w-72 opacity-5 blur-sm pointer-events-none"
       />
-      <main className="flex-1 px-6 py-8 space-y-6 p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto">
+      <main className="flex-1 px-6 py-8 space-y-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto">
         {/* Encabezado */}
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
             Bienvenido,
-            <br />G{usuario.grado} {usuario.nombre}
+            <br />{obtenerGrado(usuario.grado)} {usuario.nombre}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             {" "}
@@ -413,7 +415,7 @@ const Dependencia = () => {
                                     className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
                                   >
                                     <td className="text-center px-2 py-2 text-sm text-gray-700 dark:text-gray-300">
-                                      {f.grado}
+                                      {obtenerGradoAbreviado(f.grado)}
                                     </td>
                                     <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                                       {abreviarNombre(f.nombre)}
@@ -508,7 +510,7 @@ const Dependencia = () => {
                           className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
                         >
                           <td className="text-center  py-2 text-sm text-gray-700 dark:text-gray-300">
-                            {f.grado}
+                            {obtenerGrado(f.grado)}
                           </td>
                           <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                             {f.nombre}

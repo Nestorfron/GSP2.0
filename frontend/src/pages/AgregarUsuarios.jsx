@@ -7,7 +7,7 @@ import IconButton from "../components/IconButton";
 
 export default function AgregarUsuarios() {
   const navigate = useNavigate();
-  const { dependencias, usuario } = useAppContext();
+  const { dependencias, usuario, obtenerGrado } = useAppContext();
 
 
 
@@ -157,7 +157,7 @@ export default function AgregarUsuarios() {
                   className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
                 >
                   <td className="text-center py-2 text-sm text-gray-700 dark:text-gray-300">
-                    {u.grado}
+                    {obtenerGrado(u.grado)}
                   </td>
 
                   <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">

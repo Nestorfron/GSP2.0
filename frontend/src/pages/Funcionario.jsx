@@ -23,6 +23,7 @@ const Funcionario = () => {
     licencias,
     token,
     loading,
+    obtenerGrado,
   } = useAppContext();
 
   useEffect(() => {   
@@ -122,7 +123,7 @@ const Funcionario = () => {
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
              w-72 opacity-5 blur-sm pointer-events-none"
       />
-      <main className="flex-1 px-6 py-8 space-y-6 mb-8 bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto text-center border border-blue-100 dark:border-slate-800">
+      <main className="flex-1 px-6 py-8 space-y-6 mb-8 bg-white dark:bg-slate-900  p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto text-center">
         {/* Encabezado */}
         <div className="text-center">
           <h1 className="text-2xl font-bold text-blue-900 dark:text-blue-400">
@@ -271,7 +272,7 @@ const Funcionario = () => {
                     className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
                   >
                     <td className="text-left px-2 py-2 text-gray-700 dark:text-gray-300 truncate">
-                      G{f.grado} {abreviarNombre(f.nombre)}
+                      {obtenerGrado(f.grado)} {abreviarNombre(f.nombre)}
                     </td>
                     {proximosDias.map((fecha) => {
                       const { clase, contenido } = getAsignacion(

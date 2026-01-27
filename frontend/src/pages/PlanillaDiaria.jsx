@@ -25,8 +25,9 @@ const PlanillaDiaria = () => {
     "Atención al Público",
     "Oficina Jurídica",
     "Encargado de Turno",
-    "Egdo Turno/Chofer",
-    "Egdo Turno/Acomp.Móvil",
+    "Egdo. Turno/Chofer",
+    "Egdo. Turno/Acomp.Móvil",
+    "Egdo. Turno/At. al Público",
     "Custodia",
     "Servicio Exterior",
     "Curso",
@@ -42,6 +43,7 @@ const PlanillaDiaria = () => {
     vehiculos,
     funciones,
     loading,
+    obtenerGrado,
   } = useAppContext();
 
   /* ================= DEPENDENCIA ================= */
@@ -62,20 +64,6 @@ const PlanillaDiaria = () => {
   const situacionVehiculo = ["FUERA DE SERVICIO"];
 
   const nombreFuncion = (id) => funciones.find((f) => f.id === id)?.descripcion;
-
-  const gradosEquivalencia = {
-    1: "Agente",
-    2: "Cabo",
-    3: "Sargento",
-    4: "SOM",
-    5: "Oficial Ayudante",
-    6: "Oficial Principal",
-    7: "Sub Comisario",
-    8: "Comisario",
-    9: "Comisario Mayor",
-  };
-
-  const obtenerGrado = (grado) => gradosEquivalencia[grado] ?? grado;
 
   const obtenerFuncion = (f) => {
     const estado = estadoPorFuncionario[f.id]?.tipo;
@@ -322,7 +310,7 @@ const PlanillaDiaria = () => {
       <div className="max-w-screen-lg w-full overflow-x-auto m-auto">
         <div
           id="planilla-pdf"
-          className="bg-gray-300 p-4 text-xs text-black mb-4 min-w-[1000px]"
+          className="bg-gray-300 p-4 text-xs text-black mb-4 min-w-[1000px] mb-10"
         >
           {/* ENCABEZADO */}
           <table className="w-1/2 mb-3">

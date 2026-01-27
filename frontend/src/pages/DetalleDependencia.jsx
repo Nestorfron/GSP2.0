@@ -18,7 +18,7 @@ const DetalleDependencia = () => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
     dayjs().format("YYYY-MM-DD")
   );
-  const { usuario, jefaturas, licencias, guardias, token, loading } =
+  const { usuario, jefaturas, licencias, guardias, token, loading , obtenerGradoAbreviado, obtenerGrado} = useAppContext();
     useAppContext();
 
   const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState(null);
@@ -123,7 +123,7 @@ const DetalleDependencia = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-      <main className="flex-1 px-6 py-8 space-y-6 mb-14 bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto border border-blue-100 dark:border-slate-800">
+      <main className="flex-1 px-6 py-8 space-y-6 mb-14 bg-white dark:bg-slate-900 p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto ">
         <div className="flex flex-col items-center justify-center gap-2 mb-4">
           <select
             name="dependencia"
@@ -156,7 +156,7 @@ const DetalleDependencia = () => {
           </h3>
           <span className="font-bold text-gray-600 dark:text-gray-200">
             {JefeDependencia
-              ? "G" + JefeDependencia.grado + " " + JefeDependencia.nombre
+              ? obtenerGrado(JefeDependencia.grado) + " " + JefeDependencia.nombre
               : "Sin Jefe"}
           </span>
         </div>
@@ -254,7 +254,7 @@ const DetalleDependencia = () => {
                                     className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
                                   >
                                     <td className="text-center px-2 py-2 text-sm text-gray-700 dark:text-gray-300">
-                                      {f.grado}
+                                      {obtenerGradoAbreviado(f.grado)}
                                     </td>
                                     <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                                       {abreviarNombre(f.nombre)}
@@ -339,7 +339,7 @@ const DetalleDependencia = () => {
                           className="hover:bg-blue-50 dark:hover:bg-slate-900 transition-colors"
                         >
                           <td className="text-center  py-2 text-sm text-gray-700 dark:text-gray-300">
-                            {f.grado}
+                            {obtenerGrado(f.grado)}
                           </td>
                           <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                             {f.nombre}

@@ -225,6 +225,38 @@ export const AppProvider = ({ children }) => {
     await fetchAppData();
   };
 
+  const gradosEquivalencia = {
+    1: "Agente",
+    2: "Cabo",
+    3: "Sargento",
+    4: "Sub Oficial Mayor",
+    5: "Oficial Ayudante",
+    6: "Oficial Principal",
+    7: "Sub Comisario",
+    8: "Comisario",
+    9: "Comisario Mayor",
+  };
+
+  const gradosAbreviadosEquivalencia = {
+    1: "Agte",
+    2: "Cabo",
+    3: "Sgto.",
+    4: "S.O.M.",
+    5: "Ofl. Ayte.",
+    6: "Ofl. Ppal.",
+    7: "Sub Crio.",
+    8: "Crio.",
+    9: "Crio. Mayor",
+  };
+
+  const grados = [ 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  const obtenerGrado = (grado) => gradosEquivalencia[grado] ?? grado;
+
+
+  const obtenerGradoAbreviado = (grado) => gradosAbreviadosEquivalencia[grado] ?? grado;
+
+
   return (
     <AppContext.Provider
       value={{
@@ -244,6 +276,7 @@ export const AppProvider = ({ children }) => {
         servicios,
         token,
         loading,
+        grados,
         setNewToken,
         login,
         logout,
@@ -255,6 +288,8 @@ export const AppProvider = ({ children }) => {
         recargarVehiculos,
         recargarServicios,
         recargarPrendas,
+        obtenerGrado,
+        obtenerGradoAbreviado,
       }}
     >
       {children}

@@ -111,6 +111,7 @@ class Usuario(db.Model):
 
 
     dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=True)
+    
     zona_id = db.Column(db.Integer, db.ForeignKey('zonas.id'), nullable=True)
 
     turno_id = db.Column(db.Integer, db.ForeignKey('turnos.id'), nullable=True)
@@ -122,9 +123,11 @@ class Usuario(db.Model):
     zona = db.relationship('Zona', backref='usuarios', foreign_keys=[zona_id])
 
     guardias = db.relationship('Guardia', backref='usuario', lazy=True)
+    
     licencias = db.relationship('Licencia', backref='usuario', lazy=True)
 
     notificaciones = db.relationship('Notificacion', backref='usuario', lazy=True)
+    
     suscripciones = db.relationship('Suscripcion', backref='usuario', lazy=True)
 
     prendas = db.relationship('Prenda', backref='usuario', lazy=True)
