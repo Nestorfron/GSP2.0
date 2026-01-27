@@ -68,7 +68,7 @@ export default function ServiciosVehiculo() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-      <div className="flex-grow flex flex-col items-center p-4 pb-24 w-full lg:w-1/2 xl:max-w-3xl mx-auto space-y-6">
+      <div className="flex-grow flex flex-col items-center p-4 pb-24 w-full lg:w-3/4 xl:max-w-4xl mx-auto space-y-6">
 
         {/* ================= Header vehículo ================= */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 p-4 w-full text-center">

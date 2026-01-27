@@ -123,7 +123,7 @@ const DetalleDependencia = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-      <main className="flex-1 px-6 py-8 space-y-6 mb-14 bg-white dark:bg-slate-900 p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto ">
+      <main className="flex-1 px-6 py-8 space-y-6 mb-14 bg-white dark:bg-slate-900 p-6 w-full lg:w-3/4 xl:max-w-4xl mx-auto ">
         <div className="flex flex-col items-center justify-center gap-2 mb-4">
           <select
             name="dependencia"

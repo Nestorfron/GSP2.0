@@ -150,7 +150,7 @@ export default function LicenciasSolicitadas() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900">
-      <main className="flex-1 px-5 py-7 space-y-6 flex-grow dark:bg-slate-900  p-6 w-full lg:w-1/2 xl:max-w-3xl mx-auto">
+      <main className="flex-1 px-5 py-7 space-y-6 flex-grow dark:bg-slate-900  p-6 w-full lg:w-3/4 xl:max-w-4xl mx-auto">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
             Solicitudes de Licencia
