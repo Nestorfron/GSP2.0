@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { registerSW } from "virtual:pwa-register";
 
+import BackgroundLogo from "./components/BackgroundLogo";
+
+// Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -32,16 +35,74 @@ import CrearVehiculo from "./pages/CrearVehiculo";
 import EditarVehiculo from "./pages/EditarVehiculo";
 import ServiciosVehiculo from "./pages/ServiciosVehiculo";
 import CrearServicio from "./pages/CrearServicio";
-import EditarServicio  from "./pages/EditarServicio";
+import EditarServicio from "./pages/EditarServicio";
 
+/* ======================
+   CONTENIDO DE LA APP
+====================== */
+function AppContent() {
+  const location = useLocation();
 
+  const hideLogoRoutes = [
+    "/login",
+    "/forgot-password",
+  ];
 
+  const hideLogo =
+    hideLogoRoutes.includes(location.pathname) ||
+    location.pathname.startsWith("/reset-password");
+
+  return (
+    <>
+      {!hideLogo && <BackgroundLogo />}
+
+      <Routes>
+        <Route path="/Login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+        <Route path="/" element={<Home />} />
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/zona" element={<Zona />} />
+        <Route path="/dependencia" element={<Dependencia />} />
+        <Route path="/detalle-dependencia" element={<DetalleDependencia />} />
+        <Route path="/funcionario" element={<Funcionario />} />
+        <Route path="/prendas-funcionario/:id" element={<PrendasFuncionario />} />
+        <Route path="/funcionario/:id" element={<LicenciasFuncionario />} />
+        <Route path="/notificaciones" element={<Notificaciones />} />
+        <Route path="/escalafon-servicio" element={<EscalafonServicio />} />
+        <Route path="/licencias" element={<Licencias />} />
+        <Route path="/solicitudes-licencia" element={<LicenciasSolicitadas />} />
+        <Route path="/agregar-usuarios" element={<AgregarUsuarios />} />
+        <Route path="/crear-usuario/:dependenciaId" element={<CrearUsuario />} />
+        <Route path="/editar-usuario" element={<EditarUsuario />} />
+        <Route path="/crear-jefatura" element={<CrearJefatura />} />
+        <Route path="/crear-zona/:jefaturaId" element={<CrearZona />} />
+        <Route path="/crear-dependencia/:zonaId" element={<CrearDependencia />} />
+        <Route path="/crear-turno" element={<CrearTurno />} />
+        <Route path="/crear-extraordinaria" element={<CrearExtraordinaria />} />
+        <Route path="/crear-licencia/:year" element={<CrearLicencia />} />
+        <Route path="/planilla-diaria" element={<PlanillaDiaria />} />
+        <Route path="/crear-vehiculo" element={<CrearVehiculo />} />
+        <Route path="/editar-vehiculo" element={<EditarVehiculo />} />
+        <Route path="/servicios-vehiculo" element={<ServiciosVehiculo />} />
+        <Route path="/crear-servicio" element={<CrearServicio />} />
+        <Route path="/editar-servicio" element={<EditarServicio />} />
+      </Routes>
+    </>
+  );
+}
+
+/* ======================
+   APP ROOT
+====================== */
 function App() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateSW, setUpdateSW] = useState(() => () => {});
   const [toasts, setToasts] = useState([]);
 
-  // Registrar Service Worker PWA
+  // PWA
   useEffect(() => {
     const updateServiceWorker = registerSW({
       onNeedRefresh() {
@@ -54,36 +115,33 @@ function App() {
     setUpdateSW(() => updateServiceWorker);
   }, []);
 
-  // Escuchar mensajes push del Service Worker
+  // Push messages
   useEffect(() => {
     const handlePushMessage = (event) => {
       if (event.data?.type === "PUSH_RECEIVED") {
         addToast(`${event.data.payload.title}: ${event.data.payload.body}`);
       }
     };
-  
+
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.addEventListener("message", handlePushMessage);
     }
-  
+
     return () => {
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.removeEventListener("message", handlePushMessage);
       }
     };
   }, []);
-  
 
-  // Función para agregar un toast
   const addToast = (message) => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 5000); // desaparece después de 5s
+    }, 5000);
   };
 
-  // Actualizar la PWA
   const handleUpdate = () => {
     updateSW();
     setUpdateAvailable(false);
@@ -93,40 +151,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Routes>
-          <Route path="/Login" element={<Login />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/zona" element={<Zona />} />
-          <Route path="/dependencia" element={<Dependencia />} />
-          <Route path="/detalle-dependencia" element={<DetalleDependencia />} />
-          <Route path="/funcionario" element={<Funcionario />} />
-          <Route path="/prendas-funcionario/:id" element={<PrendasFuncionario />} />
-          <Route path="/funcionario/:id" element={<LicenciasFuncionario />} />
-          <Route path="/notificaciones" element={<Notificaciones />} />
-          <Route path="/escalafon-servicio" element={<EscalafonServicio />} />
-          <Route path="/licencias" element={<Licencias />} />
-          <Route path="/solicitudes-licencia" element={<LicenciasSolicitadas />} />
-          <Route path="/agregar-usuarios" element={<AgregarUsuarios />} />
-          <Route path="/crear-usuario/:dependenciaId" element={<CrearUsuario />} />
-          <Route path="/editar-usuario" element={<EditarUsuario />} />
-          <Route path="/crear-jefatura" element={<CrearJefatura />} />
-          <Route path="/crear-zona/:jefaturaId" element={<CrearZona />} />
-          <Route path="/crear-dependencia/:zonaId" element={<CrearDependencia />} />
-          <Route path="/crear-turno" element={<CrearTurno />} />
-          <Route path="/crear-extraordinaria" element={<CrearExtraordinaria />} />
-          <Route path="/crear-licencia/:year" element={<CrearLicencia />} />
-          <Route path="/planilla-diaria" element={<PlanillaDiaria />} />
-          <Route path="/crear-vehiculo" element={<CrearVehiculo />} />
-          <Route path="/editar-vehiculo" element={<EditarVehiculo />} />
-          <Route path="/servicios-vehiculo" element={<ServiciosVehiculo />} />
-          <Route path="/crear-servicio" element={<CrearServicio />} />
-          <Route path="/editar-servicio" element={<EditarServicio />} />
-
-        </Routes>
+        <AppContent />
       </BrowserRouter>
 
       {/* Toasts */}
@@ -150,7 +175,6 @@ function App() {
               padding: "1rem 1.5rem",
               borderRadius: "5px",
               boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-              animation: "fadein 0.3s, fadeout 0.5s 4.5s",
             }}
           >
             {t.message}
@@ -158,7 +182,7 @@ function App() {
         ))}
       </div>
 
-      {/* Actualización de PWA */}
+      {/* Update PWA */}
       {updateAvailable && (
         <div
           style={{
@@ -173,27 +197,23 @@ function App() {
             zIndex: 9999,
           }}
         >
-          🔄 Nueva versión disponible.&nbsp;
+          🔄 Nueva versión disponible&nbsp;
           <button
             onClick={handleUpdate}
             style={{
-              cursor: "pointer",
+              marginLeft: "1rem",
               background: "#fff",
               color: "#333",
               border: "none",
               padding: "0.5rem 1rem",
               borderRadius: "4px",
+              cursor: "pointer",
             }}
           >
             Actualizar
           </button>
         </div>
       )}
-
-      <style>{`
-        @keyframes fadein { from {opacity:0} to {opacity:1} }
-        @keyframes fadeout { from {opacity:1} to {opacity:0} }
-      `}</style>
     </>
   );
 }

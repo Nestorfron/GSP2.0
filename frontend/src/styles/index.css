@@ -7,3 +7,19 @@ body {
 }
 
 
+.logo-fondo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 18rem;
+  opacity: 0.09;
+  filter: blur(4px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
