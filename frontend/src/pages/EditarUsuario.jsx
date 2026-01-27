@@ -11,7 +11,7 @@ import BackButton from "../components/BackButton";
 export default function EditarUsuario() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { token, jefaturas, funciones, recargarUsuarios } = useAppContext();
+  const { token, jefaturas, funciones, recargarUsuarios, grados } = useAppContext();
 
   const usuarioData = location.state?.usuario;
 
@@ -97,7 +97,7 @@ export default function EditarUsuario() {
           </div>
 
           {/* Campos de texto */}
-          {["grado", "nombre", "correo", "rol_jerarquico"].map((field) => (
+          {[ "nombre", "correo", "rol_jerarquico"].map((field) => (
             <input
               key={field}
               type="text"
@@ -108,6 +108,23 @@ export default function EditarUsuario() {
               className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
             />
           ))}
+
+          {/* Grado */}
+          <div>
+            <select
+              name="grado"
+              value={formData.grado || ""}
+              onChange={handleChange}
+              className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            >
+              <option value="">Seleccionar grado</option>
+              {grados.map((grado) => (
+                <option key={grado} value={grado}>
+                  {grado}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Estado */}
           <div>

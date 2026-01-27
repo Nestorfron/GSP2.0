@@ -20,7 +20,7 @@ dayjs.locale("es");
 export default function LicenciasFuncionario() {
 
   const navigate = useNavigate();
-  const { token, licencias, licenciasPendientes, licenciasRechazadas, recargarDatos } = useAppContext();
+  const { token, licencias, licenciasPendientes, licenciasRechazadas, recargarDatos, obtenerGrado } = useAppContext();
   const [year, setYear] = useState(dayjs().year());
   const location = useLocation();
 
@@ -130,7 +130,7 @@ export default function LicenciasFuncionario() {
         {/* Título */}
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
-            Licencias de G{usuario.grado} {usuario.nombre}
+            Licencias de {obtenerGrado(usuario.grado)} {usuario.nombre}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
             Reglamentarias, médicas y extraordinarias

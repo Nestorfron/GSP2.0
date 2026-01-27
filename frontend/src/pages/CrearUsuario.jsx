@@ -11,7 +11,7 @@ import BackButton from "../components/BackButton";
 
 export default function CrearUsuario() {
   const navigate = useNavigate();
-  const { jefaturas, token, funciones, recargarUsuarios } = useAppContext();
+  const { jefaturas, token, funciones, recargarUsuarios, grados } = useAppContext();
 
   const dependencias =
     jefaturas?.flatMap((jefatura) =>
@@ -135,7 +135,6 @@ export default function CrearUsuario() {
 
           {/* Inputs principales */}
           {[
-            { name: "grado", placeholder: "Grado" },
             { name: "nombre", placeholder: "Nombre completo" },
             { name: "correo", placeholder: "Correo electrónico", type: "email" },
             { name: "password", placeholder: "Contraseña", type: "password" },
@@ -157,6 +156,22 @@ export default function CrearUsuario() {
               {errors[name] && <p className="text-xs text-red-500 mt-1">{errors[name]}</p>}
             </div>
           ))}
+          {/* Grado */}
+          <div>
+            <select
+              name="grado"
+              value={formData.grado || ""}
+              onChange={handleChange}
+              className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            >
+              <option value="">Seleccionar grado</option>
+              {grados.map((grado) => (
+                <option key={grado} value={grado}>
+                  {grado}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Fecha ingreso */}
           <input

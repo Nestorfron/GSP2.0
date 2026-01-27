@@ -31,6 +31,7 @@ export default function EscalafonServicio() {
     token,
     loading,
     recargarGuaridas,
+    obtenerGrado,
   } = useAppContext();
 
   const [daysToShow, setDaysToShow] = useState(14);
@@ -65,6 +66,7 @@ export default function EscalafonServicio() {
   const funcionarios = miDependencia.usuarios.filter(
     (f) => f.rol_jerarquico !== "JEFE_DEPENDENCIA"
   );
+
 
   const funcionariosPorTurno = (turnoId) =>
     funcionarios.filter((f) => f.turno_id === turnoId);
@@ -531,9 +533,9 @@ export default function EscalafonServicio() {
                         <tr key={f.id}>
                           <td
                             className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
-                            title={`G${f.grado} ${f.nombre}`}
+                            title={`${obtenerGrado(f.grado)} ${f.nombre}`}
                           >
-                            G{f.grado} {abreviarNombre(f.nombre)}
+                            {obtenerGrado(f.grado)} {abreviarNombre(f.nombre)}
                           </td>
 
                           {dias.map((d) => {

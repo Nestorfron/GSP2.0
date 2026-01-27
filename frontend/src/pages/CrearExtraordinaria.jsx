@@ -10,7 +10,7 @@ import BackButton from "../components/BackButton";
 import dayjs from "dayjs";
 
 export default function CrearGuardia() {
-  const { usuario, dependencias, token, recargarDatos } = useAppContext();
+  const { usuario, dependencias, token, recargarDatos, obtenerGrado } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
@@ -162,7 +162,7 @@ export default function CrearGuardia() {
               <option value="">Selecciona un funcionario</option>
               {dependenciaUsuarios?.map((u) => (
                 <option key={u.id} value={u.id} className="text-sm">
-                  G{u.grado + " " + u.nombre}
+                  {obtenerGrado(u.grado) + " " + u.nombre}
                 </option>
               ))}
             </select>
