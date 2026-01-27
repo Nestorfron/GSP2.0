@@ -31,7 +31,7 @@ export default function EscalafonServicio() {
     token,
     loading,
     recargarGuaridas,
-    obtenerGrado,
+    obtenerGradoAbreviado,
   } = useAppContext();
 
   const [daysToShow, setDaysToShow] = useState(14);
@@ -533,9 +533,9 @@ export default function EscalafonServicio() {
                         <tr key={f.id}>
                           <td
                             className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
-                            title={`${obtenerGrado(f.grado)} ${f.nombre}`}
+                            title={`${obtenerGradoAbreviado(f.grado)} ${f.nombre}`}
                           >
-                            {obtenerGrado(f.grado)} {abreviarNombre(f.nombre)}
+                            {obtenerGradoAbreviado(f.grado)} {abreviarNombre(f.nombre)}
                           </td>
 
                           {dias.map((d) => {
