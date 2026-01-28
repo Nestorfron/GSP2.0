@@ -21,7 +21,7 @@ export function getTurnoProps(turno) {
     return { clase: "text-xs text-white bg-blue-600", contenido: turno };
 
   if (t === "guardia" || t === "t")
-    return { clase: "text-xs text-black bg-white", contenido: "T" };
+    return { clase: "text-xs text-black", contenido: "T" };
 
   if (t === "descanso" || t === "d")
     return { clase: "text-xs text-white bg-black", contenido: "D" };
