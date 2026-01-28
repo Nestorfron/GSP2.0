@@ -118,13 +118,13 @@ export default function EscalafonServicio() {
 
     elemento.style.padding = "20px";
 
-    elemento.style.width = elemento.scrollWidth + 40 + "px"; // +40 = 20px izquierda + 20px derecha
-    elemento.style.height = elemento.scrollHeight + 40 + "px"; // igual para altura
+    elemento.style.width = elemento.scrollWidth + 20 + "px"; // izquierda y derecha
+    elemento.style.height = elemento.scrollHeight + 20 + "px"; // arriba y abajo
 
     toPng(elemento, {
       cacheBust: true,
-      width: elemento.scrollWidth + 40,
-      height: elemento.scrollHeight + 40,
+      width: elemento.scrollWidth + 10,
+      height: elemento.scrollHeight + 10,
     })
       .then((dataUrl) => {
         elemento.style.width = originalWidth;
