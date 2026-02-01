@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from flask_mail import Message # type: ignore
 from extensions import mail
 from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
-from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion, Vehiculo, Servicio
+from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion, Vehiculo, Servicio, RegimenHorario
 import secrets
 from datetime import datetime, timedelta
 from .utils.email_utils import send_email
@@ -178,6 +178,61 @@ def eliminar_turno(turno_id):
     return jsonify({"turno": turno.serialize()}), 200
 
 # -------------------------------------------------------------------
+# REGIMEN HORARIO
+# -------------------------------------------------------------------
+@api.route('/regimen_horarios', methods=['POST'])
+@jwt_required()
+def crear_regimen_horario():
+    body = request.json
+    nombre = body.get("nombre")
+    horas_trabajo = body.get("horas_trabajo")
+    horas_descanso = body.get("horas_descanso")
+    adminte_rotacion_par_impar = body.get("admite_rotacion_par_impar")
+    adminte_medio_horario = body.get("admite_medio_horario")
+
+    nuevo = RegimenHorario(
+        nombre=nombre,
+        horas_trabajo=horas_trabajo,
+        horas_descanso=horas_descanso,
+        adminte_rotacion_par_impar=adminte_rotacion_par_impar,
+        admite_medio_horario=adminte_medio_horario
+    )
+    db.session.add(nuevo)
+    db.session.commit()
+    return jsonify(nuevo.serialize()), 201
+
+@api.route('/regimen_horarios/<int:id>', methods=['PUT'])
+@jwt_required()
+def actualizar_regimen(id):
+    body = request.json
+    regimen = RegimenHorario.query.get(id)
+    if not regimen:
+        return jsonify({"error": "regimen horario no encontrado"}), 404
+    regimen.nombre = body.get("nombre")
+    regimen.horas_trabajo = body.get("horas_trabajo")
+    regimen.horas_descanso = body.get("horas_descanos")
+    regimen.adminte_rotacion_par_impar = body.get("adminte_rotacion_par_impar")
+    regimen.adminte_medio_horario = body.get("adminte_medio_horario")
+    db.session.commit()
+    return jsonify(regimen.serialize()), 200
+
+
+@api.route('/regimen_horarios', methods=['GET'])
+def listar_regimen_horarios():
+    regimen_horarios = RegimenHorario.query.all()
+    return jsonify([r.serialize() for r in regimen_horarios]), 200
+
+@api.route('/regimen_horarios/<int:regimen_horario_id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_regimen_horario(regimen_horario_id):
+    regimen_horario = RegimenHorario.query.get(regimen_horario_id)
+    if not regimen_horario:
+        return jsonify({"error": "Regimen horario no encontrado"}), 404
+    db.session.delete(regimen_horario)
+    db.session.commit()
+    return jsonify({'status': 'ok'}), 200
+
+# -------------------------------------------------------------------
 # GUARDIAS
 # -------------------------------------------------------------------
 @api.route('/guardias', methods=['POST'])
@@ -304,6 +359,8 @@ def crear_usuario():
     is_admin = body.get("is_admin")
     turno_id = body.get("turno_id")
     funcion_id = body.get("funcion_id")
+    rotacion = body.get("rotacion")
+    regimen_id = body.get("regimen_id")
 
 
     ROLES_VALIDOS = ['JEFE_ZONA', 'ADMINISTRADOR', 'FUNCIONARIO', 'JEFE_DEPENDENCIA']
@@ -353,7 +410,9 @@ def crear_usuario():
         is_admin=is_admin,
         estado=estado,
         turno_id=turno_id,
-        funcion_id=funcion_id
+        funcion_id=funcion_id,
+        rotacion=rotacion,
+        regimen_id=regimen_id
     )
 
     db.session.add(nuevo_usuario)
@@ -394,6 +453,8 @@ def actualizar_usuario(id):
     estado = body.get("estado", usuario.estado)
     is_admin = body.get("is_admin", usuario.is_admin)
     funcion_id = body.get("funcion_id", usuario.funcion_id)
+    rotacion = body.get("rotacion", usuario.rotacion)
+    regimen_id = body.get("regimen_id", usuario.regimen_id)
 
     # 🔥 ESTA ES LA PARTE IMPORTANTE
     turno_id = body.get("turno_id", usuario.turno_id)
@@ -426,6 +487,8 @@ def actualizar_usuario(id):
     usuario.turno_id = turno_id
     usuario.funcion_id = funcion_id
     usuario.is_admin = is_admin
+    usuario.rotacion = rotacion
+    usuario.regimen_id = regimen_id
 
     db.session.commit()
     return jsonify(usuario.serialize()), 200
@@ -492,7 +555,9 @@ def setup_admin():
         is_admin=True,
         estado="Activo",
         turno_id=None,
-        funcion_id=None
+        funcion_id=None,
+        rotacion=None,
+        regimen_id=None
     )
 
     db.session.add(nuevo_admin)
