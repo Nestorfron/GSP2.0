@@ -20,6 +20,7 @@ import Funcionario from "./pages/Funcionario";
 import PrendasFuncionario from "./pages/PrendasFuncionario";
 import Notificaciones from "./pages/Notificaciones";
 import EscalafonServicio from "./pages/EscalafonServicio";
+import Escalafon12x36 from "./pages/Escalafon12x36";
 import Licencias from "./pages/Licencias";
 import LicenciasFuncionario from "./pages/LicenciasFuncionario";
 import LicenciasSolicitadas from "./pages/LicenciasSolicitadas";
@@ -29,7 +30,9 @@ import EditarUsuario from "./pages/EditarUsuario";
 import CrearJefatura from "./pages/CrearJefatura";
 import CrearZona from "./pages/CrearZona";
 import CrearDependencia from "./pages/CrearDependencia";
+import EditarDependencia from "./pages/EditarDependencia";
 import CrearTurno from "./pages/CrearTurno";
+import EditarTurno from "./pages/EditarTurno";
 import CrearExtraordinaria from "./pages/CrearExtraordinaria";
 import CrearLicencia from "./pages/CrearLicencia";
 import PlanillaDiaria from "./pages/PlanillaDiaria";
@@ -38,6 +41,10 @@ import EditarVehiculo from "./pages/EditarVehiculo";
 import ServiciosVehiculo from "./pages/ServiciosVehiculo";
 import CrearServicio from "./pages/CrearServicio";
 import EditarServicio from "./pages/EditarServicio";
+import EditarRegimen from "./pages/EditarRegimen";
+import RegimenesHorarios from "./pages/RegimenesHorarios";
+import CrearRegimen from "./pages/CrearRegimen";
+
 
 /* ======================
    CONTENIDO DE LA APP
@@ -70,12 +77,14 @@ function AppContent() {
         <Route path="/zona" element={<Zona />} />
         <Route path="/editar-zona/:zonaId" element={<EditarZona />} />
         <Route path="/dependencia" element={<Dependencia />} />
+        <Route path="/editar-dependencia/:dependenciaId" element={<EditarDependencia />} />
         <Route path="/detalle-dependencia" element={<DetalleDependencia />} />
         <Route path="/funcionario" element={<Funcionario />} />
         <Route path="/prendas-funcionario/:id" element={<PrendasFuncionario />} />
         <Route path="/funcionario/:id" element={<LicenciasFuncionario />} />
         <Route path="/notificaciones" element={<Notificaciones />} />
         <Route path="/escalafon-servicio" element={<EscalafonServicio />} />
+        <Route path="/escalafon-12x36" element={<Escalafon12x36 />} />
         <Route path="/licencias" element={<Licencias />} />
         <Route path="/solicitudes-licencia" element={<LicenciasSolicitadas />} />
         <Route path="/agregar-usuarios" element={<AgregarUsuarios />} />
@@ -85,6 +94,7 @@ function AppContent() {
         <Route path="/crear-zona/:jefaturaId" element={<CrearZona />} />
         <Route path="/crear-dependencia/:zonaId" element={<CrearDependencia />} />
         <Route path="/crear-turno" element={<CrearTurno />} />
+        <Route path="/editar-turno" element={<EditarTurno />} />
         <Route path="/crear-extraordinaria" element={<CrearExtraordinaria />} />
         <Route path="/crear-licencia/:year" element={<CrearLicencia />} />
         <Route path="/planilla-diaria" element={<PlanillaDiaria />} />
@@ -93,6 +103,9 @@ function AppContent() {
         <Route path="/servicios-vehiculo" element={<ServiciosVehiculo />} />
         <Route path="/crear-servicio" element={<CrearServicio />} />
         <Route path="/editar-servicio" element={<EditarServicio />} />
+        <Route path="/editar-regimen" element={<EditarRegimen />} />
+        <Route path="/regimenes-horarios" element={<RegimenesHorarios />} />
+        <Route path="/crear-regimen" element={<CrearRegimen />} />
       </Routes>
     </>
   );

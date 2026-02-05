@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import BottomNavbar from "../components/BottomNavbar";
 import Loading from "../components/Loading";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import IconButton from "../components/IconButton";
+
 import {
   PlusCircle,
   Eye,
@@ -12,6 +13,10 @@ import {
   Edit,
   Users,
   Car,
+  Shield,
+  Building2,
+  Map,
+  Clock,
 } from "lucide-react";
 
 const GestionPanel = () => {
@@ -22,10 +27,13 @@ const GestionPanel = () => {
     jefaturas,
     dependencias,
     vehiculos,
+    regimenes,
   } = useAppContext();
 
   const navigate = useNavigate();
   const [openSection, setOpenSection] = useState(null);
+
+  /* ================= SEGURIDAD ================= */
 
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) {
@@ -38,9 +46,30 @@ const GestionPanel = () => {
   const toggle = (section) =>
     setOpenSection(openSection === section ? null : section);
 
-  const Card = ({ title, actions, children }) => (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow border border-blue-100 dark:border-slate-700 p-4">
-      <div className="flex items-center mb-2">
+  /* ================= MÉTRICAS ================= */
+
+  const totalZonas = useMemo(
+    () => jefaturas.reduce((acc, j) => acc + (j.zonas?.length || 0), 0),
+    [jefaturas]
+  );
+
+  /* ================= COMPONENTES UI ================= */
+
+  const MetricCard = ({ icon: Icon, title, value }) => (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow p-4 flex items-center gap-3 border border-blue-100 dark:border-slate-700">
+      <Icon className="text-blue-600 dark:text-blue-400" size={26} />
+      <div>
+        <p className="text-xs text-gray-500">{title}</p>
+        <p className="text-xl font-semibold text-blue-700 dark:text-blue-400">
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+
+  const SectionCard = ({ title, actions, children }) => (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow border border-blue-100 dark:border-slate-700 p-5">
+      <div className="flex items-center mb-3">
         <h2 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
           {title}
         </h2>
@@ -50,22 +79,46 @@ const GestionPanel = () => {
     </div>
   );
 
+  /* ================= UI ================= */
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-slate-900">
-      <main className="flex-1 px-6 py-8 mb-14 mx-auto w-full lg:w-3/4 xl:max-w-4xl space-y-5">
-
-        {/* Encabezado */}
+      <main className="flex-1 px-6 py-8 mb-14 mx-auto w-full lg:w-3/4 xl:max-w-5xl space-y-6">
+        {/* HEADER */}
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
-            Gestión General
+            Dashboard de Gestión
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {usuario.nombre} — {usuario.rol_jerarquico}
           </p>
         </div>
 
-        {/* JEFATURAS + ZONAS */}
-        <Card
+        {/* ================= MÉTRICAS ================= */}
+
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <MetricCard
+            icon={Shield}
+            title="Jefaturas"
+            value={jefaturas.length}
+          />
+          <MetricCard icon={Map} title="Zonas" value={totalZonas} />
+          <MetricCard
+            icon={Building2}
+            title="Dependencias"
+            value={dependencias.length}
+          />
+          <MetricCard icon={Car} title="Vehículos" value={vehiculos.length} />
+          <MetricCard
+            icon={Clock}
+            title="Regímenes"
+            value={regimenes?.length || 0}
+          />
+        </div>
+
+        {/* ================= JEFATURAS ================= */}
+
+        <SectionCard
           title="Jefaturas"
           actions={
             <>
@@ -76,176 +129,246 @@ const GestionPanel = () => {
                   onClick={() => navigate("/crear-jefatura")}
                 />
               )}
+
               <IconButton
                 icon={openSection === "jefaturas" ? EyeOff : Eye}
-                tooltip="Ver"
                 onClick={() => toggle("jefaturas")}
               />
             </>
           }
         >
           {openSection === "jefaturas" && (
-            <div className="mt-3 space-y-4 text-sm">
+            <div className="space-y-3">
               {jefaturas.map((j) => (
                 <div
                   key={j.id}
                   className="border border-blue-100 dark:border-slate-700 rounded-xl p-3"
                 >
-                  <div className="flex justify-between items-center">
-                    <div className="font-semibold text-blue-700 dark:text-blue-400">
-                      {j.nombre}
+                  <div className="flex justify-between">
+                    <div>
+                      <p className="font-semibold">{j.nombre}</p>
+                      <p className="text-xs text-gray-500">
+                        {j.zonas?.length || 0} zonas
+                      </p>
                     </div>
+
                     {usuario.rol_jerarquico === "ADMINISTRADOR" && (
                       <IconButton
                         icon={PlusCircle}
                         tooltip="Agregar zona"
-                        onClick={() => navigate(`/crear-zona/${j.id}`)}
                         size="sm"
+                        onClick={() => navigate(`/crear-zona/${j.id}`)}
                       />
                     )}
                   </div>
-
-                  {/* Zonas */}
-                  <ul className="mt-2 space-y-1 text-xs">
-                    {j.zonas && j.zonas.length > 0 ? (
-                      j.zonas.map((z) => (
-                        <li
-                          key={z.id}
-                          className="flex justify-between items-center text-gray-600 dark:text-gray-400"
-                        >
-                          <span>• {z.nombre}</span>
-
-                          {usuario.rol_jerarquico === "ADMINISTRADOR" && (
-                            <IconButton
-                              icon={Edit}
-                              tooltip="Editar zona"
-                              onClick={() =>
-                                navigate(`/editar-zona/${z.id}`, {
-                                    state: {zona: z}
-                                })
-                              }
-                              size="sm"
-                            />
-                          )}
-                        </li>
-                      ))
-                    ) : (
-                      <li className="italic text-gray-500">Sin zonas</li>
-                    )}
-                  </ul>
                 </div>
               ))}
             </div>
           )}
-        </Card>
+        </SectionCard>
 
-        {/* DEPENDENCIAS */}
-        <Card
+        {/* ================= DEPENDENCIAS ================= */}
+
+        <SectionCard
           title="Dependencias"
           actions={
             <IconButton
               icon={openSection === "dependencias" ? EyeOff : Eye}
-              tooltip="Ver"
               onClick={() => toggle("dependencias")}
             />
           }
         >
           {openSection === "dependencias" && (
-            <ul className="mt-2 space-y-3 text-sm">
-              {dependencias.map((d) => {
-                const jefe = d.usuarios?.find(
-                  (u) => u.rol_jerarquico === "JEFE_DEPENDENCIA"
-                );
+            <div className="space-y-4">
+              {jefaturas.map((j) => (
+                <div key={j.id} className="space-y-3">
+                  {/* JEFATURA */}
+                  <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+                    {j.nombre}
+                  </p>
 
-                return (
-                  <li
-                    key={d.id}
-                    className="flex justify-between items-center gap-2"
-                  >
-                    <div>
-                      <div className="font-medium">{d.nombre}</div>
-                      <div className="text-xs text-gray-500">
-                        {jefe ? jefe.nombre : "Sin jefe"}
+                  {/* ZONAS */}
+                  {j.zonas?.map((zona) => (
+                    <div
+                      key={zona.id}
+                      className="border border-blue-100 dark:border-slate-700 rounded-xl p-3"
+                    >
+                      {/* NOMBRE ZONA */}
+                      <p className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                        {zona.nombre}
+                      </p>
+
+                      {/* DEPENDENCIAS */}
+                      <div className="space-y-2">
+                        {zona.dependencias?.length > 0 ? (
+                          zona.dependencias.map((d) => {
+                            const jefe = d.usuarios?.find(
+                              (u) => u.rol_jerarquico === "JEFE_DEPENDENCIA"
+                            );
+
+                            return (
+                              <div
+                                key={d.id}
+                                className="border border-blue-50 dark:border-slate-700 rounded-lg p-3 flex justify-between bg-gray-50 dark:bg-slate-800"
+                              >
+                                <div>
+                                  <p className="font-medium">{d.nombre}</p>
+                                  <p className="text-xs text-gray-500">
+                                    {jefe?.nombre || "Sin jefe"}
+                                  </p>
+                                </div>
+
+                                <div className="flex gap-1">
+                                  <IconButton
+                                    icon={Eye}
+                                    size="sm"
+                                    onClick={() =>
+                                      navigate(`/detalle-dependencia`,
+                                        {
+                                          state: { dependencia: d },
+                                        }
+                                      )
+                                    }
+                                  />
+
+                                  <IconButton
+                                    icon={Users}
+                                    size="sm"
+                                    onClick={() =>
+                                      navigate(`/crear-usuario/${d.id}`)
+                                    }
+                                  />
+
+                                  {usuario.rol_jerarquico ===
+                                    "ADMINISTRADOR" && (
+                                    <IconButton
+                                      icon={Edit}
+                                      size="sm"
+                                      onClick={() =>
+                                        navigate(`/editar-dependencia/${d.id}`)
+                                      }
+                                    />
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="text-xs text-gray-400">
+                            Sin dependencias
+                          </p>
+                        )}
                       </div>
                     </div>
-
-                    <div className="flex gap-1">
-                      <IconButton
-                        icon={Eye}
-                        tooltip="Ver dependencia"
-                        onClick={() => navigate(`/dependencia/${d.id}`)}
-                        size="sm"
-                      />
-                      <IconButton
-                        icon={Users}
-                        tooltip="Agregar funcionario"
-                        onClick={() =>
-                          navigate(`/agregar-usuarios/${d.id}`)
-                        }
-                        size="sm"
-                      />
-                      {usuario.rol_jerarquico === "ADMINISTRADOR" && (
-                        <IconButton
-                          icon={Edit}
-                          tooltip="Editar dependencia"
-                          onClick={() =>
-                            navigate(`/editar-dependencia/${d.id}`)
-                          }
-                          size="sm"
-                        />
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                  ))}
+                </div>
+              ))}
+            </div>
           )}
-        </Card>
+        </SectionCard>
 
-        {/* VEHÍCULOS */}
-        <Card
+        {/* ================= VEHÍCULOS ================= */}
+
+        <SectionCard
           title="Vehículos"
           actions={
             <>
               <IconButton
                 icon={PlusCircle}
-                tooltip="Agregar vehículo"
                 onClick={() => navigate("/crear-vehiculo")}
               />
+
               <IconButton
                 icon={openSection === "vehiculos" ? EyeOff : Eye}
-                tooltip="Ver"
                 onClick={() => toggle("vehiculos")}
               />
             </>
           }
         >
           {openSection === "vehiculos" && (
-            <ul className="mt-2 space-y-2 text-sm">
+            <div className="space-y-2">
               {vehiculos.map((v) => (
-                <li
+                <div
                   key={v.id}
-                  className="flex justify-between items-center"
+                  className="border border-blue-100 dark:border-slate-700 rounded-xl p-3 flex justify-between"
                 >
                   <span>
-                    • {v.matricula} — {v.marca} {v.modelo}
+                    {v.matricula} — {v.marca} {v.modelo}
                   </span>
+
                   <IconButton
                     icon={Car}
-                    tooltip="Editar vehículo"
+                    size="sm"
                     onClick={() =>
                       navigate("/editar-vehiculo", {
                         state: { vehiculo: v },
                       })
                     }
-                    size="sm"
                   />
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
-        </Card>
+        </SectionCard>
 
+        {/* ================= REGÍMENES ================= */}
+
+        <SectionCard
+          title="Regímenes Horarios"
+          actions={
+            <>
+              {usuario.rol_jerarquico === "ADMINISTRADOR" && (
+                <IconButton
+                  icon={PlusCircle}
+                  tooltip="Crear régimen"
+                  onClick={() => navigate("/crear-regimen")}
+                />
+              )}
+
+              <IconButton
+                icon={openSection === "regimenes" ? EyeOff : Eye}
+                onClick={() => toggle("regimenes")}
+              />
+            </>
+          }
+        >
+          {openSection === "regimenes" && (
+            <div className="space-y-3">
+              {regimenes?.map((r) => (
+                <div
+                  key={r.id}
+                  className="border border-blue-100 dark:border-slate-700 rounded-xl p-3 flex justify-between"
+                >
+                  <div>
+                    <p className="font-medium">{r.nombre}</p>
+
+                    <p className="text-xs text-gray-500">
+                      {r.horas_trabajo}h trabajo / {r.horas_descanso}h descanso
+                    </p>
+
+                    <p className="text-xs text-gray-400">
+                      {r.admite_rotacion_par_impar && "Rotación par/impar "}
+                      {r.admite_medio_horario && "• Medio horario"}
+                    </p>
+                  </div>
+
+                  {usuario.rol_jerarquico === "ADMINISTRADOR" && (
+                    <IconButton
+                      icon={Edit}
+                      size="sm"
+                      tooltip="Editar régimen"
+                      onClick={() =>
+                        navigate("/editar-regimen", {
+                          state: { regimen: r },
+                        })
+                      }
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
       </main>
 
       <BottomNavbar />

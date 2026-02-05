@@ -159,7 +159,9 @@ const AdminPanel = () => {
                                               icon={Edit}
                                               tooltip="Editar dependencia"
                                               onClick={() =>
-                                                alert(`Editar ${dep.nombre}`)
+                                                navigate(`/editar-dependencia/${dep.id}`, {
+                                                  state: { dependencia: dep },
+                                                })
                                               }
                                               size="sm"
                                             />

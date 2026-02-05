@@ -83,7 +83,8 @@ def crear_dependencia():
     nombre = body.get("nombre")
     descripcion = body.get("descripcion")
     zona_id = body.get("zona_id")
-    nueva = Dependencia(nombre=nombre, descripcion=descripcion, zona_id=zona_id)
+    regimen_id = body.get("regimen_id")
+    nueva = Dependencia(nombre=nombre, descripcion=descripcion, zona_id=zona_id, regimen_id=regimen_id)
     db.session.add(nueva)
     db.session.commit()
     return jsonify(nueva.serialize()), 201
@@ -107,6 +108,7 @@ def actualizar_dependencia(id):
         return jsonify({"error": "Dependencia no encontrada"}), 404
     dependencia.nombre = body.get("nombre")
     dependencia.descripcion = body.get("descripcion")
+    dependencia.regimen_id = body.get("regimen_id")
     db.session.commit()
     return jsonify(dependencia.serialize()), 200
 
@@ -130,13 +132,15 @@ def crear_turno():
     hora_fin = body.get("hora_fin")
     descripcion = body.get("descripcion")
     dependencia_id = body.get("dependencia_id")
+    regimen_id = body.get("regimen_id")
 
     nuevo = Turno(
         nombre=nombre,
         hora_inicio=hora_inicio,
         hora_fin=hora_fin,
         descripcion=descripcion,
-        dependencia_id=dependencia_id
+        dependencia_id=dependencia_id,
+        regimen_id=regimen_id
     )
     db.session.add(nuevo)
     db.session.commit()
@@ -154,6 +158,7 @@ def actualizar_turno(id):
     turno.hora_fin = body.get("hora_fin")
     turno.descripcion = body.get("descripcion")
     turno.dependencia_id = body.get("dependencia_id")
+    turno.regimen_id = body.get("regimen_id")
     db.session.commit()
     return jsonify(turno.serialize()), 200
 
@@ -187,14 +192,14 @@ def crear_regimen_horario():
     nombre = body.get("nombre")
     horas_trabajo = body.get("horas_trabajo")
     horas_descanso = body.get("horas_descanso")
-    adminte_rotacion_par_impar = body.get("admite_rotacion_par_impar")
+    admite_rotacion_par_impar = body.get("admite_rotacion_par_impar")
     adminte_medio_horario = body.get("admite_medio_horario")
 
     nuevo = RegimenHorario(
         nombre=nombre,
         horas_trabajo=horas_trabajo,
         horas_descanso=horas_descanso,
-        adminte_rotacion_par_impar=adminte_rotacion_par_impar,
+        admite_rotacion_par_impar=admite_rotacion_par_impar,
         admite_medio_horario=adminte_medio_horario
     )
     db.session.add(nuevo)
@@ -211,7 +216,7 @@ def actualizar_regimen(id):
     regimen.nombre = body.get("nombre")
     regimen.horas_trabajo = body.get("horas_trabajo")
     regimen.horas_descanso = body.get("horas_descanos")
-    regimen.adminte_rotacion_par_impar = body.get("adminte_rotacion_par_impar")
+    regimen.admite_rotacion_par_impar = body.get("admite_rotacion_par_impar")
     regimen.adminte_medio_horario = body.get("adminte_medio_horario")
     db.session.commit()
     return jsonify(regimen.serialize()), 200
@@ -359,8 +364,6 @@ def crear_usuario():
     is_admin = body.get("is_admin")
     turno_id = body.get("turno_id")
     funcion_id = body.get("funcion_id")
-    rotacion = body.get("rotacion")
-    regimen_id = body.get("regimen_id")
 
 
     ROLES_VALIDOS = ['JEFE_ZONA', 'ADMINISTRADOR', 'FUNCIONARIO', 'JEFE_DEPENDENCIA']
@@ -411,8 +414,6 @@ def crear_usuario():
         estado=estado,
         turno_id=turno_id,
         funcion_id=funcion_id,
-        rotacion=rotacion,
-        regimen_id=regimen_id
     )
 
     db.session.add(nuevo_usuario)
@@ -453,8 +454,6 @@ def actualizar_usuario(id):
     estado = body.get("estado", usuario.estado)
     is_admin = body.get("is_admin", usuario.is_admin)
     funcion_id = body.get("funcion_id", usuario.funcion_id)
-    rotacion = body.get("rotacion", usuario.rotacion)
-    regimen_id = body.get("regimen_id", usuario.regimen_id)
 
     # 🔥 ESTA ES LA PARTE IMPORTANTE
     turno_id = body.get("turno_id", usuario.turno_id)
@@ -487,8 +486,6 @@ def actualizar_usuario(id):
     usuario.turno_id = turno_id
     usuario.funcion_id = funcion_id
     usuario.is_admin = is_admin
-    usuario.rotacion = rotacion
-    usuario.regimen_id = regimen_id
 
     db.session.commit()
     return jsonify(usuario.serialize()), 200
@@ -556,8 +553,6 @@ def setup_admin():
         estado="Activo",
         turno_id=None,
         funcion_id=None,
-        rotacion=None,
-        regimen_id=None
     )
 
     db.session.add(nuevo_admin)
@@ -963,7 +958,7 @@ def eliminar_vehiculo(id):
 
 
 # -------------------------------------------------------------------
-# SERVICIOS
+# SERVICIOS MOVILES
 # -------------------------------------------------------------------
 @api.route('/servicios', methods=['GET'])
 def listar_servicios():

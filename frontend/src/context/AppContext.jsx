@@ -16,12 +16,11 @@ export const AppProvider = ({ children }) => {
   const [extraordinarias, setExtraordinarias] = useState([]);
   const [licenciasPendientes, setLicenciasPendientes] = useState([]);
   const [licenciasRechazadas, setLicenciasRechazadas] = useState([]);
-  const [notificaciones, setNotificaciones ] = useState([]);
+  const [notificaciones, setNotificaciones] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [funciones, setFunciones] = useState([]);
   const [servicios, setServicios] = useState([]);
-  
-
+  const [regimenes, setRegimenes] = useState([]);
 
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [userId, setUserId] = useState(localStorage.getItem("userId") || null);
@@ -35,8 +34,21 @@ export const AppProvider = ({ children }) => {
       const usuarioData = await fetchData(`/usuarios/${userId}`);
       setUsuario(usuarioData);
 
-      if (usuarioData?.rol_jerarquico === "ADMINISTRADOR" || usuarioData?.rol_jerarquico === "JEFE_ZONA") {
-        const [jefaturasData, dependenciasData, guardiasData, licenciasData, notificacionesData, vehiculosData, funcionesData, serviciosData] = await Promise.all([
+      if (
+        usuarioData?.rol_jerarquico === "ADMINISTRADOR" ||
+        usuarioData?.rol_jerarquico === "JEFE_ZONA"
+      ) {
+        const [
+          jefaturasData,
+          dependenciasData,
+          guardiasData,
+          licenciasData,
+          notificacionesData,
+          vehiculosData,
+          funcionesData,
+          serviciosData,
+          regimenesData,
+        ] = await Promise.all([
           fetchData("/jefaturas"),
           fetchData("/dependencias"),
           fetchData("/guardias"),
@@ -45,6 +57,7 @@ export const AppProvider = ({ children }) => {
           fetchData("/vehiculos"),
           fetchData("/funcion"),
           fetchData("/servicios"),
+          fetchData("/regimen_horarios"),
         ]);
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
@@ -54,8 +67,23 @@ export const AppProvider = ({ children }) => {
         setVehiculos(vehiculosData || []);
         setFunciones(funcionesData || []);
         setServicios(serviciosData || []);
-      } else if (usuarioData?.rol_jerarquico === "JEFE_DEPENDENCIA" || usuarioData?.rol_jerarquico === "FUNCIONARIO") {
-        const [jefaturasData, dependenciasData, turnosData, guardiasData, licenciasData, notificacionesData, vehiculosData, funcionesData, serviciosData ] = await Promise.all([
+        setRegimenes(regimenesData || []);
+      } else if (
+        usuarioData?.rol_jerarquico === "JEFE_DEPENDENCIA" ||
+        usuarioData?.rol_jerarquico === "FUNCIONARIO"
+      ) {
+        const [
+          jefaturasData,
+          dependenciasData,
+          turnosData,
+          guardiasData,
+          licenciasData,
+          notificacionesData,
+          vehiculosData,
+          funcionesData,
+          serviciosData,
+          regimenesData,
+        ] = await Promise.all([
           fetchData("/jefaturas"),
           fetchData("/dependencias"),
           fetchData("/turnos"),
@@ -65,25 +93,43 @@ export const AppProvider = ({ children }) => {
           fetchData("/vehiculos"),
           fetchData("/funcion"),
           fetchData("/servicios"),
+          fetchData("/regimen_horarios"),
         ]);
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
         setTurnos(turnosData || []);
-        console.log(turnosData)
-        const ordinariasData = guardiasData.filter(g => g.tipo !== "extraordinaria");
+        const ordinariasData = guardiasData.filter(
+          (g) => g.tipo !== "extraordinaria"
+        );
         setGuardias(ordinariasData);
-        const extraorariasData = guardiasData.filter(g => g.tipo === "Extraordinaria" || g.tipo === "Curso" || g.tipo === "curso" || g.tipo === "extraordinaria");
+        const extraorariasData = guardiasData.filter(
+          (g) =>
+            g.tipo === "Extraordinaria" ||
+            g.tipo === "Curso" ||
+            g.tipo === "curso" ||
+            g.tipo === "extraordinaria"
+        );
         setExtraordinarias(extraorariasData);
-        const licenciasAprobadas = licenciasData.filter(l => l.estado === "aprobada" || l.estado === "aprobado" || l.estado === "activo");
+        const licenciasAprobadas = licenciasData.filter(
+          (l) =>
+            l.estado === "aprobada" ||
+            l.estado === "aprobado" ||
+            l.estado === "activo"
+        );
         setLicencias(licenciasAprobadas || []);
-        const licenciasPendientes = licenciasData.filter(l => l.estado === "pendiente");
+        const licenciasPendientes = licenciasData.filter(
+          (l) => l.estado === "pendiente"
+        );
         setLicenciasPendientes(licenciasPendientes || []);
-        const licenciasRechazadas = licenciasData.filter(l => l.estado === "rechazada");
+        const licenciasRechazadas = licenciasData.filter(
+          (l) => l.estado === "rechazada"
+        );
         setLicenciasRechazadas(licenciasRechazadas || []);
         setNotificaciones(notificacionesData || []);
         setVehiculos(vehiculosData || []);
         setFunciones(funcionesData || []);
         setServicios(serviciosData || []);
+        setRegimenes(regimenesData || []);
       }
     } catch (error) {
       console.error("Error cargando datos de la app:", error);
@@ -93,8 +139,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  
-
   useEffect(() => {
     if (token && userId && !estaTokenExpirado(token)) {
       fetchAppData();
@@ -102,7 +146,6 @@ export const AppProvider = ({ children }) => {
       setLoading(false);
     }
   }, [token, userId]);
-
 
   const login = async (correo, password) => {
     try {
@@ -151,8 +194,8 @@ export const AppProvider = ({ children }) => {
     setVehiculos([]);
     setFunciones([]);
     setServicios([]);
+    setRegimenes([]);
     setUsuario(null);
-
   };
 
   const recargarDependencias = async () => {
@@ -166,11 +209,22 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const recargarTurnos = async () => {
+    try {
+      const turnosData = await fetchData("/turnos");
+      setTurnos(turnosData || []);
+    } catch (error) {
+      console.error("Error cargando datos de turnos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const recargarGuaridas = async () => {
     const data = await fetchData(`/guardias`);
-    const ordinariasData2 = data.filter(g => g.tipo !== "extraordinaria");
+    const ordinariasData2 = data.filter((g) => g.tipo !== "extraordinaria");
     setGuardias(ordinariasData2);
-    const extraorariasData2 = data.filter(g => g.tipo === "extraordinaria");
+    const extraorariasData2 = data.filter((g) => g.tipo === "extraordinaria");
     setExtraordinarias(extraorariasData2);
     const data2 = await fetchData(`/licencias`);
     setLicencias(data2);
@@ -233,6 +287,17 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const recargarRegimenes = async () => {
+    try {
+      const regimenesData = await fetchData("/regimen_horarios");
+      setRegimenes(regimenesData || []);
+    } catch (error) {
+      console.error("Error cargando datos de regimenes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const recargarDatos = async () => {
     await fetchAppData();
   };
@@ -261,13 +326,12 @@ export const AppProvider = ({ children }) => {
     9: "Crio. Mayor",
   };
 
-  const grados = [ 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const grados = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   const obtenerGrado = (grado) => gradosEquivalencia[grado] ?? grado;
 
-
-  const obtenerGradoAbreviado = (grado) => gradosAbreviadosEquivalencia[grado] ?? grado;
-
+  const obtenerGradoAbreviado = (grado) =>
+    gradosAbreviadosEquivalencia[grado] ?? grado;
 
   return (
     <AppContext.Provider
@@ -286,14 +350,18 @@ export const AppProvider = ({ children }) => {
         vehiculos,
         funciones,
         servicios,
+        regimenes,
         token,
         loading,
         grados,
+        setLoading,
         setNewToken,
         login,
         logout,
         recargarDatos,
         recargarDependencias,
+        recargarTurnos,
+        recargarRegimenes,
         recargarGuaridas,
         recargarNotificaciones,
         setUsuario,

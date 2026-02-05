@@ -11,8 +11,7 @@ import BackButton from "../components/BackButton";
 export default function CrearTurno() {
   const depId = useLocation().state?.depId;
   const navigate = useNavigate();
-  const { token, recargarDatos } = useAppContext();
-
+  const { token, regimenes, recargarDatos } = useAppContext();
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -20,6 +19,7 @@ export default function CrearTurno() {
     hora_fin: "",
     descripcion: "",
     dependencia_id: depId || "",
+    regimen_id: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -70,6 +70,7 @@ export default function CrearTurno() {
       hora_fin: "",
       descripcion: "",
       dependencia_id: depId || "",
+      regimen_id: null,
     });
     setErrors({});
     setSuccess(false);
@@ -135,6 +136,20 @@ export default function CrearTurno() {
               ))}
             </select>
           )}
+          
+            <select
+              name="regimen_id"
+              value={formData.regimen_id}
+              onChange={handleChange}
+              className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            >
+              <option value="">Seleccionar régimen</option>
+              {regimenes.map(r => (
+                <option key={r.id} value={r.id}>
+                  {r.nombre}
+                </option>
+              ))}
+            </select>
 
           {/* Botones */}
           <button

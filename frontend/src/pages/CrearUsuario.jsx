@@ -11,11 +11,20 @@ import BackButton from "../components/BackButton";
 
 export default function CrearUsuario() {
   const navigate = useNavigate();
-  const { jefaturas, token, funciones, recargarDependencias, grados } = useAppContext();
+
+  const {
+    jefaturas,
+    funciones,
+    regimenes,
+    grados,
+    token,
+    recargarJefaturas,
+    recargarDependencias,
+  } = useAppContext();
 
   const dependencias =
-    jefaturas?.flatMap((jefatura) =>
-      jefatura.zonas?.flatMap((zona) => zona.dependencias || []) || []
+    jefaturas?.flatMap((j) =>
+      j.zonas?.flatMap((z) => z.dependencias || []) || []
     ) || [];
 
   const [formData, setFormData] = useState({
@@ -28,286 +37,199 @@ export default function CrearUsuario() {
     dependencia_id: "",
     turno_id: "",
     funcion_id: "",
-    estado: "Activo",
+    estado: "ACTIVO",
     is_admin: false,
   });
 
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // ✅ Filtrar turnos por dependencia seleccionada
   const turnosFiltrados = useMemo(() => {
-    const depSeleccionada = dependencias.find(
-      (dep) => dep.id === Number(formData.dependencia_id)
+    const dep = dependencias.find(
+      (d) => d.id === Number(formData.dependencia_id)
     );
-    return depSeleccionada?.turnos || [];
+    return dep?.turnos || [];
   }, [formData.dependencia_id, dependencias]);
 
-  const validate = (name, value) => {
-    let message = "";
-    switch (name) {
-      case "correo":
-        if (!/\S+@\S+\.\S+/.test(value)) message = "Correo inválido";
-        break;
-      case "password":
-        if (value.length < 6) message = "Debe tener al menos 6 caracteres";
-        break;
-      case "nombre":
-        if (value.trim().length < 3) message = "Debe tener al menos 3 letras";
-        break;
-      default:
-        if (!value.trim() && name !== "fecha_ingreso") message = "Campo obligatorio";
-    }
-    setErrors((prev) => ({ ...prev, [name]: message }));
-  };
+  useEffect(() => {
+    if (!token || estaTokenExpirado(token)) navigate("/login");
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
-      ...(name === "dependencia_id" ? { turno_id: "" } : {}), 
+      ...(name === "dependencia_id" ? { turno_id: "" } : {}),
     }));
-    validate(name, value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const hasErrors = Object.values(errors).some((e) => e);
-    if (hasErrors) return alert("Corrige los errores antes de enviar");
 
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const payload = {
-        ...formData,
-        dependencia_id: formData.dependencia_id || null,
-        turno_id: formData.turno_id || null,
-        fecha_ingreso: formData.fecha_ingreso || null,
-      };
-
-      const data = await postData("usuarios", payload, token);
-      if (data) setSuccess(true);
+      await postData("usuarios", formData, token);
+      setSuccess(true);
+      recargarJefaturas();
       recargarDependencias();
     } catch (err) {
-      alert(`❌ Error: ${err.message}`);
+      alert(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      grado: "",
-      nombre: "",
-      correo: "",
-      password: "",
-      rol_jerarquico: "",
-      fecha_ingreso: dayjs().format("YYYY-MM-DD"),
-      dependencia_id: "",
-      turno_id: "",
-      funcion_id: "",
-      estado: "Activo",
-      is_admin: false,
-    });
-    setErrors({});
-    setSuccess(false);
-  };
-
-  useEffect(() => {
-    if (!token || estaTokenExpirado(token)) navigate("/login");
-  }, [token, navigate]);
+  const inputClass =
+    "w-full border border-blue-200 dark:border-slate-700 rounded-xl px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none text-sm sm:text-base";
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-      <div className="flex-grow flex flex-col items-center p-4 pb-24 flex-grow flex flex-col items-center p-4 pb-24 dark:bg-slate-900  p-6 w-full lg:w-3/4 xl:max-w-4xl mx-auto">
+      <div className="flex-grow w-full px-3 sm:px-6 py-6 sm:py-10 mx-auto max-w-xl md:max-w-2xl lg:max-w-3xl">
         <form
           onSubmit={handleSubmit}
-          className="w-full  bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4"
+          className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 space-y-4"
         >
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <PlusCircle className="text-blue-600 dark:text-blue-300" size={28} />
-            <h1 className="text-xl font-semibold text-blue-900 dark:text-blue-200">
-              Crear nuevo usuario
+          <div className="flex justify-center items-center gap-2 mb-3">
+            <PlusCircle size={26} className="text-blue-600" />
+            <h1 className="text-lg sm:text-xl font-semibold text-blue-800 dark:text-blue-200">
+              Crear usuario
             </h1>
           </div>
 
-          {/* Inputs principales */}
-          {[
-            { name: "nombre", placeholder: "Nombre completo" },
-            { name: "correo", placeholder: "Correo electrónico", type: "email" },
-            { name: "password", placeholder: "Contraseña", type: "password" },
-          ].map(({ name, placeholder, type = "text" }) => (
-            <div key={name}>
-              <input
-                type={type}
-                name={name}
-                placeholder={placeholder}
-                value={formData[name]}
-                onChange={handleChange}
-                required
-                className={`w-full border rounded-lg px-3 py-2 bg-transparent outline-none focus:ring-2 transition-all ${
-                  errors[name]
-                    ? "border-red-400 focus:ring-red-400"
-                    : "border-blue-200 dark:border-slate-700 focus:ring-blue-400"
-                }`}
-              />
-              {errors[name] && <p className="text-xs text-red-500 mt-1">{errors[name]}</p>}
-            </div>
-          ))}
-          {/* Grado */}
-          <div>
-            <select
-              name="grado"
-              value={formData.grado || ""}
-              onChange={handleChange}
-              className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
-            >
-              <option value="">Seleccionar grado</option>
-              {grados.map((grado) => (
-                <option key={grado} value={grado}>
-                  {grado}
-                </option>
-              ))}
-            </select>
-          </div>
+          <input
+            name="nombre"
+            placeholder="Nombre completo"
+            value={formData.nombre}
+            onChange={handleChange}
+            className={inputClass}
+          />
 
-          {/* Fecha ingreso */}
+          <input
+            type="email"
+            name="correo"
+            placeholder="Correo"
+            value={formData.correo}
+            onChange={handleChange}
+            className={inputClass}
+          />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            value={formData.password}
+            onChange={handleChange}
+            className={inputClass}
+          />
+
+          <select
+            name="grado"
+            value={formData.grado}
+            onChange={handleChange}
+            className={inputClass}
+          >
+            <option value="">Seleccionar grado</option>
+            {grados.map((g) => (
+              <option key={g}>{g}</option>
+            ))}
+          </select>
+
           <input
             type="date"
             name="fecha_ingreso"
             value={formData.fecha_ingreso}
             onChange={handleChange}
-            className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            className={inputClass}
           />
 
-          {/* Select Rol */}
           <select
             name="rol_jerarquico"
             value={formData.rol_jerarquico}
             onChange={handleChange}
-            required
-            className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            className={inputClass}
           >
-            <option value="">Seleccionar rol</option>
+            <option value="">Rol jerárquico</option>
             <option value="ADMINISTRADOR">Administrador</option>
-            <option value="JEFE_ZONA">Jefe de Zona</option>
-            <option value="JEFE_DEPENDENCIA">Jefe de Dependencia</option>
+            <option value="JEFE_ZONA">Jefe Zona</option>
+            <option value="JEFE_DEPENDENCIA">Jefe Dependencia</option>
             <option value="FUNCIONARIO">Funcionario</option>
           </select>
 
-          {/* Select Dependencia */}
           <select
             name="dependencia_id"
             value={formData.dependencia_id}
             onChange={handleChange}
-            className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            className={inputClass}
           >
-            <option value="">Seleccionar dependencia (opcional)</option>
-            {dependencias.map((dep) => (
-              <option key={dep.id} value={dep.id}>
-                {dep.nombre}
+            <option value="">Dependencia</option>
+            {dependencias.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.nombre}
               </option>
             ))}
           </select>
 
-          {/* 🔹 Select Turno filtrado por dependencia */}
           <select
             name="turno_id"
             value={formData.turno_id}
             onChange={handleChange}
-            disabled={!formData.dependencia_id || turnosFiltrados.length === 0}
-            className={`w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none ${
-              !formData.dependencia_id ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={inputClass}
           >
-            <option value="">
-              {turnosFiltrados.length > 0
-                ? "Seleccionar turno (opcional)"
-                : "Sin turnos disponibles"}
-            </option>
-            {turnosFiltrados.map((turno) => (
-              <option key={turno.id} value={turno.id}>
-                {turno.nombre}
+            <option value="">Turno</option>
+            {turnosFiltrados.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.nombre}
               </option>
             ))}
           </select>
 
-          {/* Select Funcion */}
           <select
             name="funcion_id"
             value={formData.funcion_id}
             onChange={handleChange}
-            className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            className={inputClass}
           >
-            <option value="">Seleccionar función (opcional)</option>
-            {funciones.map((funcion) => (
-              <option key={funcion.id} value={funcion.id}>
-                {funcion.descripcion}
+            <option value="">Función</option>
+            {funciones.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.descripcion}
               </option>
             ))}
           </select>
 
-          {/* Checkbox admin */}
-          <label className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-300 mt-2">
+          <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               name="is_admin"
               checked={formData.is_admin}
               onChange={handleChange}
-              className="accent-blue-600"
             />
-            ¿Es administrador?
+            Administrador
           </label>
 
-          {/* Botones */}
           <button
-            type="submit"
             disabled={loading}
-            className={`w-full py-2 rounded-lg text-white font-medium transition-all ${
-              loading
-                ? "bg-blue-300 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium"
           >
-            {loading ? "Creando usuario..." : "Crear usuario"}
+            {loading ? "Creando..." : "Crear usuario"}
           </button>
 
-          <BackButton to={-1} tooltip="Volver" />
         </form>
+        <BackButton to={-1} />
+
       </div>
 
       <Navbar />
 
-      {/* Modal éxito */}
       <AnimatePresence>
         {success && (
-          <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 text-center max-w-sm w-full"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-            >
-              <CheckCircle2 className="text-green-500 w-16 h-16 mx-auto mb-3" />
-              <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-200">
-                Usuario creado con éxito
-              </h2>
-              <div className="flex justify-center gap-3 mt-6">
-                <button
-                  onClick={resetForm}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium transition-all"
-                >
-                  Crear otro
-                </button>
-                <BackButton to={-1} tooltip="Volver" />
-              </div>
+          <motion.div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+            <motion.div className="bg-white dark:bg-slate-900 p-8 rounded-2xl text-center shadow-lg">
+              <CheckCircle2 className="mx-auto text-green-500 mb-3" size={50} />
+              <p className="font-semibold">Usuario creado correctamente</p>
+              <BackButton to={-1} />
             </motion.div>
           </motion.div>
         )}

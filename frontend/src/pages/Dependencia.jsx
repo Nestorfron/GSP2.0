@@ -113,6 +113,10 @@ const Dependencia = () => {
     "Segundo Turno",
     "Tercer Turno",
     "Destacados",
+    "Primera Guardia",
+    "Segunda Guardia",
+    "Tercera Guardia",
+    "Cuarta Guardia",
   ];
 
   // Turnos
@@ -377,6 +381,16 @@ const Dependencia = () => {
                         <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
                           {t.nombre}
                         </h3>
+                        <IconButton
+                          icon={Edit}
+                          tooltip="Editar"
+                          onClick={() =>
+                            navigate(`/editar-turno`, {
+                              state: { turno: t },
+                            })
+                          }
+                          size="sm"
+                        />
                       </div>
 
                       {/* Tabla de funcionarios del turno */}

@@ -1,32 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { PlusCircle, CheckCircle2 } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { CheckCircle2, Pencil } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { postData } from "../utils/api";
+import { putData } from "../utils/api";
 import Navbar from "../components/BottomNavbar";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import { useAppContext } from "../context/AppContext";
 import BackButton from "../components/BackButton";
 
-
-
-export default function CrearDependencia() {
-  const { token, regimenes, recargarDatos } = useAppContext();
+export default function EditarDependencia() {
+  const { token, jefaturas, regimenes, recargarDependencias, loading, setLoading } = useAppContext();
   const navigate = useNavigate();
-  const { zonaId } = useParams();
+  const location = useLocation();
+
+  const dependencia = location.state?.dependencia;
+
+  const zonas = jefaturas?.flatMap((j) => j.zonas || []) || [];
+
   const [formData, setFormData] = useState({
-    nombre: "",
-    descripcion: "",
-    zona_id: zonaId || "",
-    regimen_id: "",
+    nombre: dependencia?.nombre || "",
+    descripcion: dependencia?.descripcion || "",
+    zona_id: dependencia?.zona_id || "",
+    regimen_id: dependencia?.regimen_id || "",
   });
+
+
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  /* ================= VALIDACIÓN ================= */
   const validate = (name, value) => {
     let message = "";
-    if (!value.trim()) message = "Campo obligatorio";
+    if (!value?.toString().trim() && name === "nombre") {
+      message = "Campo obligatorio";
+    }
     setErrors((prev) => ({ ...prev, [name]: message }));
   };
 
@@ -36,17 +43,30 @@ export default function CrearDependencia() {
     validate(name, value);
   };
 
+  /* ================= CARGAR DESDE STATE ================= */
+
+
+  /* ================= TOKEN ================= */
+  useEffect(() => {
+    if (!token || estaTokenExpirado(token)) {
+      navigate("/login");
+    }
+  }, [token]);
+
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const hasErrors = Object.values(errors).some((e) => e);
     if (hasErrors) return alert("Corrige los errores antes de enviar");
 
     setLoading(true);
+
     try {
-      const token = localStorage.getItem("token");
-      const data = await postData("dependencias", formData, token);
-      if (data) setSuccess(true);
-      recargarDatos();
+      await putData(`dependencias/${dependencia.id}`, formData, token);
+
+      setSuccess(true);
+      recargarDependencias();
     } catch (err) {
       alert(`❌ Error: ${err.message}`);
     } finally {
@@ -54,29 +74,17 @@ export default function CrearDependencia() {
     }
   };
 
-  const resetForm = () => {
-    setFormData({ nombre: "", descripcion: "", zona_id: zonaId || "", regimen_id: "" });
-    setErrors({});
-    setSuccess(false);
-  };
-
-  useEffect(() => {
-    if (!token || estaTokenExpirado(token)) {
-      navigate("/login");
-    }
-  }, [token, navigate]);
-
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-      <div className="flex-grow flex flex-col items-center p-4 pb-24 dark:bg-slate-900  p-6 w-full lg:w-3/4 xl:max-w-4xl mx-auto">
+      <div className="flex-grow flex flex-col items-center p-4 pb-24 p-6 w-full lg:w-3/4 xl:max-w-4xl mx-auto">
         <form
           onSubmit={handleSubmit}
-          className="w-full  bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4"
+          className="w-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 space-y-4"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
-            <PlusCircle className="text-blue-600 dark:text-blue-300" size={28} />
+            <Pencil className="text-blue-600 dark:text-blue-300" size={28} />
             <h1 className="text-xl font-semibold text-blue-900 dark:text-blue-200">
-              Crear nueva dependencia
+              Editar dependencia
             </h1>
           </div>
 
@@ -89,31 +97,37 @@ export default function CrearDependencia() {
               onChange={handleChange}
               required
               className={`w-full border rounded-lg px-3 py-2 bg-transparent outline-none focus:ring-2 transition-all ${
-                errors.nombre ? "border-red-400 focus:ring-red-400" : "border-blue-200 dark:border-slate-700 focus:ring-blue-400"
+                errors.nombre
+                  ? "border-red-400 focus:ring-red-400"
+                  : "border-blue-200 dark:border-slate-700 focus:ring-blue-400"
               }`}
             />
-            {errors.nombre && <p className="text-xs text-red-500 mt-1">{errors.nombre}</p>}
+
+            {errors.nombre && (
+              <p className="text-xs text-red-500">{errors.nombre}</p>
+            )}
 
             <textarea
               name="descripcion"
-              placeholder="Descripción (opcional)"
+              placeholder="Descripción"
               value={formData.descripcion}
               onChange={handleChange}
               className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none resize-none"
             />
 
-            {!zonaId && (
-              <input
-                type="number"
-                name="zona_id"
-                placeholder="ID de la zona"
-                value={formData.zona_id}
-                onChange={handleChange}
-                className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
-              />
-            )}
-          </div>
-          <div className="space-y-3">
+            <select
+              name="zona_id"
+              value={formData.zona_id}
+              onChange={handleChange}
+              className="w-full border border-blue-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-400 outline-none"
+            >
+              {zonas.map((z) => (
+                <option key={z.id} value={z.id}>
+                  {z.nombre}
+                </option>
+              ))}
+            </select>
+
             <select
               name="regimen_id"
               value={formData.regimen_id}
@@ -133,18 +147,22 @@ export default function CrearDependencia() {
             type="submit"
             disabled={loading}
             className={`w-full py-2 rounded-lg text-white font-medium transition-all ${
-              loading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+              loading
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
-            {loading ? "Creando dependencia..." : "Crear dependencia"}
+            Guardar cambios
           </button>
 
-          <BackButton to={-1} tooltip="Volver" />
         </form>
+        <BackButton to={-1} tooltip="Volver" />
+
       </div>
 
       <Navbar />
 
+      {/* MODAL SUCCESS */}
       <AnimatePresence>
         {success && (
           <motion.div
@@ -160,20 +178,13 @@ export default function CrearDependencia() {
               exit={{ scale: 0.8 }}
             >
               <CheckCircle2 className="text-green-500 w-16 h-16 mx-auto mb-3" />
+
               <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-200">
-                Dependencia creada con éxito
+                Dependencia actualizada
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                La nueva dependencia fue registrada correctamente.
-              </p>
+
               <div className="flex justify-center gap-3 mt-6">
-                <button
-                  onClick={resetForm}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium transition-all"
-                >
-                  Crear otra
-                </button>
-                <BackButton to="/admin" tooltip="Volver" />
+                <BackButton to="/admin" tooltip="Volver al panel" />
               </div>
             </motion.div>
           </motion.div>

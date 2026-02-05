@@ -69,10 +69,12 @@ class Dependencia(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     descripcion = db.Column(db.Text)
     zona_id = db.Column(db.Integer, db.ForeignKey('zonas.id'), nullable=True)
+    regimen_id = db.Column(db.Integer, db.ForeignKey('regimenes_horarios.id'), nullable=True)
 
     usuarios = db.relationship('Usuario', backref='dependencia', lazy=True)
     turnos = db.relationship('Turno', backref='dependencia', lazy=True)
     vehiculos = db.relationship('Vehiculo', backref='dependencia', lazy=True)
+
 
     zonas_asignadas = db.relationship(
         'Zona',
@@ -89,6 +91,7 @@ class Dependencia(db.Model):
             'nombre': self.nombre,
             'descripcion': self.descripcion,
             'zona_id': self.zona_id,
+            'regimen_id': self.regimen_id,
             'usuarios': [u.serialize() for u in self.usuarios],
             'turnos': [t.serialize() for t in self.turnos],
             'vehiculos': [v.serialize() for v in self.vehiculos]
@@ -108,7 +111,6 @@ class Usuario(db.Model):
     rol_jerarquico = db.Column(db.String(50), nullable=False)
     fecha_ingreso = db.Column(db.DateTime, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
-    rotacion =  db.Column(db.Boolean, default=True)
 
 
     dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=True)
@@ -118,8 +120,6 @@ class Usuario(db.Model):
     turno_id = db.Column(db.Integer, db.ForeignKey('turnos.id'), nullable=True)
 
     funcion_id = db.Column(db.Integer, db.ForeignKey('funcion.id'), nullable=True)
-
-    regimen_id = db.Column(db.Integer, db.ForeignKey('regimenes_horarios.id'), nullable=True)
 
     estado = db.Column(db.String(50), nullable=True)
     
@@ -146,14 +146,12 @@ class Usuario(db.Model):
             'rol_jerarquico': self.rol_jerarquico,
             'fecha_ingreso': self.fecha_ingreso,
             'dependencia_id': self.dependencia_id,
-            'rotacion': self.rotacion,
             'zona_id': self.zona_id,
             'turno_id': self.turno_id,
-            'regimen_id': self.regimen_id,
             'estado': self.estado,
             'is_admin': self.is_admin,
+            'funcion_id': self.funcion_id,
             'prendas': [p.serialize() for p in self.prendas],
-            'funcion_id': self.funcion_id
         }
 
 
@@ -192,8 +190,9 @@ class Turno(db.Model):
     hora_fin = db.Column(db.Time, nullable=False)
     descripcion = db.Column(db.Text)
 
-
     dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=False)
+
+    regimen_id = db.Column(db.Integer, db.ForeignKey('regimenes_horarios.id'), nullable=True)
 
 
     def serialize(self):
@@ -203,11 +202,16 @@ class Turno(db.Model):
             'hora_inicio': str(self.hora_inicio),
             'hora_fin': str(self.hora_fin),
             'descripcion': self.descripcion,
-            'dependencia_id': self.dependencia_id
+            'dependencia_id': self.dependencia_id,
+            'regimen_id': self.regimen_id
         }
 
     def __repr__(self):
         return f'<Turno {self.nombre}>'
+    
+# -------------------------
+# REGIMENES DE TRABAJO
+# -------------------------
 
 class RegimenHorario(db.Model):
     __tablename__ = 'regimenes_horarios'
@@ -222,6 +226,20 @@ class RegimenHorario(db.Model):
     admite_medio_horario = db.Column(db.Boolean, default=False)
 
     descripcion = db.Column(db.Text)
+
+    dependencias = db.relationship('Dependencia', backref='regimen', lazy=True)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'nombre': self.nombre,
+            'horas_trabajo': self.horas_trabajo,
+            'horas_descanso': self.horas_descanso,
+            'admite_rotacion_par_impar': self.admite_rotacion_par_impar,
+            'admite_medio_horario': self.admite_medio_horario,
+            'descripcion': self.descripcion,
+            'dependencias': [d.serialize() for d in self.dependencias]
+        }
 
     def __repr__(self):
         return f'<RegimenHorario {self.nombre}>'
@@ -412,7 +430,7 @@ class Vehiculo(db.Model):
         
 
 # -------------------------
-# SERVICIOS
+# SERVICIOS MOVILES
 # -------------------------
 
 class Servicio(db.Model):
