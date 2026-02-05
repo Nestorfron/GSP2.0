@@ -178,13 +178,13 @@ const Dependencia = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-     
       <main className="flex-1 px-6 py-8 space-y-6 w-full lg:w-3/4 xl:max-w-4xl mx-auto">
         {/* Encabezado */}
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
             Bienvenido,
-            <br />{obtenerGrado(usuario.grado)} {usuario.nombre}
+            <br />
+            {obtenerGrado(usuario.grado)} {usuario.nombre}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             {" "}
@@ -690,9 +690,22 @@ const Dependencia = () => {
                   </div>
                 </div>
               ) : (
-                <p className="text-center text-gray-500 bg-white dark:bg-slate-800 dark:text-gray-400 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 p-4">
-                  No hay vehículos asignados a esta dependencia.
-                </p>
+                <div className="text-center">
+                  <IconButton
+                    className="ms-auto"
+                    icon={PlusCircle}
+                    tooltip="Agregar vehículo"
+                    onClick={() =>
+                      navigate(`/crear-vehiculo`, {
+                        state: { depId: miDependencia?.id },
+                      })
+                    }
+                    size="sm"
+                  />
+                  <p className="text-center text-gray-500 bg-white dark:bg-slate-800 dark:text-gray-400 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 p-4">
+                    No hay vehículos asignados a esta dependencia.
+                  </p>
+                </div>
               )}
             </div>
           </div>

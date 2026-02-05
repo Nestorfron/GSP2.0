@@ -154,6 +154,17 @@ export const AppProvider = ({ children }) => {
 
   };
 
+  const recargarDependencias = async () => {
+    try {
+      const dependenciasData = await fetchData("/dependencias");
+      setDependencias(dependenciasData || []);
+    } catch (error) {
+      console.error("Error cargando datos de dependencias:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const recargarGuaridas = async () => {
     const data = await fetchData(`/guardias`);
     const ordinariasData2 = data.filter(g => g.tipo !== "extraordinaria");
@@ -281,6 +292,7 @@ export const AppProvider = ({ children }) => {
         login,
         logout,
         recargarDatos,
+        recargarDependencias,
         recargarGuaridas,
         recargarNotificaciones,
         setUsuario,
