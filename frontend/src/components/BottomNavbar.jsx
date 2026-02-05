@@ -76,15 +76,15 @@ const BottomNavbar = () => {
     }
   };
 
-  const getEscalafonPath = () => {
-    if (usuario.rol_jerarquico === "ADMINISTRADOR" || usuario.rol_jerarquico === "JEFE_ZONA") return "/escalafon-servicio";
-    const regimen_id = dependencias.find((d) => d.id === usuario.dependencia_id).regimen_id;
-    const regimen = regimenes.find((r) => r.id === regimen_id)?.nombre;
-    if (regimen === "12X36") {
-      return "/escalafon-12x36";
-    }
-    return "/escalafon-servicio";
-  };
+  // const getEscalafonPath = () => {
+  //   if (usuario.rol_jerarquico === "ADMINISTRADOR" || usuario.rol_jerarquico === "JEFE_ZONA") return "/escalafon-servicio";
+  //   const regimen_id = dependencias.find((d) => d.id === usuario.dependencia_id).regimen_id;
+  //   const regimen = regimenes.find((r) => r.id === regimen_id)?.nombre;
+  //   if (regimen === "12X36") {
+  //     return "/escalafon-12x36";
+  //   }
+  //   return "/escalafon-servicio";
+  // };
 
   const notificacionesUsuario = notificaciones.filter(
     (n) => n.usuario_id === usuario.id
@@ -110,7 +110,8 @@ const BottomNavbar = () => {
     {
       key: "escalafon",
       icon: Calendar,
-      path: getEscalafonPath(),
+      // path: getEscalafonPath(),
+      path: "/escalafon-servicio",
       label: "Escalafón",
     },
     {

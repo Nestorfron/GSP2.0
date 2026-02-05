@@ -56,6 +56,11 @@ const Zona = () => {
     );
   }
 
+  const dependenciasOrdenadas = [...(dependencias || [])].sort((a, b) =>
+    a.nombre.localeCompare(b.nombre, undefined, { numeric: true })
+  );
+  
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
     
@@ -191,7 +196,7 @@ const Zona = () => {
           <div className="w-full px-4 pb-6" style={{ height: "350px" }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={dependencias?.map((dep) => ({
+                data={dependenciasOrdenadas.map((dep) => ({
                   name: dep.nombre.replace("Seccional", "Secc"),
                   value:
                     dep.usuarios?.filter(

@@ -37,6 +37,7 @@ const PlanillaDiaria = () => {
     usuario,
     dependencias,
     turnos,
+    regimenes,
     guardias,
     licencias,
     extraordinarias,
@@ -71,6 +72,17 @@ const PlanillaDiaria = () => {
       return funcionesEditadas[f.id] || "Agregar función";
     }
     return estado || "Servicio";
+  };
+
+  const regimenNombre = () => {
+    for (const r of regimenes) {
+      if (r.id === miDependencia.regimen_id) {
+        if (r.nombre === "12X36") return "12X36";
+        if (r.nombre === "24X48") return "24X48";
+        if (r.nombre === "8X16") return "8 horas";
+      };
+    }
+    return null;
   };
 
   const getNomobreSeccional = (nombre) => {
@@ -458,9 +470,7 @@ const PlanillaDiaria = () => {
                           : formatHorario(turno.hora_inicio, turno.hora_fin)}
                       </td>
                       <td className="border bg-white text-center">
-                        {turno.nombre === "Destacados"
-                          ? "FULL TIME"
-                          : "8 horas"}{" "}
+                        {regimenNombre(turno.regimen_id)}
                       </td>
                       <td className="border bg-white px-1">
                         {estadoPorFuncionario[f.id]?.tipo ===

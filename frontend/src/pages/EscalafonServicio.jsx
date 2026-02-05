@@ -28,6 +28,7 @@ export default function EscalafonServicio() {
     turnos,
     guardias,
     licencias,
+    regimenes,
     token,
     loading,
     recargarGuaridas,
@@ -66,7 +67,6 @@ export default function EscalafonServicio() {
   const funcionarios = miDependencia.usuarios.filter(
     (f) => f.rol_jerarquico !== "JEFE_DEPENDENCIA"
   );
-
 
   const funcionariosPorTurno = (turnoId) =>
     funcionarios.filter((f) => f.turno_id === turnoId);
@@ -151,6 +151,10 @@ export default function EscalafonServicio() {
     "Segundo Turno",
     "Tercer Turno",
     "Destacados",
+    "Primera Guardia",
+    "Segunda Guardia",
+    "Tercera Guardia",
+    "Cuarta Guardia",
   ];
   const turnosOrdenados = turnos
     .filter((t) => t.dependencia_id === miDependencia.id)
@@ -170,11 +174,100 @@ export default function EscalafonServicio() {
       : `${inicial}. ${partes[1] || ""}`;
   };
 
+  const regimenNombre = () => {
+    for (const r of regimenes) {
+      if (r.id === miDependencia.regimen_id) return r.nombre;
+    }
+    return null;
+  };
+
   const handleCrearGuardia = async ({ usuario, dia, tipo, comentario }) => {
     if (!token) return;
 
     try {
       const fechaBase = dia.utc().startOf("day");
+      const nombreRegimen = regimenNombre();
+
+      const patrones = {
+        "12X36": {
+          patron: [tipo, "D"],
+          dias: 10,
+        },
+        "24X48": {
+          patron: [tipo, "D", "D"],
+          dias: 9,
+        },
+      };
+
+      const esDescanso = tipo === "D";
+      const esExtraordinaria = tipo === "Custodia" || tipo === "Extraordinaria" || tipo === "Curso" || tipo === "curso" || tipo === "extraordinaria" || tipo === "BROU" || tipo === "T-1" || tipo === "T-2";
+      const esLicencia = tipo === "licencia" || tipo === "licencia_medica";
+
+      if (patrones[nombreRegimen] && !esDescanso && !esLicencia && !esExtraordinaria) {
+        const { patron, dias } = patrones[nombreRegimen];
+      
+        const diasPatron = Array.from({ length: dias }, (_, i) =>
+          fechaBase.add(i, "day").utc()
+        );
+      
+        /* =========================
+           DETECTAR GUARDIAS FUTURAS
+        ==========================*/
+      
+        const hayGuardiaFutura = diasPatron.some((f) =>
+          guardias.some(
+            (g) =>
+              g.usuario_id === usuario.id &&
+              dayjs(g.fecha_inicio).utc().startOf("day").isSame(f, "day")
+          )
+        );
+      
+        const diasACrear = hayGuardiaFutura ? [fechaBase] : diasPatron;
+      
+        for (let i = 0; i < diasACrear.length; i++) {
+          const fecha = diasACrear[i];
+      
+          // si es solo un día mantiene el tipo elegido
+          const tipoDia = hayGuardiaFutura
+            ? tipo
+            : patron[i % patron.length];
+      
+          const existente = guardias.find(
+            (g) =>
+              g.usuario_id === usuario.id &&
+              dayjs(g.fecha_inicio).utc().startOf("day").isSame(fecha, "day")
+          );
+      
+          if (existente) {
+            const endpoint =
+              existente.tipo === "licencia"
+                ? `licencias/${existente.id}`
+                : existente.tipo === "licencia_medica"
+                ? `licencias-medicas/${existente.id}`
+                : `guardias/${existente.id}`;
+      
+            await deleteData(endpoint, token);
+          }
+      
+          await postData(
+            "/guardias",
+            {
+              usuario_id: usuario.id,
+              fecha_inicio: fecha.toISOString(),
+              fecha_fin: fecha.toISOString(),
+              tipo: tipoDia,
+              comentario,
+            },
+            token,
+            { "Content-Type": "application/json" }
+          );
+        }
+      
+        recargarGuaridas();
+        setSelectorTipo(null);
+        return;
+      }
+      
 
       const esBloque = tipo === "T" || tipo.toLowerCase() === "brou";
 
@@ -533,9 +626,12 @@ export default function EscalafonServicio() {
                         <tr key={f.id}>
                           <td
                             className="border bg-white dark:bg-slate-800 px-2 py-1 text-left min-w-[8rem] w-40 whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
-                            title={`${obtenerGradoAbreviado(f.grado)} ${f.nombre}`}
+                            title={`${obtenerGradoAbreviado(f.grado)} ${
+                              f.nombre
+                            }`}
                           >
-                            {obtenerGradoAbreviado(f.grado)} {abreviarNombre(f.nombre)}
+                            {obtenerGradoAbreviado(f.grado)}{" "}
+                            {abreviarNombre(f.nombre)}
                           </td>
 
                           {dias.map((d) => {

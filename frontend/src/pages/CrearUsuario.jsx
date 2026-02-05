@@ -18,7 +18,7 @@ export default function CrearUsuario() {
     regimenes,
     grados,
     token,
-    recargarJefaturas,
+    recargarUsuarios,
     recargarDependencias,
   } = useAppContext();
 
@@ -72,7 +72,7 @@ export default function CrearUsuario() {
     try {
       await postData("usuarios", formData, token);
       setSuccess(true);
-      recargarJefaturas();
+      recargarUsuarios();
       recargarDependencias();
     } catch (err) {
       alert(err.message);

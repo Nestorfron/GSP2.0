@@ -17,7 +17,7 @@ export default function EditarUsuario() {
     funciones,
     grados,
     token,
-    recargarJefaturas,
+    recargarUsuarios,
     recargarDependencias,
   } = useAppContext();
 
@@ -78,7 +78,7 @@ export default function EditarUsuario() {
     try {
       await putData(`usuarios/${formData.id}`, formData, token);
       setSuccess(true);
-      recargarJefaturas();
+      recargarUsuarios();
       recargarDependencias();
     } catch (err) {
       alert(err.message);
