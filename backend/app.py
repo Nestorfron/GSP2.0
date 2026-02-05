@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from extensions import mail
 
 from config import Config
-from api.models import db, Usuario, Turno, Jefatura, Zona, Dependencia, Licencia, Guardia, Notificacion, Suscripcion, PasswordResetToken, Prenda, Funcion, Vehiculo, Servicio
+from api.models import db, Usuario, Turno, Jefatura, Zona, Dependencia, Licencia, Guardia, Notificacion, Suscripcion, PasswordResetToken, Prenda, Funcion, Vehiculo, Servicio, RegimenHorario
 
 from api.routes import api
 
@@ -39,6 +39,7 @@ def create_app():
     admin.add_view(ModelView(Funcion, db.session))
     admin.add_view(ModelView(Vehiculo, db.session))
     admin.add_view(ModelView(Servicio, db.session))
+    admin.add_view(ModelView(RegimenHorario, db.session))
 
     # Blueprints
     app.register_blueprint(api, url_prefix='/api')

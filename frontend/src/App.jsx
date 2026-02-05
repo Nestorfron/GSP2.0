@@ -11,7 +11,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Perfil from "./pages/Perfil";
 import AdminPanel from "./pages/AdminPanel";
+import GestionPanel from "./pages/GestionPanel"
 import Zona from "./pages/Zona";
+import EditarZona from "./pages/EditarZona"
 import Dependencia from "./pages/Dependencia";
 import DetalleDependencia from "./pages/DetalleDependencia";
 import Funcionario from "./pages/Funcionario";
@@ -64,7 +66,9 @@ function AppContent() {
         <Route path="/" element={<Home />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/gestion" element={<GestionPanel />} />
         <Route path="/zona" element={<Zona />} />
+        <Route path="/editar-zona/:zonaId" element={<EditarZona />} />
         <Route path="/dependencia" element={<Dependencia />} />
         <Route path="/detalle-dependencia" element={<DetalleDependencia />} />
         <Route path="/funcionario" element={<Funcionario />} />

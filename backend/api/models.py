@@ -108,6 +108,7 @@ class Usuario(db.Model):
     rol_jerarquico = db.Column(db.String(50), nullable=False)
     fecha_ingreso = db.Column(db.DateTime, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
+    rotacion =  db.Column(db.Boolean, default=True)
 
 
     dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=True)
@@ -117,6 +118,8 @@ class Usuario(db.Model):
     turno_id = db.Column(db.Integer, db.ForeignKey('turnos.id'), nullable=True)
 
     funcion_id = db.Column(db.Integer, db.ForeignKey('funcion.id'), nullable=True)
+
+    regimen_id = db.Column(db.Integer, db.ForeignKey('regimenes_horarios.id'), nullable=True)
 
     estado = db.Column(db.String(50), nullable=True)
     
@@ -143,8 +146,10 @@ class Usuario(db.Model):
             'rol_jerarquico': self.rol_jerarquico,
             'fecha_ingreso': self.fecha_ingreso,
             'dependencia_id': self.dependencia_id,
+            'rotacion': self.rotacion,
             'zona_id': self.zona_id,
             'turno_id': self.turno_id,
+            'regimen_id': self.regimen_id,
             'estado': self.estado,
             'is_admin': self.is_admin,
             'prendas': [p.serialize() for p in self.prendas],
@@ -186,6 +191,8 @@ class Turno(db.Model):
     hora_inicio = db.Column(db.Time, nullable=False)
     hora_fin = db.Column(db.Time, nullable=False)
     descripcion = db.Column(db.Text)
+
+
     dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=False)
 
 
@@ -201,6 +208,24 @@ class Turno(db.Model):
 
     def __repr__(self):
         return f'<Turno {self.nombre}>'
+
+class RegimenHorario(db.Model):
+    __tablename__ = 'regimenes_horarios'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    nombre = db.Column(db.String(50), nullable=False, unique=True)
+    horas_trabajo = db.Column(db.Integer, nullable=False)
+    horas_descanso = db.Column(db.Integer, nullable=False)
+
+    admite_rotacion_par_impar = db.Column(db.Boolean, default=False)
+    admite_medio_horario = db.Column(db.Boolean, default=False)
+
+    descripcion = db.Column(db.Text)
+
+    def __repr__(self):
+        return f'<RegimenHorario {self.nombre}>'
+
 
 # -------------------------
 # GUARDIAS Y LICENCIAS

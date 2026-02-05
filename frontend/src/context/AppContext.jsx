@@ -69,6 +69,7 @@ export const AppProvider = ({ children }) => {
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
         setTurnos(turnosData || []);
+        console.log(turnosData)
         const ordinariasData = guardiasData.filter(g => g.tipo !== "extraordinaria");
         setGuardias(ordinariasData);
         const extraorariasData = guardiasData.filter(g => g.tipo === "Extraordinaria" || g.tipo === "Curso" || g.tipo === "curso" || g.tipo === "extraordinaria");

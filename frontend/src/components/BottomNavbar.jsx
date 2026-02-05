@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Home, User, Bell, Calendar, CalendarCheck, List } from "lucide-react";
+import {
+  Home,
+  User,
+  Bell,
+  Calendar,
+  CalendarCheck,
+  List,
+  Users,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
-import { estaTokenExpirado } from "../utils/tokenUtils";
 import { postData } from "../utils/api";
 
 const BottomNavbar = () => {
@@ -74,8 +81,15 @@ const BottomNavbar = () => {
 
   const notificacionesCount = notificacionesUsuario.length;
 
+  // 📋 Ítems del menú
   const menuItems = [
     { key: "home", icon: Home, path: getHomePath(), label: "Inicio" },
+    {
+      key: "gestion",
+      icon: Users,
+      path: "/gestion",
+      label: "Gestión",
+    },
     {
       key: "dependencia",
       icon: List,
@@ -103,25 +117,30 @@ const BottomNavbar = () => {
     { key: "perfil", icon: User, path: "/perfil", label: "Perfil" },
   ];
 
+  // 🔐 Filtros por rol
   const filteredMenuItems = menuItems.filter((item) => {
+    // SOLO ADMIN
+    if (item.path === "/gestion") {
+      return usuario?.rol_jerarquico === "ADMINISTRADOR";
+    }
+
     if (["/escalafon-servicio", "/licencias"].includes(item.path)) {
       return !["ADMINISTRADOR", "JEFE_ZONA"].includes(usuario?.rol_jerarquico);
     }
+
     if (item.path === "/detalle-dependencia") {
       return !["ADMINISTRADOR", "FUNCIONARIO", "JEFE_DEPENDENCIA"].includes(
         usuario?.rol_jerarquico
       );
     }
+
     return true;
   });
 
   return (
     <>
       {/* BOTTOM NAV */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 
-                      border-t border-slate-200 dark:border-slate-800 shadow-lg z-50 pb-6"
-      >
+      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-lg z-50 pb-6">
         <div className="flex justify-around items-center h-16 px-2">
           {filteredMenuItems.map((item) => {
             const Icon = item.icon;
@@ -148,11 +167,12 @@ const BottomNavbar = () => {
                 >
                   <Icon size={24} />
 
-                  {item.key === "notificaciones" && notificacionesCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full shadow">
-                      {notificacionesCount}
-                    </span>
-                  )}
+                  {item.key === "notificaciones" &&
+                    notificacionesCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full shadow">
+                        {notificacionesCount}
+                      </span>
+                    )}
                 </div>
 
                 <span
@@ -188,7 +208,7 @@ const BottomNavbar = () => {
 
       {/* MODAL EXTENDER SESIÓN */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fadeIn">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999]">
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl w-80 text-center border border-gray-200 dark:border-slate-700">
             <div className="text-5xl mb-3">⚠️</div>
 
