@@ -362,6 +362,7 @@ def crear_usuario():
     zona_id = body.get("zona_id")
     estado = body.get("estado")
     is_admin = body.get("is_admin")
+    medio_horario = body.get("medio_horario")
     turno_id = body.get("turno_id")
     funcion_id = body.get("funcion_id")
 
@@ -411,6 +412,7 @@ def crear_usuario():
         dependencia_id=dependencia_id,
         zona_id=zona_id,
         is_admin=is_admin,
+        medio_horario=medio_horario,
         estado=estado,
         turno_id=turno_id,
         funcion_id=funcion_id,
@@ -453,6 +455,7 @@ def actualizar_usuario(id):
     zona_id = body.get("zona_id", usuario.zona_id)
     estado = body.get("estado", usuario.estado)
     is_admin = body.get("is_admin", usuario.is_admin)
+    medio_horario = body.get("medio_horario", usuario.medio_horario)
     funcion_id = body.get("funcion_id", usuario.funcion_id)
 
     # 🔥 ESTA ES LA PARTE IMPORTANTE
@@ -486,6 +489,7 @@ def actualizar_usuario(id):
     usuario.turno_id = turno_id
     usuario.funcion_id = funcion_id
     usuario.is_admin = is_admin
+    usuario.medio_horario = medio_horario
 
     db.session.commit()
     return jsonify(usuario.serialize()), 200
@@ -550,6 +554,7 @@ def setup_admin():
         dependencia_id=None,
         zona_id=None,
         is_admin=True,
+        medio_horario=False,
         estado="Activo",
         turno_id=None,
         funcion_id=None,

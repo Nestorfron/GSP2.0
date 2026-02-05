@@ -185,6 +185,26 @@ export default function EditarUsuario() {
             ))}
           </select>
 
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="medio_horario"
+              checked={formData.medio_horario || false}
+              onChange={handleChange}
+            />
+            Medio horario
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="is_admin"
+              checked={formData.is_admin || false}
+              onChange={handleChange}
+            />
+            Administrador
+          </label>
+
           {/* BOTON */}
           <button className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
             {loading ? "Guardando..." : "Guardar cambios"}

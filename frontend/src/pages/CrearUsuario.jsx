@@ -15,7 +15,6 @@ export default function CrearUsuario() {
   const {
     jefaturas,
     funciones,
-    regimenes,
     grados,
     token,
     recargarUsuarios,
@@ -38,6 +37,7 @@ export default function CrearUsuario() {
     turno_id: "",
     funcion_id: "",
     estado: "ACTIVO",
+    medio_horario: false,
     is_admin: false,
   });
 
@@ -207,6 +207,16 @@ export default function CrearUsuario() {
               onChange={handleChange}
             />
             Administrador
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="medio_horario"
+              checked={formData.medio_horario}
+              onChange={handleChange}
+            />
+            Medio horario
           </label>
 
           <button

@@ -111,6 +111,7 @@ class Usuario(db.Model):
     rol_jerarquico = db.Column(db.String(50), nullable=False)
     fecha_ingreso = db.Column(db.DateTime, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
+    medio_horario = db.Column(db.Boolean, default=False)
 
 
     dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=True)
@@ -150,6 +151,7 @@ class Usuario(db.Model):
             'turno_id': self.turno_id,
             'estado': self.estado,
             'is_admin': self.is_admin,
+            'medio_horario': self.medio_horario,
             'funcion_id': self.funcion_id,
             'prendas': [p.serialize() for p in self.prendas],
         }
