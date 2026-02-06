@@ -20,7 +20,6 @@ import Funcionario from "./pages/Funcionario";
 import PrendasFuncionario from "./pages/PrendasFuncionario";
 import Notificaciones from "./pages/Notificaciones";
 import EscalafonServicio from "./pages/EscalafonServicio";
-import Escalafon12x36 from "./pages/Escalafon12x36";
 import Licencias from "./pages/Licencias";
 import LicenciasFuncionario from "./pages/LicenciasFuncionario";
 import LicenciasSolicitadas from "./pages/LicenciasSolicitadas";
@@ -84,7 +83,6 @@ function AppContent() {
         <Route path="/funcionario/:id" element={<LicenciasFuncionario />} />
         <Route path="/notificaciones" element={<Notificaciones />} />
         <Route path="/escalafon-servicio" element={<EscalafonServicio />} />
-        <Route path="/escalafon-12x36" element={<Escalafon12x36 />} />
         <Route path="/licencias" element={<Licencias />} />
         <Route path="/solicitudes-licencia" element={<LicenciasSolicitadas />} />
         <Route path="/agregar-usuarios" element={<AgregarUsuarios />} />

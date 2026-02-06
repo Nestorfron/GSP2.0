@@ -230,6 +230,18 @@ export const AppProvider = ({ children }) => {
     setLicencias(data2);
   };
 
+  const recargarExtraordinarias = async () => {
+    const data = await fetchData(`/guardias`);
+    const extraorariasData = data.filter(
+      (g) =>
+        g.tipo === "Extraordinaria" ||
+        g.tipo === "Curso" ||
+        g.tipo === "curso" ||
+        g.tipo === "extraordinaria"
+    );
+    setExtraordinarias(extraorariasData);
+  };
+
   const recargarNotificaciones = async () => {
     try {
       const notificacionesData = await fetchData("/notificaciones", token);
@@ -363,6 +375,7 @@ export const AppProvider = ({ children }) => {
         recargarTurnos,
         recargarRegimenes,
         recargarGuaridas,
+        recargarExtraordinarias,
         recargarNotificaciones,
         setUsuario,
         recargarUsuarios,

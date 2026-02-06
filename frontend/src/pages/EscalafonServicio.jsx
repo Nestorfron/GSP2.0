@@ -632,6 +632,14 @@ export default function EscalafonServicio() {
                           >
                             {obtenerGradoAbreviado(f.grado)}{" "}
                             {abreviarNombre(f.nombre)}
+                            {f.medio_horario && (
+                              <span
+                                title="Funcionario con medio horario"
+                                className="ms-2 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-2 py-0.5 rounded-full"
+                              >
+                                1/2 horario
+                              </span>
+                            )}
                           </td>
 
                           {dias.map((d) => {

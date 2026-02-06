@@ -38,7 +38,7 @@ const Dependencia = () => {
     vehiculos,
     token,
     loading,
-    recargarDatos,
+    recargarExtraordinarias,
     obtenerGrado,
     obtenerGradoAbreviado,
   } = useAppContext();
@@ -64,7 +64,8 @@ const Dependencia = () => {
   // Extraordinarias a partir de hoy
   const extraordinariasDesdeHoy = extraordinarias.filter(
     (g) =>
-      dayjs(g.fecha_inicio).utc().format("YYYY-MM-DD") === fechaSeleccionada
+      dayjs(g.fecha_inicio).utc().format("YYYY-MM-DD") === fechaSeleccionada &&
+      miDependencia?.usuarios.some((u) => u.id === g.usuario_id)
   );
 
   // Licencias pendientes de TODOS los funcionarios de la dependencia
@@ -142,14 +143,14 @@ const Dependencia = () => {
 
   const usuarioExtraordinaria = (id) => {
     const usuario = miDependencia.usuarios.find((u) => u.id === id);
-    return obtenerGrado(usuario.grado) + " " + abreviarNombre(usuario.nombre);
+    return obtenerGrado(usuario?.grado) + " " + abreviarNombre(usuario.nombre);
   };
 
   const handleDelete = async (id) => {
     try {
       const tokenLocal = localStorage.getItem("token");
       await deleteData(`/guardias/${id}`, tokenLocal);
-      if (typeof recargarDatos === "function") recargarDatos();
+      recargarExtraordinarias();
     } catch (err) {
       alert(`❌ Error: ${err.message}`);
     }
@@ -181,7 +182,6 @@ const Dependencia = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
-
       <main className="flex-1 px-6 py-8 space-y-6 w-full lg:w-3/4 xl:max-w-4xl mx-auto">
         {/* Encabezado */}
         <div className="text-center">
@@ -264,7 +264,7 @@ const Dependencia = () => {
               </div>
 
               {(verTodas ? extraordinarias : extraordinariasDesdeHoy).length >
-                0 ? (
+              0 ? (
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">
                   <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-slate-900 border-b border-blue-100 dark:border-slate-700 rounded-t-2xl">
                     <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
@@ -308,11 +308,11 @@ const Dependencia = () => {
                                 .format("DD/MM HH:mm")}{" "}
                               -{" "}
                               {dayjs(g.fecha_inicio).utc().format("DD/MM") ===
-                                dayjs(g.fecha_fin).utc().format("DD/MM")
+                              dayjs(g.fecha_fin).utc().format("DD/MM")
                                 ? dayjs(g.fecha_fin).utc().format("HH:mm")
                                 : dayjs(g.fecha_fin)
-                                  .utc()
-                                  .format("DD/MM HH:mm")}
+                                    .utc()
+                                    .format("DD/MM HH:mm")}
                             </td>
                             <td className="border px-4 py-2 text-sm text-center">
                               {g.tipo} - {g.comentario}
@@ -406,7 +406,7 @@ const Dependencia = () => {
                               </th>
                               <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
                                 {fechaSeleccionada ===
-                                  dayjs().format("YYYY-MM-DD")
+                                dayjs().format("YYYY-MM-DD")
                                   ? "Hoy"
                                   : dayjs(fechaSeleccionada).format("DD/MM")}
                               </th>
@@ -428,14 +428,23 @@ const Dependencia = () => {
                                     </td>
                                     <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                                       {abreviarNombre(f.nombre)}
+                                      {f.medio_horario && (
+                                        <span
+                                          title="Funcionario con medio horario"
+                                          className="ms-2 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-2 py-0.5 rounded-full"
+                                        >
+                                          1/2 horario
+                                        </span>
+                                      )}
                                     </td>
                                     <td
-                                      className={`border px-4 py-1 text-sm text-center py-1 relative group ${turnoPorFuncionario?.nombre === "BROU"
+                                      className={`border px-4 py-1 text-sm text-center py-1 relative group ${
+                                        turnoPorFuncionario?.nombre === "BROU"
                                           ? clase
                                           : contenido === "BROU"
-                                            ? "text-xs text-white bg-blue-600"
-                                            : clase
-                                        }`}
+                                          ? "text-xs text-white bg-blue-600"
+                                          : clase
+                                      }`}
                                     >
                                       {contenido}
                                     </td>
@@ -522,6 +531,14 @@ const Dependencia = () => {
                           </td>
                           <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                             {f.nombre}
+                            {f.medio_horario && (
+                              <span
+                                title="Funcionario con medio horario"
+                                className="ms-2 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-2 py-0.5 rounded-full"
+                              >
+                                1/2 horario
+                              </span>
+                            )}
                           </td>
                           <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                             {turnos.find((t) => t.id === f.turno_id)?.nombre ||
@@ -718,9 +735,7 @@ const Dependencia = () => {
                   <p className="text-center text-gray-500 bg-white dark:bg-slate-800 dark:text-gray-400 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 p-4">
                     No hay vehículos asignados a esta dependencia.
                   </p>
-
                 </div>
-
               )}
             </div>
           </div>

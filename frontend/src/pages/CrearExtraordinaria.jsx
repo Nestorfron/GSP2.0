@@ -10,7 +10,7 @@ import BackButton from "../components/BackButton";
 import dayjs from "dayjs";
 
 export default function CrearGuardia() {
-  const { usuario, dependencias, token, recargarDatos, obtenerGrado } = useAppContext();
+  const { usuario, dependencias, token, recargarExtraordinarias, obtenerGrado } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
@@ -97,7 +97,7 @@ export default function CrearGuardia() {
       }, token);
   
       if (data && data1) setSuccess(true);
-      recargarDatos();
+      recargarExtraordinarias();
     } catch (err) {
       alert(`❌ Error: ${err.message}`);
     } finally {

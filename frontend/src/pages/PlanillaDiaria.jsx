@@ -80,7 +80,7 @@ const PlanillaDiaria = () => {
         if (r.nombre === "12X36") return "12X36";
         if (r.nombre === "24X48") return "24X48";
         if (r.nombre === "8X16") return "8 horas";
-      };
+      }
     }
     return null;
   };
@@ -330,7 +330,7 @@ const PlanillaDiaria = () => {
               <tr className="bg-white text-center">
                 <td className="border font-bold w-32">SECCIONAL:</td>
                 <td className="border font-bold w-32">
-                 {getNomobreSeccional(miDependencia.nombre.toUpperCase())}
+                  {getNomobreSeccional(miDependencia.nombre.toUpperCase())}
                 </td>
                 <td className="bg-gray-300 w-32"></td>
                 <td className="border font-bold w-24">FECHA:</td>
@@ -465,9 +465,18 @@ const PlanillaDiaria = () => {
                       </td>
 
                       <td className="border bg-white text-center">
-                        {turno.nombre === "Destacados"
-                          ? "24hs"
-                          : formatHorario(turno.hora_inicio, turno.hora_fin)}
+                        {f.medio_horario ? (
+                          <span
+                            title="Funcionario con medio horario"
+                            className="ms-2 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-2 py-0.5 rounded-full"
+                          >
+                            1/2 horario
+                          </span>
+                        ) : turno.nombre === "Destacados" ? (
+                          "24hs"
+                        ) : (
+                          formatHorario(turno.hora_inicio, turno.hora_fin)
+                        )}
                       </td>
                       <td className="border bg-white text-center">
                         {regimenNombre(turno.regimen_id)}
@@ -484,8 +493,7 @@ const PlanillaDiaria = () => {
                           "Licencia Semanal" &&
                         estadoPorFuncionario[f.id]?.tipo !==
                           "Licencia Médica" &&
-                        estadoPorFuncionario[f.id]?.tipo !== 
-                        "Licencia Anual" &&
+                        estadoPorFuncionario[f.id]?.tipo !== "Licencia Anual" &&
                         estadoPorFuncionario[f.id]?.tipo !== "T" ? (
                           exportando ? (
                             <span className="block bg-white text-xs">
