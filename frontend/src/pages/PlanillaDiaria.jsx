@@ -129,6 +129,8 @@ const PlanillaDiaria = () => {
         return "Segundo Turno (14 a 22)";
       case "3ER":
         return "Tercer Turno (22 a 06)";
+      case "T-I":
+        return "Oficina Jurídica";
       default:
         return funcion;
     }
