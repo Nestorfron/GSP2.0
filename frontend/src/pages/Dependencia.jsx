@@ -145,7 +145,7 @@ const Dependencia = () => {
 
   const usuarioExtraordinaria = (id) => {
     const usuario = miDependencia.usuarios.find((u) => u.id === id);
-    return obtenerGrado(usuario?.grado) + " " + abreviarNombre(usuario.nombre);
+    return obtenerGrado(usuario?.grado) + " " + abreviarNombre(usuario?.nombre);
   };
 
   const handleDelete = async (id) => {
