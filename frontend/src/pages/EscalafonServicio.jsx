@@ -40,6 +40,7 @@ export default function EscalafonServicio() {
   const [selectorTipo, setSelectorTipo] = useState(null);
   const [selectorLicencia, setSelectorLicencia] = useState(null);
   const [controlTurnos, setControlTurnos] = useState({});
+  const [confirmarMes, setConfirmarMes] = useState(null);
 
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) navigate("/login");
@@ -183,11 +184,69 @@ export default function EscalafonServicio() {
     return null;
   };
 
-  const handleCrearGuardia = async ({ usuario, dia, tipo, comentario }) => {
+  const obtenerIndicePatron = (usuario, fechaBase) => {
+    let contador = 0;
+  
+    for (let i = 1; i <= 6; i++) {
+      const fecha = fechaBase.subtract(i, "day");
+  
+      const guardia = guardias.find(
+        (g) =>
+          g.usuario_id === usuario.id &&
+          dayjs(g.fecha_inicio).utc().startOf("day").isSame(fecha, "day")
+      );
+  
+      if (!guardia) break;
+  
+      const estado = guardia.tipo?.toUpperCase();
+  
+      // estados válidos del patrón
+      if (estado !== "T" && estado !== "D" && estado !== "BROU") break;
+  
+      contador++;
+    }
+  
+    return contador % 6;
+  };
+
+  const handleCrearGuardia = async ({
+    usuario,
+    dia,
+    tipo,
+    comentario,
+    aplicarMesCompleto,
+  }) => {
     if (!token) return;
 
+    const esBloque = tipo === "T" || tipo?.toLowerCase() === "brou";
+    const fechaBase = dia.utc().startOf("day");
+
+    // 👇 verificar si hay algo marcado cerca del patrón (antes o después)
+    if (esBloque && aplicarMesCompleto === undefined) {
+      const finMes = fechaBase.endOf("month");
+
+      const hayAlgoEnFuturo = guardias.some((g) => {
+        if (g.usuario_id !== usuario.id) return false;
+
+        const fechaGuardia = dayjs(g.fecha_inicio).utc().startOf("day");
+
+        return (
+          fechaGuardia.isAfter(fechaBase, "day") &&
+          fechaGuardia.isSameOrBefore(finMes, "day")
+        );
+      });
+
+      // si no hay nada en el rango → mostrar modal
+      if (!hayAlgoEnFuturo) {
+        setConfirmarMes({ usuario, dia, tipo, comentario });
+        return;
+      }
+
+      // si hay algo cerca → solo aplicar bloque normal
+      aplicarMesCompleto = false;
+    }
+
     try {
-      const fechaBase = dia.utc().startOf("day");
       const nombreRegimen = regimenNombre();
 
       const patrones = {
@@ -202,20 +261,33 @@ export default function EscalafonServicio() {
       };
 
       const esDescanso = tipo === "D";
-      const esExtraordinaria = tipo === "Custodia" || tipo === "Extraordinaria" || tipo === "Curso" || tipo === "curso" || tipo === "extraordinaria" || tipo === "BROU" || tipo === "T-1" || tipo === "T-2";
+      const esExtraordinaria =
+        tipo === "Custodia" ||
+        tipo === "Extraordinaria" ||
+        tipo === "Curso" ||
+        tipo === "curso" ||
+        tipo === "extraordinaria" ||
+        tipo === "BROU" ||
+        tipo === "T-1" ||
+        tipo === "T-2";
+
       const esLicencia = tipo === "licencia" || tipo === "licencia_medica";
 
-      if (patrones[nombreRegimen] && !esDescanso && !esLicencia && !esExtraordinaria) {
+      /* =========================
+         PATRONES DE RÉGIMEN
+      ==========================*/
+      if (
+        patrones[nombreRegimen] &&
+        !esDescanso &&
+        !esLicencia &&
+        !esExtraordinaria
+      ) {
         const { patron, dias } = patrones[nombreRegimen];
-      
+
         const diasPatron = Array.from({ length: dias }, (_, i) =>
           fechaBase.add(i, "day").utc()
         );
-      
-        /* =========================
-           DETECTAR GUARDIAS FUTURAS
-        ==========================*/
-      
+
         const hayGuardiaFutura = diasPatron.some((f) =>
           guardias.some(
             (g) =>
@@ -223,23 +295,20 @@ export default function EscalafonServicio() {
               dayjs(g.fecha_inicio).utc().startOf("day").isSame(f, "day")
           )
         );
-      
+
         const diasACrear = hayGuardiaFutura ? [fechaBase] : diasPatron;
-      
+
         for (let i = 0; i < diasACrear.length; i++) {
           const fecha = diasACrear[i];
-      
-          // si es solo un día mantiene el tipo elegido
-          const tipoDia = hayGuardiaFutura
-            ? tipo
-            : patron[i % patron.length];
-      
+          const tipoDia = hayGuardiaFutura ? tipo : patron[i % patron.length];
+          const fechaISO = dayjs(fecha).toISOString();
+
           const existente = guardias.find(
             (g) =>
               g.usuario_id === usuario.id &&
               dayjs(g.fecha_inicio).utc().startOf("day").isSame(fecha, "day")
           );
-      
+
           if (existente) {
             const endpoint =
               existente.tipo === "licencia"
@@ -247,16 +316,16 @@ export default function EscalafonServicio() {
                 : existente.tipo === "licencia_medica"
                 ? `licencias-medicas/${existente.id}`
                 : `guardias/${existente.id}`;
-      
+
             await deleteData(endpoint, token);
           }
-      
+
           await postData(
             "/guardias",
             {
               usuario_id: usuario.id,
-              fecha_inicio: fecha.toISOString(),
-              fecha_fin: fecha.toISOString(),
+              fecha_inicio: fechaISO,
+              fecha_fin: fechaISO,
               tipo: tipoDia,
               comentario,
             },
@@ -264,15 +333,15 @@ export default function EscalafonServicio() {
             { "Content-Type": "application/json" }
           );
         }
-      
+
         recargarGuaridas();
         setSelectorTipo(null);
         return;
       }
-      
 
-      const esBloque = tipo === "T" || tipo.toLowerCase() === "brou";
-
+      /* =========================
+         BLOQUE T / BROU
+      ==========================*/
       if (!esBloque) {
         const existente = guardias.find(
           (g) =>
@@ -290,12 +359,14 @@ export default function EscalafonServicio() {
           await deleteData(endpoint, token);
         }
 
+        const fechaISO = fechaBase.toISOString();
+
         await postData(
           "/guardias",
           {
             usuario_id: usuario.id,
-            fecha_inicio: fechaBase.toISOString(),
-            fecha_fin: fechaBase.toISOString(),
+            fecha_inicio: fechaISO,
+            fecha_fin: fechaISO,
             tipo,
             comentario,
           },
@@ -303,21 +374,69 @@ export default function EscalafonServicio() {
           { "Content-Type": "application/json" }
         );
       } else {
-        const diasBloque = Array.from({ length: 5 }, (_, i) =>
-          fechaBase.add(i, "day").utc()
-        );
+        let diasBloque = [];
 
-        const hayGuardiaFutura = diasBloque.some((f) =>
+        if (aplicarMesCompleto) {
+          const finMes = fechaBase.endOf("month");
+          let cursor = fechaBase.clone();
+          let contador = obtenerIndicePatron(usuario, fechaBase);
+
+          const esBrou = tipo?.toLowerCase() === "brou";
+
+          while (cursor.isSameOrBefore(finMes, "day")) {
+            if (esBrou) {
+              const diaSemana = cursor.day();
+              if (diaSemana !== 0 && diaSemana !== 6) {
+                diasBloque.push({
+                  fecha: cursor.utc(),
+                  tipo: tipo,
+                });
+              }
+            } else {
+              const esDescansoDia = contador % 6 === 5;
+
+              diasBloque.push({
+                fecha: cursor.utc(),
+                tipo: esDescansoDia ? "D" : tipo,
+              });
+
+              contador++;
+            }
+
+            cursor = cursor.add(1, "day");
+          }
+        } else {
+          const indice = obtenerIndicePatron(usuario, fechaBase);
+
+          diasBloque = Array.from({ length: 6 - indice }, (_, i) => {
+            const posicion = indice + i;
+            const esDescansoDia = posicion % 6 === 5;
+
+            return {
+              fecha: fechaBase.add(i, "day").utc(),
+              tipo: esDescansoDia ? "D" : tipo,
+            };
+          });
+        }
+
+        const hayGuardiaFutura = diasBloque.some((d) =>
           guardias.some(
             (g) =>
               g.usuario_id === usuario.id &&
-              dayjs(g.fecha_inicio).utc().startOf("day").isSame(f, "day")
+              dayjs(g.fecha_inicio).utc().startOf("day").isSame(d.fecha, "day")
           )
         );
 
-        const diasACrear = hayGuardiaFutura ? [fechaBase] : diasBloque;
+        const diasACrear = aplicarMesCompleto
+          ? diasBloque
+          : hayGuardiaFutura
+          ? [diasBloque[0]]
+          : diasBloque;
 
-        for (const fecha of diasACrear) {
+        for (const item of diasACrear) {
+          const fecha = item.fecha;
+          const fechaISO = dayjs(fecha).toISOString();
+
           const existente = guardias.find(
             (g) =>
               g.usuario_id === usuario.id &&
@@ -331,6 +450,7 @@ export default function EscalafonServicio() {
                 : existente.tipo === "licencia_medica"
                 ? `licencias-medicas/${existente.id}`
                 : `guardias/${existente.id}`;
+
             await deleteData(endpoint, token);
           }
 
@@ -338,9 +458,9 @@ export default function EscalafonServicio() {
             "/guardias",
             {
               usuario_id: usuario.id,
-              fecha_inicio: fecha.toISOString(),
-              fecha_fin: fecha.toISOString(),
-              tipo,
+              fecha_inicio: fechaISO,
+              fecha_fin: fechaISO,
+              tipo: item.tipo,
               comentario,
             },
             token,
@@ -355,6 +475,21 @@ export default function EscalafonServicio() {
       console.error("❌ Error al crear/actualizar guardia:", error);
       alert("Ocurrió un error al crear la guardia.");
     }
+  };
+
+  const continuarCreacionGuardia = async (aplicarMesCompleto) => {
+    if (!confirmarMes) return;
+
+    const { usuario, dia, tipo, comentario } = confirmarMes;
+    setConfirmarMes(null);
+
+    await handleCrearGuardia({
+      usuario,
+      dia,
+      tipo,
+      comentario,
+      aplicarMesCompleto,
+    });
   };
 
   const handleEliminarLicencia = async ({ usuario, dia }) => {
@@ -747,6 +882,36 @@ export default function EscalafonServicio() {
           recargarLicencias={recargarGuaridas}
           onCerrar={() => setSelectorLicencia(null)}
         />
+      )}
+
+      {confirmarMes && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-xl w-80">
+            <h2 className="text-lg font-semibold mb-4 text-center">
+              Aplicar guardia
+            </h2>
+
+            <p className="text-sm text-center mb-5">
+              ¿Querés marcar el patrón hasta fin de mes?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => continuarCreacionGuardia(false)}
+                className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 py-2 rounded"
+              >
+                Solo bloque
+              </button>
+
+              <button
+                onClick={() => continuarCreacionGuardia(true)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
+              >
+                Todo el mes
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <BottomNavbar />
