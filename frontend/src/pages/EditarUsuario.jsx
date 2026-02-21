@@ -7,6 +7,10 @@ import Navbar from "../components/BottomNavbar";
 import { useAppContext } from "../context/AppContext";
 import { estaTokenExpirado } from "../utils/tokenUtils";
 import BackButton from "../components/BackButton";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 export default function EditarUsuario() {
   const navigate = useNavigate();
@@ -31,19 +35,30 @@ export default function EditarUsuario() {
   /* =========================
      ESTADO FORMULARIO
   ========================= */
-  const [formData, setFormData] = useState(() => ({
-    ...usuario,
-  }));
-
+  const [formData, setFormData] = useState(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  /* =========================
+     CARGAR USUARIO
+  ========================= */
+  useEffect(() => {
+    if (usuario) {
+      setFormData({
+        ...usuario,
+        fecha_ingreso: usuario.fecha_ingreso
+          ? dayjs.utc(usuario.fecha_ingreso).format("YYYY-MM-DD")
+          : "",
+      });
+    }
+  }, [usuario]);
 
   /* =========================
      TOKEN
   ========================= */
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) navigate("/login");
-  }, [token]);
+  }, [token, navigate]);
 
   /* =========================
      TURNOS FILTRADOS
@@ -61,10 +76,21 @@ export default function EditarUsuario() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormData((prev) => {
+      const nuevoValor = type === "checkbox" ? checked : value;
+
+      const updated = {
+        ...prev,
+        [name]: nuevoValor,
+      };
+
+      // Si cambia dependencia, limpiar turno
+      if (name === "dependencia_id") {
+        updated.turno_id = "";
+      }
+
+      return updated;
+    });
   };
 
   /* =========================
@@ -72,6 +98,7 @@ export default function EditarUsuario() {
   ========================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData) return;
 
     setLoading(true);
 
@@ -94,12 +121,10 @@ export default function EditarUsuario() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-      
-      <div className="flex-grow w-full px-3 sm:px-6 py-6 sm:py-10 mx-auto max-w-xl md:max-w-2xl lg:max-w-3xl">
-        
+      <div className="bg-white rounded-2xl shadow-lg flex-grow w-full px-3 sm:px-6 py-6 sm:py-10 mx-auto max-w-xl md:max-w-2xl lg:max-w-3xl">
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 space-y-4"
+          className=" dark:bg-slate-900  p-4 sm:p-6 md:p-8 space-y-4"
         >
           {/* HEADER */}
           <div className="flex justify-center items-center gap-2">
@@ -125,6 +150,15 @@ export default function EditarUsuario() {
             onChange={handleChange}
             className={inputClass}
             placeholder="Correo"
+          />
+
+          {/* FECHA DE INGRESO */}
+          <input
+            type="date"
+            name="fecha_ingreso"
+            value={formData.fecha_ingreso || ""}
+            onChange={handleChange}
+            className={inputClass}
           />
 
           {/* GRADO */}
@@ -185,6 +219,7 @@ export default function EditarUsuario() {
             ))}
           </select>
 
+          {/* CHECKBOXES */}
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -206,7 +241,10 @@ export default function EditarUsuario() {
           </label>
 
           {/* BOTON */}
-          <button className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+          <button
+            type="submit"
+            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition"
+          >
             {loading ? "Guardando..." : "Guardar cambios"}
           </button>
         </form>
@@ -231,7 +269,7 @@ export default function EditarUsuario() {
             >
               <CheckCircle2 className="mx-auto text-green-500 mb-3" size={50} />
               <p className="font-semibold">Usuario actualizado</p>
-              < BackButton to={-1} />
+              <BackButton to={-1} />
             </motion.div>
           </motion.div>
         )}

@@ -142,6 +142,12 @@ const PlanillaDiaria = () => {
   /* ================= TURNOS ================= */
   const ordenTurnos = [
     "PRIMER TURNO",
+    "PRIMERA GUARDIA",
+    "SEGUNDA GUARDIA",
+    "TERCERA GUARDIA",
+    "CUARTA GUARDIA",
+    "INTERNA",
+    "JURIDICA",
     "SEGUNDO TURNO",
     "TERCER TURNO",
     "DESTACADOS",

@@ -21,6 +21,7 @@ export default function ModalAgregarGuardia({
     "Custodia",
     "T-1",
     "T-2",
+    "T-I",
   ];
 
   const handleClickTipo = async (tipo) => {
@@ -71,6 +72,8 @@ export default function ModalAgregarGuardia({
                   ? "bg-violet-300 hover:bg-violet-400 text-violet-900 font-semibold dark:bg-violet-500 dark:hover:bg-violet-600 dark:text-white"
                   : tipo === "T-2"
                   ? "bg-violet-700 hover:bg-violet-800 text-white font-semibold dark:bg-violet-900 dark:hover:bg-violet-950"
+                  : tipo === "T-I"
+                  ? "bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-semibold dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:text-white"
                   : "bg-blue-100 hover:bg-blue-200 text-blue-900 dark:bg-blue-800 dark:text-blue-100";
 
               return (

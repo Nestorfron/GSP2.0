@@ -110,6 +110,8 @@ const Dependencia = () => {
   // Orden de turnos
   const ordenTurnos = [
     "Primer Turno",
+    "Interna",
+    "Jurídica",
     "BROU",
     "Segundo Turno",
     "Tercer Turno",

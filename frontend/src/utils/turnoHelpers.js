@@ -35,6 +35,9 @@ export function getTurnoProps(turno) {
   if (t === "t-2")
     return { clase: "text-xs text-white bg-violet-700 font-semibold", contenido: turno };
 
+  if (t === "t-i")
+    return { clase: "text-xs text-yellow-900 bg-yellow-300 font-semibold", contenido: turno };
+
   // fallback
   return {
     clase: "text-xs text-gray-700 dark:text-gray-300 bg-transparent",

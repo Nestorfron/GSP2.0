@@ -147,6 +147,8 @@ export default function EscalafonServicio() {
 
   const ordenTurnos = [
     "Primer Turno",
+    "Interna",
+    "Jurídica",
     "BROU",
     "Segundo Turno",
     "Tercer Turno",
