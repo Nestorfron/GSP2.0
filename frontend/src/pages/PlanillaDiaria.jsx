@@ -123,12 +123,12 @@ const PlanillaDiaria = () => {
       case "DESCANSO":
       case "D":
         return "Licencia Semanal";
-      case "1ER":
-        return "Primer Turno (06 a 14)";
+      case "1RO":
+        return "Primer Turno (08 a 16)";
       case "2DO":
-        return "Segundo Turno (14 a 22)";
+        return "Segundo Turno (16 a 00)";
       case "3ER":
-        return "Tercer Turno (22 a 06)";
+        return "Tercer Turno (00 a 08)";
       case "T-I":
         return "Oficina Jurídica";
       default:
@@ -436,7 +436,13 @@ const PlanillaDiaria = () => {
                       </td>
                       <td className="border bg-white">{f.nombre}</td>
                       <td className="border bg-white px-2">
-                        {estadoPorFuncionario[f.id]?.tipo === "T" ? (
+                        {estadoPorFuncionario[f.id]?.tipo === "T" ||
+                        estadoPorFuncionario[f.id]?.tipo === "1ro" ||
+                        estadoPorFuncionario[f.id]?.tipo === "2do" ||
+                        estadoPorFuncionario[f.id]?.tipo === "3er" ||
+                        estadoPorFuncionario[f.id]?.tipo === "T-2" ||
+                        estadoPorFuncionario[f.id]?.tipo === "T-2" ||
+                        estadoPorFuncionario[f.id]?.tipo === "T-3" ? (
                           exportando ? (
                             <span className="block bg-white text-xs">
                               {funcionesEditadas[f.id] ??
@@ -473,7 +479,13 @@ const PlanillaDiaria = () => {
                       </td>
 
                       <td className="border bg-white text-center">
-                        {f.medio_horario ? (
+                        {estadoPorFuncionario[f.id]?.tipo === "T-1" ? (
+                          "07 a 15"
+                        ) : estadoPorFuncionario[f.id]?.tipo === "T-2" ? (
+                          "23 a 07"
+                        ) : estadoPorFuncionario[f.id]?.tipo === "1ro" ? (
+                          "08 a 16"
+                        ) : f.medio_horario ? (
                           <span
                             title="Funcionario con medio horario"
                             className="ms-2 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-2 py-0.5 rounded-full"
@@ -483,7 +495,13 @@ const PlanillaDiaria = () => {
                         ) : turno.nombre === "Destacados" ? (
                           "24hs"
                         ) : (
-                          formatHorario(turno.hora_inicio, turno.hora_fin)
+                          estadoPorFuncionario[f.id]?.tipo === "Primer Turno (08 a 16)" ? (
+                            "08 a 16"
+                          ) : estadoPorFuncionario[f.id]?.tipo === "Segundo Turno (16 a 00)" ? (
+                            "16 a 00"
+                          ) : estadoPorFuncionario[f.id]?.tipo === "Tercer Turno (00 a 08)" ? (
+                            "00 a 08"
+                            ) : formatHorario(turno.hora_inicio, turno.hora_fin)
                         )}
                       </td>
                       <td className="border bg-white text-center">
