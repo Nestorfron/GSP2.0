@@ -19,6 +19,7 @@ const PlanillaDiaria = () => {
   const [funcionesEditadas, setFuncionesEditadas] = useState({});
   const [situacionesEditadas, setSituacionesEditadas] = useState({});
   const [exportando, setExportando] = useState(false);
+  const [encargadoSeleccionado, setEncargadoSeleccionado] = useState(null);
   const [funcionesTurnoT, setFuncionesTurnoT] = useState([
     "Chofer de Servicio",
     "Acompañante de Móvil",
@@ -35,6 +36,7 @@ const PlanillaDiaria = () => {
 
   const {
     usuario,
+    usuarios,
     dependencias,
     turnos,
     regimenes,
@@ -213,8 +215,16 @@ const PlanillaDiaria = () => {
       };
     }
   });
+  /* ================= ENCARGADOS ================= */
+  const encargados = dependencias.reduce((acc, d) => {
+    const titular = d.usuarios.find(
+      (u) => u.rol_jerarquico === "JEFE_DEPENDENCIA"
+    );
+    if (titular) acc.push(titular);
+    return acc;
+  }, []);
 
-  /* ================= ENCARGADO ================= */
+  /* ================= ENCARGADO DEPENDENCIA ================= */
   const encargado = miDependencia.usuarios.find(
     (u) => u.rol_jerarquico === "JEFE_DEPENDENCIA"
   );
@@ -246,7 +256,10 @@ const PlanillaDiaria = () => {
 
   /* ================= PDF ================= */
   const capturar = () => {
-    setExportando(true);
+    if (encargadoSeleccionado === undefined || encargadoSeleccionado === null) {
+      alert("Debes seleccionar un encargado Interino");
+      return;
+    }   
     setTimeout(async () => {
       const elemento = document.getElementById("planilla-pdf");
 
@@ -350,7 +363,7 @@ const PlanillaDiaria = () => {
           </table>
 
           {/* ================= ENCARGADO ================= */}
-          {encargado && (
+          {encargado && estadoEncargado === "ENCARGADO DEPENDENCIA" && (
             <table className="w-full mb-3">
               <thead>
                 <tr className="bg-white">
@@ -389,6 +402,72 @@ const PlanillaDiaria = () => {
             </table>
           )}
 
+          {/* ================= ENCARGADO SUPLENTE ================= */}
+
+          {estadoEncargado !== "ENCARGADO DEPENDENCIA" && (
+            <table className="w-full mb-3">
+              <thead>
+                <tr className="bg-white">
+                  <th className="w-[90px] bg-gray-300"></th>
+                  <th className="border w-[30px]">Nro.</th>
+                  <th className="border w-[60px]">GRADO</th>
+                  <th className="border min-w-[250px]">NOMBRE</th>
+                  <th className="border min-w-[180px]">FUNCIÓN</th>
+                  <th className="border w-[90px]">HORARIO</th>
+                  <th className="border w-[80px]">RÉGIMEN</th>
+                  <th className="border w-[150px]">OBSERVACIONES</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr className="bg-white">
+                  <td className="bg-gray-300"></td>
+
+                  <td className="border text-center align-middle">{nro++}</td>
+
+                  {/* 🔹 GRADO */}
+                  <td className="border text-center align-middle">
+                    {encargadoSeleccionado
+                      ? obtenerGrado(encargadoSeleccionado.grado)
+                      : "-"}
+                  </td>
+                  <td className="border bg-white">
+                    {exportando ? (
+                      <span className="text-xs">
+                        {encargadoSeleccionado?.nombre || "Sin asignar"}
+                      </span>
+                    ) : (
+                      <select
+                        value={encargadoSeleccionado?.id || ""}
+                        onChange={(e) =>
+                          setEncargadoSeleccionado(
+                            encargados.find((u) => u.id === Number(e.target.value))
+                          )
+                        }
+                        className="w-full text-xs bg-white outline-none"
+                      >
+                        <option value="">Seleccionar encargado</option>
+                        {encargados.map((u) => (
+                          <option key={u.id} value={u.id}>
+                           {u.nombre}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </td>
+                  <td className="border px-2">Encargado Interino</td>
+                  <td className="border text-center">FULL TIME</td>
+                  <td className="border text-center">24hs</td>
+                  <td className="border px-1">
+                    {fechaFinEncargado
+                      ? `Hasta ${fechaFinEncargado.slice(0, 5)}`
+                      : ""}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
+
           {/* ================= TURNOS ================= */}
           {misTurnos.map((turno) => {
             const funcionarios = miDependencia.usuarios
@@ -413,7 +492,7 @@ const PlanillaDiaria = () => {
                   <tr className="bg-white">
                     <th className="w-[90px] bg-yellow-300">{nombreTurno}</th>
                     <th className="border w-[30px]">Nro.</th>
-                    <th className="border w-[50px]">GRADO</th>
+                    <th className="border w-[60px]">GRADO</th>
                     <th className="border min-w-[250px]">NOMBRE</th>
                     <th className="border min-w-[180px]">FUNCIÓN</th>
                     <th className="border w-[90px]">HORARIO</th>
@@ -494,14 +573,17 @@ const PlanillaDiaria = () => {
                           </span>
                         ) : turno.nombre === "Destacados" ? (
                           "24hs"
+                        ) : estadoPorFuncionario[f.id]?.tipo ===
+                          "Primer Turno (08 a 16)" ? (
+                          "08 a 16"
+                        ) : estadoPorFuncionario[f.id]?.tipo ===
+                          "Segundo Turno (16 a 00)" ? (
+                          "16 a 00"
+                        ) : estadoPorFuncionario[f.id]?.tipo ===
+                          "Tercer Turno (00 a 08)" ? (
+                          "00 a 08"
                         ) : (
-                          estadoPorFuncionario[f.id]?.tipo === "Primer Turno (08 a 16)" ? (
-                            "08 a 16"
-                          ) : estadoPorFuncionario[f.id]?.tipo === "Segundo Turno (16 a 00)" ? (
-                            "16 a 00"
-                          ) : estadoPorFuncionario[f.id]?.tipo === "Tercer Turno (00 a 08)" ? (
-                            "00 a 08"
-                            ) : formatHorario(turno.hora_inicio, turno.hora_fin)
+                          formatHorario(turno.hora_inicio, turno.hora_fin)
                         )}
                       </td>
                       <td className="border bg-white text-center">

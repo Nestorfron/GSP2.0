@@ -69,6 +69,10 @@ export default function EscalafonServicio() {
     (f) => f.rol_jerarquico !== "JEFE_DEPENDENCIA"
   );
 
+  const encargado = miDependencia.usuarios.filter(
+    (f) => f.rol_jerarquico === "JEFE_DEPENDENCIA"
+  );
+
   const funcionariosPorTurno = (turnoId) =>
     funcionarios.filter((f) => f.turno_id === turnoId);
 
@@ -186,26 +190,26 @@ export default function EscalafonServicio() {
 
   const obtenerIndicePatron = (usuario, fechaBase) => {
     let contador = 0;
-  
+
     for (let i = 1; i <= 6; i++) {
       const fecha = fechaBase.subtract(i, "day");
-  
+
       const guardia = guardias.find(
         (g) =>
           g.usuario_id === usuario.id &&
           dayjs(g.fecha_inicio).utc().startOf("day").isSame(fecha, "day")
       );
-  
+
       if (!guardia) break;
-  
+
       const estado = guardia.tipo?.toUpperCase();
-  
+
       // estados válidos del patrón
       if (estado !== "T" && estado !== "D" && estado !== "BROU") break;
-  
+
       contador++;
     }
-  
+
     return contador % 6;
   };
 
@@ -701,6 +705,153 @@ export default function EscalafonServicio() {
           </button>
         </div>
       </div>
+
+      {/* Encargado */}
+
+      {usuario.rol_jerarquico === "JEFE_DEPENDENCIA" ||
+      usuario.is_admin === true ? (
+        <div className="mb-6 overflow-x-auto">
+          <table className="min-w-full text-sm text-center border-collapse table-fixed w-full border border-gray-200 dark:border-slate-700">
+            <thead>
+              <tr className="bg-gray-200 dark:bg-slate-800">
+                <th className="border px-2 py-1 text-left min-w-[8rem] w-40 sticky left-0 z-20 bg-white dark:bg-slate-800">
+                  <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-400 truncate">
+                    Encargado
+                  </h2>
+                </th>
+
+                {dias.map((d) => {
+                  const fecha = d.format("YYYY-MM-DD");
+                  const hayError =
+                    controlTurnos?.[fecha]?.["Primer Turno"]?.cumple === false;
+
+                  return (
+                    <th
+                      key={fecha}
+                      className="border px-2 py-1 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 w-12 relative"
+                    >
+                      {d.format("DD/MM")}
+                      <br />
+                      {d.format("ddd")}
+
+                      {hayError && (
+                        <div className="absolute top-0 right-0 w-3 h-3 bg-red-600 rounded-full"></div>
+                      )}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+
+            <tbody>
+              {encargado?.length > 0 ? (
+                [...encargado]
+                  .sort((a, b) => {
+                    const gradoA = a.grado || "";
+                    const gradoB = b.grado || "";
+                    if (gradoA > gradoB) return -1;
+                    if (gradoA < gradoB) return 1;
+
+                    const fechaA = new Date(a.fecha_ingreso);
+                    const fechaB = new Date(b.fecha_ingreso);
+                    return fechaA - fechaB;
+                  })
+                  .map((f) => (
+                    <tr key={f.id} className="bg-white">
+                      {/* 🔹 Nombre */}
+                      <td
+                        className="border px-2 py-1 text-left min-w-[8rem] w-40 whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
+                        title={`${obtenerGradoAbreviado(f.grado)} ${f.nombre}`}
+                      >
+                        {obtenerGradoAbreviado(f.grado)}{" "}
+                        {abreviarNombre(f.nombre)}
+                        {f.medio_horario && (
+                          <span className="ms-2 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-2 py-0.5 rounded-full">
+                            1/2 horario
+                          </span>
+                        )}
+                      </td>
+
+                      {/* 🔹 Días */}
+                      {dias.map((d) => {
+                        const valor = getCelda(f, d);
+                        const { clase, contenido } = getTurnoProps(valor);
+
+                        const puedeEditar =
+                          usuario?.rol_jerarquico === "JEFE_DEPENDENCIA" ||
+                          usuario?.is_admin === true;
+
+                        return (
+                          <td
+                            key={d.format("YYYY-MM-DD")}
+                            className={`border py-1 relative group ${clase}`}
+                          >
+                            {contenido}
+
+                            {puedeEditar && (
+                              <>
+                                {["L", "L.Ext", "CH", "L.Med"].includes(
+                                  valor
+                                ) ? (
+                                  <button
+                                    onClick={() =>
+                                      handleEliminarLicencia({
+                                        usuario: f,
+                                        dia: d.clone(),
+                                      })
+                                    }
+                                    className="absolute top-0 right-0 text-xs text-gray-500 p-1 opacity-0 group-hover:opacity-100 hover:text-red-700 transition"
+                                  >
+                                    ❌
+                                  </button>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() =>
+                                        setSelectorTipo({
+                                          usuario: f,
+                                          dia: d.clone(),
+                                        })
+                                      }
+                                      className="absolute top-0 right-6 text-xs text-gray-500 p-1 opacity-0 group-hover:opacity-100 hover:text-blue-700 transition"
+                                    >
+                                      ✏️
+                                    </button>
+
+                                    <button
+                                      onClick={() =>
+                                        setSelectorLicencia({
+                                          usuario: f,
+                                          dia: d.clone(),
+                                        })
+                                      }
+                                      className="absolute top-0 right-0 text-xs text-gray-500 p-1 opacity-0 group-hover:opacity-100 hover:text-red-500 transition"
+                                    >
+                                      📄
+                                    </button>
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={dias.length + 1}
+                    className="text-center py-4 text-gray-500 dark:text-gray-400"
+                  >
+                    No hay encargado asignado.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
 
       {/* Tablas */}
       <div
