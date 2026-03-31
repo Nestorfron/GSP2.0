@@ -515,6 +515,36 @@ export default function EscalafonServicio() {
     }
   };
 
+  const handleEliminarGuardia = async ({ usuario, dia }) => {
+    if (!token) return;
+
+    const fechaBase = dia.utc().startOf("day");
+
+    const guardia = guardias.find(
+      (g) =>
+        g.usuario_id === usuario.id &&
+        dayjs(g.fecha_inicio).utc().startOf("day").isSame(fechaBase, "day")
+    );
+
+    if (!guardia) return;
+
+    try {
+      const endpoint =
+        guardia.tipo === "licencia"
+          ? `licencias/${guardia.id}`
+          : guardia.tipo === "licencia_medica"
+          ? `licencias-medicas/${guardia.id}`
+          : `guardias/${guardia.id}`;
+
+      await deleteData(endpoint, token);
+
+      recargarGuaridas();
+    } catch (error) {
+      console.error("❌ Error al eliminar guardia:", error);
+      alert("Ocurrió un error al eliminar la guardia.");
+    }
+  };
+
   const imprimirFuncionariosPorTurno = (dia) => {
     const resultado = {};
 
@@ -811,6 +841,20 @@ export default function EscalafonServicio() {
                                         setSelectorTipo({
                                           usuario: f,
                                           dia: d.clone(),
+                                          tieneGuardia: guardias.some(
+                                            (g) =>
+                                              g.usuario_id === f.id &&
+                                              dayjs(g.fecha_inicio)
+                                                .utc()
+                                                .startOf("day")
+                                                .isSame(
+                                                  d
+                                                    .clone()
+                                                    .utc()
+                                                    .startOf("day"),
+                                                  "day"
+                                                )
+                                          ),
                                         })
                                       }
                                       className="absolute top-0 right-6 text-xs text-gray-500 p-1 opacity-0 group-hover:opacity-100 hover:text-blue-700 transition"
@@ -974,10 +1018,23 @@ export default function EscalafonServicio() {
                                             setSelectorTipo({
                                               usuario: f,
                                               dia: d.clone(),
+                                              tieneGuardia: guardias.some(
+                                                (g) =>
+                                                  g.usuario_id === f.id &&
+                                                  dayjs(g.fecha_inicio)
+                                                    .utc()
+                                                    .startOf("day")
+                                                    .isSame(
+                                                      d
+                                                        .clone()
+                                                        .utc()
+                                                        .startOf("day"),
+                                                      "day"
+                                                    )
+                                              ),
                                             })
                                           }
                                           className="absolute top-0 right-6 text-xs text-gray-500 p-1 opacity-0 group-hover:opacity-100 hover:text-blue-700 transition"
-                                          title="Cambiar Guardia"
                                         >
                                           ✏️
                                         </button>
@@ -1023,6 +1080,7 @@ export default function EscalafonServicio() {
         selectorTipo={selectorTipo}
         setSelectorTipo={setSelectorTipo}
         onConfirmar={handleCrearGuardia}
+        onEliminar={handleEliminarGuardia}
       />
 
       {selectorLicencia && (
