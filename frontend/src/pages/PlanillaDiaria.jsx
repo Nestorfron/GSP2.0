@@ -363,7 +363,7 @@ const PlanillaDiaria = () => {
           </table>
 
           {/* ================= ENCARGADO ================= */}
-          {encargado && estadoEncargado === "ENCARGADO DEPENDENCIA" && (
+          
             <table className="w-full mb-3">
               <thead>
                 <tr className="bg-white">
@@ -400,7 +400,6 @@ const PlanillaDiaria = () => {
                 </tr>
               </tbody>
             </table>
-          )}
 
           {/* ================= ENCARGADO SUPLENTE ================= */}
 
@@ -423,7 +422,7 @@ const PlanillaDiaria = () => {
                 <tr className="bg-white">
                   <td className="bg-gray-300"></td>
 
-                  <td className="border text-center align-middle">{nro++}</td>
+                  <td className="border text-center align-middle">-</td>
 
                   {/* 🔹 GRADO */}
                   <td className="border text-center align-middle">
