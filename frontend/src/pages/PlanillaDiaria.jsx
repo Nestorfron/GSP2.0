@@ -519,7 +519,7 @@ const PlanillaDiaria = () => {
                         estadoPorFuncionario[f.id]?.tipo === "1ro" ||
                         estadoPorFuncionario[f.id]?.tipo === "2do" ||
                         estadoPorFuncionario[f.id]?.tipo === "3er" ||
-                        estadoPorFuncionario[f.id]?.tipo === "T-2" ||
+                        estadoPorFuncionario[f.id]?.tipo === "T-1" ||
                         estadoPorFuncionario[f.id]?.tipo === "T-2" ||
                         estadoPorFuncionario[f.id]?.tipo === "T-3" ? (
                           exportando ? (
@@ -559,9 +559,9 @@ const PlanillaDiaria = () => {
 
                       <td className="border bg-white text-center">
                         {estadoPorFuncionario[f.id]?.tipo === "T-1" ? (
-                          "07 a 15"
+                          "08 a 20"
                         ) : estadoPorFuncionario[f.id]?.tipo === "T-2" ? (
-                          "23 a 07"
+                          "20 a 08"
                         ) : estadoPorFuncionario[f.id]?.tipo === "1ro" ? (
                           "08 a 16"
                         ) : f.medio_horario ? (
@@ -587,7 +587,8 @@ const PlanillaDiaria = () => {
                         )}
                       </td>
                       <td className="border bg-white text-center">
-                        {regimenNombre(turno.regimen_id)}
+                        {estadoPorFuncionario[f.id]?.tipo === "T-1" || estadoPorFuncionario[f.id]?.tipo === "T-2" ? "12x12" :
+                        regimenNombre(turno.regimen_id)}
                       </td>
                       <td className="border bg-white px-1">
                         {estadoPorFuncionario[f.id]?.tipo ===
