@@ -256,7 +256,7 @@ const PlanillaDiaria = () => {
 
   /* ================= PDF ================= */
   const capturar = () => {
-    if (encargadoSeleccionado === undefined || encargadoSeleccionado === null) {
+    if (encargadoSeleccionado === undefined && estadoEncargado !== "ENCARGADO DEPENDENCIA"  || encargadoSeleccionado === null && estadoEncargado !== "ENCARGADO DEPENDENCIA") {
       alert("Debes seleccionar un encargado Interino");
       return;
     }   
