@@ -46,6 +46,12 @@ export default function EscalafonServicio() {
     if (!token || estaTokenExpirado(token)) navigate("/login");
   }, [token, navigate]);
 
+  useEffect(() => {
+    if (usuario.rol_jerarquico === "JEFE_DEPENDENCIA" || usuario.is_admin === true) {
+      setDaysToShow(30);
+    }
+  }, []);
+
   if (loading) return <Loading />;
 
   const miDependencia = dependencias.find((dep) =>
@@ -677,7 +683,6 @@ export default function EscalafonServicio() {
             onChange={(e) => setDaysToShow(parseInt(e.target.value))}
             className="border rounded px-2 py-1 dark:bg-slate-800 dark:text-gray-200"
           >
-            <option value={7}>1 Semana</option>
             <option value={14}>2 Semanas</option>
             <option value={30}>1 Mes</option>
           </select>
@@ -744,7 +749,7 @@ export default function EscalafonServicio() {
           <table className="min-w-full text-sm text-center border-collapse table-fixed w-full border border-gray-200 dark:border-slate-700">
             <thead>
               <tr className="bg-gray-200 dark:bg-slate-800">
-                <th className="border px-2 py-1 text-left min-w-[8rem] w-40 sticky left-0 z-20 bg-white dark:bg-slate-800">
+                <th className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 min-w-[10rem] max-w-[10rem] sticky left-0 z-20">
                   <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-400 truncate">
                     Encargado
                   </h2>
@@ -790,7 +795,7 @@ export default function EscalafonServicio() {
                     <tr key={f.id} className="bg-white">
                       {/* 🔹 Nombre */}
                       <td
-                        className="border px-2 py-1 text-left min-w-[8rem] w-40 whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
+                        className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 min-w-[10rem] max-w-[10rem] whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
                         title={`${obtenerGradoAbreviado(f.grado)} ${f.nombre}`}
                       >
                         {obtenerGradoAbreviado(f.grado)}{" "}
@@ -910,7 +915,7 @@ export default function EscalafonServicio() {
               <table className="min-w-full text-sm text-center border-collapse table-fixed w-full">
                 <thead>
                   <tr className="bg-gray-200 dark:bg-slate-900">
-                    <th className="border bg-white dark:bg-slate-800 px-2 py-1 text-left min-w-[8rem] w-40 sticky left-0 z-20">
+                    <th className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 min-w-[10rem] max-w-[10rem] sticky left-0 z-20">
                       <h2 className="text-lg font-semibold text-blue-800 dark:text-blue-400 truncate">
                         {turno.nombre}
                       </h2>
@@ -957,7 +962,7 @@ export default function EscalafonServicio() {
                       .map((f) => (
                         <tr key={f.id}>
                           <td
-                            className="border bg-white dark:bg-slate-800 px-2 py-1 text-left min-w-[8rem] w-40 whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
+                            className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 min-w-[10rem] max-w-[10rem] whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
                             title={`${obtenerGradoAbreviado(f.grado)} ${
                               f.nombre
                             }`}

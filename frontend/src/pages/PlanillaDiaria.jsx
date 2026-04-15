@@ -259,7 +259,8 @@ const PlanillaDiaria = () => {
     if (encargadoSeleccionado === undefined && estadoEncargado !== "ENCARGADO DEPENDENCIA" && estadoEncargado !== "T"  || encargadoSeleccionado === null && estadoEncargado !== "ENCARGADO DEPENDENCIA" && estadoEncargado !== "T") {
       alert("Debes seleccionar un encargado Interino");
       return;
-    }   
+    }
+    setExportando(true);   
     setTimeout(async () => {
       const elemento = document.getElementById("planilla-pdf");
 
