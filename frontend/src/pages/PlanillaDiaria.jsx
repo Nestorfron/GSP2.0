@@ -256,7 +256,7 @@ const PlanillaDiaria = () => {
 
   /* ================= PDF ================= */
   const capturar = () => {
-    if (encargadoSeleccionado === undefined && estadoEncargado !== "ENCARGADO DEPENDENCIA"  || encargadoSeleccionado === null && estadoEncargado !== "ENCARGADO DEPENDENCIA") {
+    if (encargadoSeleccionado === undefined && estadoEncargado !== "ENCARGADO DEPENDENCIA" && estadoEncargado !== "T"  || encargadoSeleccionado === null && estadoEncargado !== "ENCARGADO DEPENDENCIA" && estadoEncargado !== "T") {
       alert("Debes seleccionar un encargado Interino");
       return;
     }   
@@ -388,7 +388,7 @@ const PlanillaDiaria = () => {
                     {encargado.nombre}
                   </td>
                   <td className="border align-middle break-words whitespace-normal px-1">
-                    {estadoEncargado}
+                    {estadoEncargado === "T" ? "ENCARGADO DEPENDENCIA" : estadoEncargado}
                   </td>
                   <td className="border text-center align-middle">FULL TIME</td>
                   <td className="border text-center align-middle">24hs</td>
@@ -403,7 +403,7 @@ const PlanillaDiaria = () => {
 
           {/* ================= ENCARGADO SUPLENTE ================= */}
 
-          {estadoEncargado !== "ENCARGADO DEPENDENCIA" && (
+          {estadoEncargado !== "ENCARGADO DEPENDENCIA" && estadoEncargado !== "T" && (
             <table className="w-full mb-3">
               <thead>
                 <tr className="bg-white">
