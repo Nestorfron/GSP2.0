@@ -31,7 +31,7 @@ export const AppProvider = ({ children }) => {
     setLoading(true);
 
     try {
-      const usuarioData = await fetchData(`/usuarios/${userId}`);
+      const usuarioData = await fetchData(`/usuarios/${userId}`, token);
       setUsuario(usuarioData);
 
       if (
@@ -49,15 +49,15 @@ export const AppProvider = ({ children }) => {
           serviciosData,
           regimenesData,
         ] = await Promise.all([
-          fetchData("/jefaturas"),
-          fetchData("/dependencias"),
-          fetchData("/guardias"),
-          fetchData("/licencias"),
-          fetchData("/notificaciones"),
-          fetchData("/vehiculos"),
-          fetchData("/funcion"),
-          fetchData("/servicios"),
-          fetchData("/regimen_horarios"),
+          fetchData("/jefaturas", token),
+          fetchData("/dependencias", token),
+          fetchData("/guardias", token),
+          fetchData("/licencias", token),
+          fetchData("/notificaciones", token),
+          fetchData("/vehiculos", token),
+          fetchData("/funcion", token),
+          fetchData("/servicios", token),
+          fetchData("/regimen_horarios", token),
         ]);
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
@@ -84,16 +84,16 @@ export const AppProvider = ({ children }) => {
           serviciosData,
           regimenesData,
         ] = await Promise.all([
-          fetchData("/jefaturas"),
-          fetchData("/dependencias"),
-          fetchData("/turnos"),
-          fetchData("/guardias"),
-          fetchData("/licencias"),
-          fetchData("/notificaciones"),
-          fetchData("/vehiculos"),
-          fetchData("/funcion"),
-          fetchData("/servicios"),
-          fetchData("/regimen_horarios"),
+          fetchData("/jefaturas", token),
+          fetchData("/dependencias", token),
+          fetchData("/turnos", token),
+          fetchData("/guardias", token),
+          fetchData("/licencias", token),
+          fetchData("/notificaciones", token),
+          fetchData("/vehiculos", token),
+          fetchData("/funcion", token),
+          fetchData("/servicios", token),
+          fetchData("/regimen_horarios", token),
         ]);
         setJefaturas(jefaturasData || []);
         setDependencias(dependenciasData || []);
@@ -200,7 +200,7 @@ export const AppProvider = ({ children }) => {
 
   const recargarDependencias = async () => {
     try {
-      const dependenciasData = await fetchData("/dependencias");
+      const dependenciasData = await fetchData("/dependencias", token);
       setDependencias(dependenciasData || []);
     } catch (error) {
       console.error("Error cargando datos de dependencias:", error);
@@ -211,7 +211,7 @@ export const AppProvider = ({ children }) => {
 
   const recargarTurnos = async () => {
     try {
-      const turnosData = await fetchData("/turnos");
+      const turnosData = await fetchData("/turnos", token);
       setTurnos(turnosData || []);
     } catch (error) {
       console.error("Error cargando datos de turnos:", error);
@@ -221,17 +221,17 @@ export const AppProvider = ({ children }) => {
   };
 
   const recargarGuaridas = async () => {
-    const data = await fetchData(`/guardias`);
+    const data = await fetchData(`/guardias`, token);
     const ordinariasData2 = data.filter((g) => g.tipo !== "extraordinaria");
     setGuardias(ordinariasData2);
     const extraorariasData2 = data.filter((g) => g.tipo === "extraordinaria");
     setExtraordinarias(extraorariasData2);
-    const data2 = await fetchData(`/licencias`);
+    const data2 = await fetchData(`/licencias`, token);
     setLicencias(data2);
   };
 
   const recargarExtraordinarias = async () => {
-    const data = await fetchData(`/guardias`);
+    const data = await fetchData(`/guardias`, token);
     const extraorariasData = data.filter(
       (g) =>
         g.tipo === "Extraordinaria" ||
@@ -244,7 +244,7 @@ export const AppProvider = ({ children }) => {
 
   const recargarNotificaciones = async () => {
     try {
-      const notificacionesData = await fetchData("/notificaciones", token);
+      const notificacionesData = await fetchData("/notificaciones", token, token);
       if (notificacionesData) {
         setNotificaciones(notificacionesData || []);
       }
@@ -257,7 +257,7 @@ export const AppProvider = ({ children }) => {
 
   const recargarUsuarios = async () => {
     try {
-      const usuariosData = await fetchData("/usuarios");
+      const usuariosData = await fetchData("/usuarios", token);
       setUsuarios(usuariosData || []);
     } catch (error) {
       console.error("Error cargando datos de usuarios:", error);
@@ -268,7 +268,7 @@ export const AppProvider = ({ children }) => {
 
   const recargarVehiculos = async () => {
     try {
-      const vehiculosData = await fetchData("/vehiculos");
+      const vehiculosData = await fetchData("/vehiculos", token);
       setVehiculos(vehiculosData || []);
     } catch (error) {
       console.error("Error cargando datos de vehiculos:", error);
@@ -279,7 +279,7 @@ export const AppProvider = ({ children }) => {
 
   const recargarServicios = async () => {
     try {
-      const serviciosData = await fetchData("/servicios");
+      const serviciosData = await fetchData("/servicios", token);
       setServicios(serviciosData || []);
     } catch (error) {
       console.error("Error cargando datos de servicios:", error);
@@ -290,7 +290,7 @@ export const AppProvider = ({ children }) => {
 
   const recargarPrendas = async () => {
     try {
-      const prendasData = await fetchData("/prendas");
+      const prendasData = await fetchData("/prendas", token);
       setPrendas(prendasData || []);
     } catch (error) {
       console.error("Error cargando datos de prendas:", error);
@@ -301,7 +301,7 @@ export const AppProvider = ({ children }) => {
 
   const recargarRegimenes = async () => {
     try {
-      const regimenesData = await fetchData("/regimen_horarios");
+      const regimenesData = await fetchData("/regimen_horarios", token);
       setRegimenes(regimenesData || []);
     } catch (error) {
       console.error("Error cargando datos de regimenes:", error);

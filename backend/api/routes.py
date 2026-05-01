@@ -32,6 +32,7 @@ def crear_jefatura():
     return jsonify(nueva.serialize()), 201
 
 @api.route('/jefaturas', methods=['GET'])
+@jwt_required()
 def listar_jefaturas():
     data = Jefatura.query.all()
     return jsonify([x.serialize() for x in data]), 200
@@ -61,6 +62,7 @@ def crear_zona():
     return jsonify(nueva.serialize()), 201
 
 @api.route('/zonas', methods=['GET'])
+@jwt_required()
 def listar_zonas():
     data = Zona.query.all()
     return jsonify([x.serialize() for x in data]), 200
@@ -90,11 +92,13 @@ def crear_dependencia():
     return jsonify(nueva.serialize()), 201
 
 @api.route('/dependencias', methods=['GET'])
+@jwt_required()
 def listar_dependencias():
     data = Dependencia.query.all()
     return jsonify([x.serialize() for x in data]), 200
 
 @api.route('/dependencias/<int:id>', methods=['GET'])
+@jwt_required()
 def obtener_dependencia(id):
     dependencia = Dependencia.query.get(id)
     return jsonify(dependencia.serialize()), 200
@@ -164,6 +168,7 @@ def actualizar_turno(id):
 
 
 @api.route('/turnos', methods=['GET'])
+@jwt_required()
 def listar_turnos():
     dependencia_id = request.args.get('dependencia_id', type=int)
     if dependencia_id:
@@ -223,6 +228,7 @@ def actualizar_regimen(id):
 
 
 @api.route('/regimen_horarios', methods=['GET'])
+@jwt_required()
 def listar_regimen_horarios():
     regimen_horarios = RegimenHorario.query.all()
     return jsonify([r.serialize() for r in regimen_horarios]), 200
@@ -281,6 +287,7 @@ def eliminar_guardia(id):
     return jsonify({'status': 'ok'}), 200
 
 @api.route('/guardias', methods=['GET'])
+@jwt_required()
 def listar_guardias():
     data = Guardia.query.all()
     return jsonify([x.serialize() for x in data]), 200
@@ -331,6 +338,7 @@ def eliminar_licencia(id):
     return jsonify({'status': 'ok'}), 200
 
 @api.route('/licencias', methods=['GET'])
+@jwt_required()
 def listar_licencias():
     data = Licencia.query.all()
     return jsonify([x.serialize() for x in data]), 200
@@ -426,12 +434,14 @@ def crear_usuario():
 
 
 @api.route('/usuarios', methods=['GET'])
+@jwt_required()
 def listar_usuarios():
     data = Usuario.query.all()
     return jsonify([x.serialize() for x in data]), 200
 
 
 @api.route('/usuarios/<int:id>', methods=['GET'])
+@jwt_required()
 def obtener_usuario(id):
     usuario = Usuario.query.get_or_404(id)
     return jsonify(usuario.serialize()), 200
@@ -694,6 +704,7 @@ def reset_password():
     return jsonify({"message": "Contraseña actualizada correctamente."}), 200
 
 @api.route('/test-email', methods=['GET'])
+@jwt_required()
 def test_email():
 
     msg = Message(
@@ -713,6 +724,7 @@ def test_email():
 # NOTIFICACIONES
 # -------------------------------------------------------------------
 @api.route('/notificaciones', methods=['GET'])
+@jwt_required()
 def listar_notificaciones():
     data = Notificacion.query.all()        
     return jsonify([x.serialize() for x in data]), 200
@@ -783,6 +795,7 @@ def save_subscription():
 
 
 @api.route('/subscriptions', methods=['GET'])
+@jwt_required()
 def listar_subscripciones():
     data = Suscripcion.query.all()
     return jsonify([x.serialize() for x in data]), 200
@@ -826,6 +839,7 @@ def enviar_push(usuario_id, mensaje):
 # PRENDAS DE UNIFORME
 # -------------------------------------------------------------------
 @api.route('/prendas', methods=['GET'])
+@jwt_required()
 def listar_prendas():
     data = Prenda.query.all()
     return jsonify([x.serialize() for x in data]), 200
@@ -872,6 +886,7 @@ def eliminar_prenda(id):
 # FUNCION
 # -------------------------------------------------------------------
 @api.route('/funcion', methods=['GET'])
+@jwt_required()
 def listar_funcion():
     data = Funcion.query.all()
     return jsonify([x.serialize() for x in data]), 200
@@ -913,6 +928,7 @@ def eliminar_funcion(id):
 # VEHICULOS
 # -------------------------------------------------------------------
 @api.route('/vehiculos', methods=['GET'])
+@jwt_required()
 def listar_vehiculos():
     data = Vehiculo.query.all()
     return jsonify([x.serialize() for x in data]), 200
@@ -966,6 +982,7 @@ def eliminar_vehiculo(id):
 # SERVICIOS MOVILES
 # -------------------------------------------------------------------
 @api.route('/servicios', methods=['GET'])
+@jwt_required()
 def listar_servicios():
     data = Servicio.query.all()
     return jsonify([x.serialize() for x in data]), 200
