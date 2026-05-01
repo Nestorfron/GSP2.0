@@ -13,5 +13,5 @@ Flask-Mail
 pywebpush
 cryptography
 pyjwt
-
+flask-limiter
 
