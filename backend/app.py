@@ -4,12 +4,11 @@ from flask_jwt_extended import JWTManager
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_migrate import Migrate
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-
 from extensions import mail
+
 from config import Config
 from api.models import db, Usuario, Turno, Jefatura, Zona, Dependencia, Licencia, Guardia, Notificacion, Suscripcion, PasswordResetToken, Prenda, Funcion, Vehiculo, Servicio, RegimenHorario
+
 from api.routes import api
 
 
@@ -17,48 +16,30 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    CORS(
-    app,
-    resources={
-        r"/api/*": {
-            "origins": [
-                "http://localhost:5173",
-                "https://gsp-2-0.vercel.app"
-            ]
-        }
-    },
-    supports_credentials=True
-    )
-
+    # Extensiones
+    CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
     mail.init_app(app)
     db.init_app(app)
     JWTManager(app)
     Migrate(app, db)
 
-   
-    limiter = Limiter(
-        key_func=get_remote_address,
-        default_limits=["200 per day", "50 per hour"]
-    )
-    limiter.init_app(app)
-
-    if app.config.get("ENV") == "development":
-        admin = Admin(app, name='Panel Admin')
-        admin.add_view(ModelView(Usuario, db.session))
-        admin.add_view(ModelView(Jefatura, db.session))
-        admin.add_view(ModelView(Zona, db.session))
-        admin.add_view(ModelView(Dependencia, db.session))
-        admin.add_view(ModelView(Turno, db.session))
-        admin.add_view(ModelView(Guardia, db.session))
-        admin.add_view(ModelView(Licencia, db.session))
-        admin.add_view(ModelView(Notificacion, db.session))
-        admin.add_view(ModelView(Suscripcion, db.session))
-        admin.add_view(ModelView(PasswordResetToken, db.session))
-        admin.add_view(ModelView(Prenda, db.session))
-        admin.add_view(ModelView(Funcion, db.session))
-        admin.add_view(ModelView(Vehiculo, db.session))
-        admin.add_view(ModelView(Servicio, db.session))
-        admin.add_view(ModelView(RegimenHorario, db.session))
+    # Admin panel
+    admin = Admin(app, name='Panel Admin')
+    admin.add_view(ModelView(Usuario, db.session))
+    admin.add_view(ModelView(Jefatura, db.session))
+    admin.add_view(ModelView(Zona, db.session))
+    admin.add_view(ModelView(Dependencia, db.session))
+    admin.add_view(ModelView(Turno, db.session))
+    admin.add_view(ModelView(Guardia, db.session))
+    admin.add_view(ModelView(Licencia, db.session))
+    admin.add_view(ModelView(Notificacion, db.session))
+    admin.add_view(ModelView(Suscripcion, db.session))
+    admin.add_view(ModelView(PasswordResetToken, db.session))
+    admin.add_view(ModelView(Prenda, db.session))
+    admin.add_view(ModelView(Funcion, db.session))
+    admin.add_view(ModelView(Vehiculo, db.session))
+    admin.add_view(ModelView(Servicio, db.session))
+    admin.add_view(ModelView(RegimenHorario, db.session))
 
     # Blueprints
     app.register_blueprint(api, url_prefix='/api')
@@ -68,7 +49,7 @@ def create_app():
     def ping():
         return {'status': 'ok'}, 200
 
-    # Cerrar conexión después de cada request
+    # Cerrar conexión después de cada request (EVITA fugas)
     @app.teardown_appcontext
     def shutdown_session(exception=None):
         db.session.remove()
@@ -78,6 +59,7 @@ def create_app():
 
 app = create_app()
 
+# ⚠️ Solo crear tablas si realmente estás en desarrollo
 with app.app_context():
     try:
         db.create_all()
@@ -86,4 +68,5 @@ with app.app_context():
 
 
 if __name__ == "__main__":
+    # ⚠️ DESACTIVAR DEBUG EN SUPABASE (produce doble proceso)
     app.run(debug=False)
