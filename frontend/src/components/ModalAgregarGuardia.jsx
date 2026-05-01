@@ -17,12 +17,13 @@ export default function ModalAgregarGuardia({
     "1ro",
     "2do",
     "3er",
-    "Curso",
+    "T-I",
     "BROU",
+    "Curso",
     "Custodia",
+    "Serv.Ext.",
     "T-1",
     "T-2",
-    "T-I",
     "Eliminar",
   ];
 
@@ -82,7 +83,7 @@ export default function ModalAgregarGuardia({
                     ? "bg-red-600 hover:bg-red-700 text-white font-bold"
                     : tipo === "D"
                     ? "bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-gray-100"
-                    : tipo === "Curso" || tipo === "Custodia"
+                    : tipo === "Curso" || tipo === "Custodia" || tipo === "Serv.Ext."
                     ? "bg-blue-600 hover:bg-blue-700 text-white font-bold"
                     : tipo === "BROU"
                     ? "bg-white hover:bg-gray-100 text-black dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"

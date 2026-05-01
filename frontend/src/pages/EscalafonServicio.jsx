@@ -35,7 +35,7 @@ export default function EscalafonServicio() {
     obtenerGradoAbreviado,
   } = useAppContext();
 
-  const [daysToShow, setDaysToShow] = useState(14);
+  const [daysToShow, setDaysToShow] = useState(15);
   const [startDate, setStartDate] = useState(dayjs().startOf("day"));
   const [selectorTipo, setSelectorTipo] = useState(null);
   const [selectorLicencia, setSelectorLicencia] = useState(null);
@@ -48,7 +48,7 @@ export default function EscalafonServicio() {
 
   useEffect(() => {
     if (usuario.rol_jerarquico === "JEFE_DEPENDENCIA" || usuario.is_admin === true) {
-      setDaysToShow(30);
+      setDaysToShow(31);
     }
   }, []);
 
@@ -683,8 +683,8 @@ export default function EscalafonServicio() {
             onChange={(e) => setDaysToShow(parseInt(e.target.value))}
             className="border rounded px-2 py-1 dark:bg-slate-800 dark:text-gray-200"
           >
-            <option value={14}>2 Semanas</option>
-            <option value={30}>1 Mes</option>
+            <option value={15}>2 Semanas</option>
+            <option value={31}>1 Mes</option>
           </select>
         </div>
 

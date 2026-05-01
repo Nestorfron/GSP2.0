@@ -2,17 +2,16 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       strategies: "injectManifest",
       injectManifest: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
-      srcDir: 'src',                      // <-- dónde está tu sw.js
-      filename: 'sw.js',                  // <-- nombre del SW real
+      srcDir: 'src',                     
+      filename: 'sw.js',                  
       registerType: 'autoUpdate',
     
       includeAssets: [

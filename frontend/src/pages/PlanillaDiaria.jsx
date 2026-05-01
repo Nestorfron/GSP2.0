@@ -256,11 +256,18 @@ const PlanillaDiaria = () => {
 
   /* ================= PDF ================= */
   const capturar = () => {
-    if (encargadoSeleccionado === undefined && estadoEncargado !== "ENCARGADO DEPENDENCIA" && estadoEncargado !== "T"  || encargadoSeleccionado === null && estadoEncargado !== "ENCARGADO DEPENDENCIA" && estadoEncargado !== "T") {
+    if (
+      (encargadoSeleccionado === undefined &&
+        estadoEncargado !== "ENCARGADO DEPENDENCIA" &&
+        estadoEncargado !== "T") ||
+      (encargadoSeleccionado === null &&
+        estadoEncargado !== "ENCARGADO DEPENDENCIA" &&
+        estadoEncargado !== "T")
+    ) {
       alert("Debes seleccionar un encargado Interino");
       return;
     }
-    setExportando(true);   
+    setExportando(true);
     setTimeout(async () => {
       const elemento = document.getElementById("planilla-pdf");
 
@@ -364,109 +371,114 @@ const PlanillaDiaria = () => {
           </table>
 
           {/* ================= ENCARGADO ================= */}
-          
-            <table className="w-full mb-3">
-              <thead>
-                <tr className="bg-white">
-                  <th className="w-[90px] bg-gray-300"></th>
-                  <th className="border w-[30px]">Nro.</th>
-                  <th className="border w-[50px]">GRADO</th>
-                  <th className="border min-w-[250px]">NOMBRE</th>
-                  <th className="border min-w-[180px]">FUNCIÓN</th>
-                  <th className="border w-[90px]">HORARIO</th>
-                  <th className="border w-[80px]">RÉGIMEN</th>
-                  <th className="border w-[150px]">OBSERVACIONES</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white">
-                  <td className="bg-gray-300"></td>
-                  <td className="border text-center align-middle">{nro++}</td>
-                  <td className="border text-center align-middle">
-                    {obtenerGrado(encargado.grado)}
-                  </td>
-                  <td className="border align-middle break-words whitespace-normal">
-                    {encargado.nombre}
-                  </td>
-                  <td className="border align-middle break-words whitespace-normal px-1">
-                    {estadoEncargado === "T" ? "ENCARGADO DEPENDENCIA" : estadoEncargado}
-                  </td>
-                  <td className="border text-center align-middle">FULL TIME</td>
-                  <td className="border text-center align-middle">24hs</td>
-                  <td className="border align-middle break-words whitespace-normal px-1">
-                    {fechaFinEncargado
-                      ? `Hasta ${fechaFinEncargado.slice(0, 5)}`
-                      : ""}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+
+          <table className="w-full mb-3">
+            <thead>
+              <tr className="bg-white">
+                <th className="w-[90px] bg-gray-300"></th>
+                <th className="border w-[30px]">Nro.</th>
+                <th className="border w-[50px]">GRADO</th>
+                <th className="border min-w-[250px]">NOMBRE</th>
+                <th className="border min-w-[180px]">FUNCIÓN</th>
+                <th className="border w-[90px]">HORARIO</th>
+                <th className="border w-[80px]">RÉGIMEN</th>
+                <th className="border w-[150px]">OBSERVACIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="bg-white">
+                <td className="bg-gray-300"></td>
+                <td className="border text-center align-middle">{nro++}</td>
+                <td className="border text-center align-middle">
+                  {obtenerGrado(encargado.grado)}
+                </td>
+                <td className="border align-middle break-words whitespace-normal">
+                  {encargado.nombre}
+                </td>
+                <td className="border align-middle break-words whitespace-normal px-1">
+                  {estadoEncargado === "T"
+                    ? "ENCARGADO DEPENDENCIA"
+                    : estadoEncargado}
+                </td>
+                <td className="border text-center align-middle">FULL TIME</td>
+                <td className="border text-center align-middle">24hs</td>
+                <td className="border align-middle break-words whitespace-normal px-1">
+                  {fechaFinEncargado
+                    ? `Hasta ${fechaFinEncargado.slice(0, 5)}`
+                    : ""}
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
           {/* ================= ENCARGADO SUPLENTE ================= */}
 
-          {estadoEncargado !== "ENCARGADO DEPENDENCIA" && estadoEncargado !== "T" && (
-            <table className="w-full mb-3">
-              <thead>
-                <tr className="bg-white">
-                  <th className="w-[90px] bg-gray-300"></th>
-                  <th className="border w-[30px]">Nro.</th>
-                  <th className="border w-[60px]">GRADO</th>
-                  <th className="border min-w-[250px]">NOMBRE</th>
-                  <th className="border min-w-[180px]">FUNCIÓN</th>
-                  <th className="border w-[90px]">HORARIO</th>
-                  <th className="border w-[80px]">RÉGIMEN</th>
-                  <th className="border w-[150px]">OBSERVACIONES</th>
-                </tr>
-              </thead>
+          {estadoEncargado !== "ENCARGADO DEPENDENCIA" &&
+            estadoEncargado !== "T" && (
+              <table className="w-full mb-3">
+                <thead>
+                  <tr className="bg-white">
+                    <th className="w-[90px] bg-gray-300"></th>
+                    <th className="border w-[30px]">Nro.</th>
+                    <th className="border w-[60px]">GRADO</th>
+                    <th className="border min-w-[250px]">NOMBRE</th>
+                    <th className="border min-w-[180px]">FUNCIÓN</th>
+                    <th className="border w-[90px]">HORARIO</th>
+                    <th className="border w-[80px]">RÉGIMEN</th>
+                    <th className="border w-[150px]">OBSERVACIONES</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                <tr className="bg-white">
-                  <td className="bg-gray-300"></td>
+                <tbody>
+                  <tr className="bg-white">
+                    <td className="bg-gray-300"></td>
 
-                  <td className="border text-center align-middle">-</td>
+                    <td className="border text-center align-middle">-</td>
 
-                  {/* 🔹 GRADO */}
-                  <td className="border text-center align-middle">
-                    {encargadoSeleccionado
-                      ? obtenerGrado(encargadoSeleccionado.grado)
-                      : "-"}
-                  </td>
-                  <td className="border bg-white">
-                    {exportando ? (
-                      <span className="text-xs">
-                        {encargadoSeleccionado?.nombre || "Sin asignar"}
-                      </span>
-                    ) : (
-                      <select
-                        value={encargadoSeleccionado?.id || ""}
-                        onChange={(e) =>
-                          setEncargadoSeleccionado(
-                            encargados.find((u) => u.id === Number(e.target.value))
-                          )
-                        }
-                        className="w-full text-xs bg-white outline-none"
-                      >
-                        <option value="">Seleccionar encargado</option>
-                        {encargados.map((u) => (
-                          <option key={u.id} value={u.id}>
-                           {u.nombre}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </td>
-                  <td className="border px-2">Encargado Interino</td>
-                  <td className="border text-center">FULL TIME</td>
-                  <td className="border text-center">24hs</td>
-                  <td className="border px-1">
-                    {fechaFinEncargado
-                      ? `Hasta ${fechaFinEncargado.slice(0, 5)}`
-                      : ""}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          )}
+                    {/* 🔹 GRADO */}
+                    <td className="border text-center align-middle">
+                      {encargadoSeleccionado
+                        ? obtenerGrado(encargadoSeleccionado.grado)
+                        : "-"}
+                    </td>
+                    <td className="border bg-white">
+                      {exportando ? (
+                        <span className="text-xs">
+                          {encargadoSeleccionado?.nombre || "Sin asignar"}
+                        </span>
+                      ) : (
+                        <select
+                          value={encargadoSeleccionado?.id || ""}
+                          onChange={(e) =>
+                            setEncargadoSeleccionado(
+                              encargados.find(
+                                (u) => u.id === Number(e.target.value)
+                              )
+                            )
+                          }
+                          className="w-full text-xs bg-white outline-none"
+                        >
+                          <option value="">Seleccionar encargado</option>
+                          {encargados.map((u) => (
+                            <option key={u.id} value={u.id}>
+                              {u.nombre}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </td>
+                    <td className="border px-2">Encargado Interino</td>
+                    <td className="border text-center">FULL TIME</td>
+                    <td className="border text-center">24hs</td>
+                    <td className="border px-1">
+                      {fechaFinEncargado
+                        ? `Hasta ${fechaFinEncargado.slice(0, 5)}`
+                        : ""}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
 
           {/* ================= TURNOS ================= */}
           {misTurnos.map((turno) => {
@@ -515,13 +527,18 @@ const PlanillaDiaria = () => {
                       </td>
                       <td className="border bg-white">{f.nombre}</td>
                       <td className="border bg-white px-2">
-                        {estadoPorFuncionario[f.id]?.tipo === "T" ||
-                        estadoPorFuncionario[f.id]?.tipo === "1ro" ||
-                        estadoPorFuncionario[f.id]?.tipo === "2do" ||
-                        estadoPorFuncionario[f.id]?.tipo === "3er" ||
-                        estadoPorFuncionario[f.id]?.tipo === "T-1" ||
-                        estadoPorFuncionario[f.id]?.tipo === "T-2" ||
-                        estadoPorFuncionario[f.id]?.tipo === "T-3" ? (
+                        {estadoPorFuncionario[f.id]?.tipo === "Serv.Ext." ? (
+                          "Servicio Exterior"
+                        ) : estadoPorFuncionario[f.id].tipo ===
+                          "extraordinaria" ? (
+                          "Licencia Extraorinaria"
+                        ) : estadoPorFuncionario[f.id]?.tipo === "T" ||
+                          estadoPorFuncionario[f.id]?.tipo === "1ro" ||
+                          estadoPorFuncionario[f.id]?.tipo === "2do" ||
+                          estadoPorFuncionario[f.id]?.tipo === "3er" ||
+                          estadoPorFuncionario[f.id]?.tipo === "T-1" ||
+                          estadoPorFuncionario[f.id]?.tipo === "T-2" ||
+                          estadoPorFuncionario[f.id]?.tipo === "T-3" ? (
                           exportando ? (
                             <span className="block bg-white text-xs">
                               {funcionesEditadas[f.id] ??
@@ -558,7 +575,9 @@ const PlanillaDiaria = () => {
                       </td>
 
                       <td className="border bg-white text-center">
-                        {estadoPorFuncionario[f.id]?.tipo === "T-1" ? (
+                        {estadoPorFuncionario[f.id]?.tipo === "Serv.Ext." ? (
+                          " - "
+                        ) : estadoPorFuncionario[f.id]?.tipo === "T-1" ? (
                           "08 a 20"
                         ) : estadoPorFuncionario[f.id]?.tipo === "T-2" ? (
                           "20 a 08"
@@ -575,25 +594,28 @@ const PlanillaDiaria = () => {
                           "24hs"
                         ) : estadoPorFuncionario[f.id]?.tipo ===
                           "Primer Turno (08 a 16)" ? (
-                          "08 a 16"
+                          "08 A 16"
                         ) : estadoPorFuncionario[f.id]?.tipo ===
                           "Segundo Turno (16 a 00)" ? (
-                          "16 a 00"
+                          "16 A 00"
                         ) : estadoPorFuncionario[f.id]?.tipo ===
                           "Tercer Turno (00 a 08)" ? (
-                          "00 a 08"
+                          "00 A 08"
                         ) : (
                           formatHorario(turno.hora_inicio, turno.hora_fin)
                         )}
                       </td>
                       <td className="border bg-white text-center">
-                        {estadoPorFuncionario[f.id]?.tipo === "T-1" || estadoPorFuncionario[f.id]?.tipo === "T-2" ? "12x12" :
-                        regimenNombre(turno.regimen_id)}
+                        {estadoPorFuncionario[f.id]?.tipo === "T-1" ||
+                        estadoPorFuncionario[f.id]?.tipo === "T-2"
+                          ? "12x12"
+                          : regimenNombre(turno.regimen_id)}
                       </td>
                       <td className="border bg-white px-1">
                         {estadoPorFuncionario[f.id]?.tipo ===
                           "Licencia Médica" ||
-                        estadoPorFuncionario[f.id]?.tipo === "Licencia Anual"
+                        estadoPorFuncionario[f.id]?.tipo === "Licencia Anual" ||
+                        estadoPorFuncionario[f.id]?.tipo === "extraordinaria"
                           ? "Hasta " +
                             estadoPorFuncionario[f.id]?.fechaFin?.slice(0, 5)
                           : ""}
