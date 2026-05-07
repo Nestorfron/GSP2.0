@@ -583,7 +583,9 @@ const PlanillaDiaria = () => {
                           "20 a 08"
                         ) : estadoPorFuncionario[f.id]?.tipo === "1ro" ? (
                           "08 a 16"
-                        ) : f.medio_horario ? (
+                        ) : estadoPorFuncionario[f.id]?.tipo === "BROU" ? (
+                          "12 a 20"
+                        ) :f.medio_horario ? (
                           <span
                             title="Funcionario con medio horario"
                             className="ms-2 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-2 py-0.5 rounded-full"
