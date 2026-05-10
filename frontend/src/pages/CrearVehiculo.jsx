@@ -51,9 +51,22 @@ export default function CrearVehiculo() {
     setLoading(true);
     try {
       const payload = {
-        ...formData,
-        anio: Number(formData.anio),
-        dependencia_id: depId || formData.dependencia_id || null,
+        matricula: formData.matricula?.trim(),
+        marca: formData.marca?.trim(),
+        modelo: formData.modelo?.trim(),
+      
+        anio: formData.anio ? Number(formData.anio) : null,
+      
+        estado: formData.estado?.trim() || null,
+      
+        proximo_servicio:
+          formData.proximo_servicio?.trim()
+            ? formData.proximo_servicio
+            : null,
+      
+        dependencia_id: Number(
+          depId ?? formData.dependencia_id
+        ) || null,
       };
 
       const data = await postData("vehiculos", payload, token);

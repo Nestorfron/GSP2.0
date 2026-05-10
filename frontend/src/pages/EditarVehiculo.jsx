@@ -54,14 +54,31 @@ export default function EditarVehiculo() {
     setLoading(true);
     try {
       const payload = {
-        ...formData,
-        anio: Number(formData.anio),
+        matricula: formData.matricula,
+        marca: formData.marca,
+        modelo: formData.modelo,
+      
+  
+        anio: formData.anio ? Number(formData.anio) : null,
+      
+  
+        estado: formData.estado?.trim() || null,
+        dependencia_id: formData.dependencia_id
+          ? Number(formData.dependencia_id)
+          : null,
+      
+        proximo_servicio:
+          formData.proximo_servicio?.trim()
+            ? formData.proximo_servicio
+            : null,
       };
+
 
       const data = await putData(`vehiculos/${vehiculo.id}`, payload, token);
       if (data) setSuccess(true);
       recargarVehiculos();
     } catch (err) {
+      
       alert(`❌ Error: ${err.message}`);
     } finally {
       setLoading(false);
