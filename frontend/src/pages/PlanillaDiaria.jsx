@@ -588,9 +588,9 @@ const PlanillaDiaria = () => {
                         ) :f.medio_horario ? (
                           <span
                             title="Funcionario con medio horario"
-                            className="ms-2 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-2 py-0.5 rounded-full"
+                            className="ms-1 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-0.5 py-0.5 rounded-full"
                           >
-                            1/2 horario
+                            1/2 Horario
                           </span>
                         ) : turno.nombre === "Destacados" ? (
                           "24hs"
@@ -610,7 +610,12 @@ const PlanillaDiaria = () => {
                       <td className="border bg-white text-center">
                         {estadoPorFuncionario[f.id]?.tipo === "T-1" ||
                         estadoPorFuncionario[f.id]?.tipo === "T-2"
-                          ? "12x12"
+                          ? "12x12" :f.medio_horario ? (
+                          <span
+                            title="Funcionario con medio horario">
+                            4 horas
+                          </span>
+                        )
                           : regimenNombre(turno.regimen_id)}
                       </td>
                       <td className="border bg-white px-1">
