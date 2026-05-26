@@ -308,8 +308,8 @@ const PlanillaDiaria = () => {
 
           pdf.save(
             "Fuerza efectiva " +
-              dayjs(fechaSeleccionada).format("DD/MM/YY") +
-              ".pdf"
+            dayjs(fechaSeleccionada).format("DD/MM/YY") +
+            ".pdf"
           );
         })
         .catch((err) => {
@@ -323,6 +323,8 @@ const PlanillaDiaria = () => {
       setExportando(false);
     }, 50);
   };
+
+
 
   if (loading) return <Loading />;
 
@@ -513,6 +515,7 @@ const PlanillaDiaria = () => {
                   </tr>
                 </thead>
                 <tbody>
+
                   {funcionarios.map((f, i) => (
                     <tr key={f.id}>
                       {i === 0 && (
@@ -527,51 +530,59 @@ const PlanillaDiaria = () => {
                       </td>
                       <td className="border bg-white">{f.nombre}</td>
                       <td className="border bg-white px-2">
-                        {estadoPorFuncionario[f.id]?.tipo === "Serv.Ext." ? (
-                          "Servicio Exterior"
-                        ) : estadoPorFuncionario[f.id].tipo ===
-                          "extraordinaria" ? (
-                          "Licencia Extraorinaria"
-                        ) : estadoPorFuncionario[f.id]?.tipo === "T" ||
-                          estadoPorFuncionario[f.id]?.tipo === "1ro" ||
-                          estadoPorFuncionario[f.id]?.tipo === "2do" ||
-                          estadoPorFuncionario[f.id]?.tipo === "3er" ||
-                          estadoPorFuncionario[f.id]?.tipo === "T-1" ||
-                          estadoPorFuncionario[f.id]?.tipo === "T-2" ||
-                          estadoPorFuncionario[f.id]?.tipo === "T-3" ? (
-                          exportando ? (
-                            <span className="block bg-white text-xs">
-                              {funcionesEditadas[f.id] ??
-                                nombreFuncion(f.funcion_id)}
-                            </span>
-                          ) : (
-                            <select
-                              value={
-                                funcionesEditadas[f.id] ?? "Agregar función"
-                              }
-                              onChange={(e) =>
-                                setFuncionesEditadas((prev) => ({
-                                  ...prev,
-                                  [f.id]: e.target.value,
-                                }))
-                              }
-                              className="w-full text-xs bg-white outline-none"
-                            >
-                              <option value={f.funcion_id}>
-                                {nombreFuncion(f.funcion_id)}
-                              </option>
-                              {funcionesTurnoT.map((opcion, index) => (
-                                <option key={index} value={opcion}>
-                                  {opcion}
+                        {(() => {
+                          const tipoActual = estadoPorFuncionario[f.id]?.tipo || "";
+
+                          const esHorarioPersonalizado =
+                            /^\d+\s*a\s*\d+$/i.test(tipoActual);
+
+                          return estadoPorFuncionario[f.id]?.tipo === "Serv.Ext." ? (
+                            "Servicio Exterior"
+                          ) : estadoPorFuncionario[f.id].tipo === "extraordinaria" ? (
+                            "Licencia Extraorinaria"
+                          ) : estadoPorFuncionario[f.id]?.tipo === "T" ||
+                            estadoPorFuncionario[f.id]?.tipo === "1ro" ||
+                            estadoPorFuncionario[f.id]?.tipo === "2do" ||
+                            estadoPorFuncionario[f.id]?.tipo === "3er" ||
+                            estadoPorFuncionario[f.id]?.tipo === "T-1" ||
+                            estadoPorFuncionario[f.id]?.tipo === "T-2" ||
+                            estadoPorFuncionario[f.id]?.tipo === "T-3" ||
+                            esHorarioPersonalizado ? (
+                            exportando ? (
+                              <span className="block bg-white text-xs">
+                                {funcionesEditadas[f.id] ??
+                                  nombreFuncion(f.funcion_id)}
+                              </span>
+                            ) : (
+                              <select
+                                value={
+                                  funcionesEditadas[f.id] ?? "Agregar función"
+                                }
+                                onChange={(e) =>
+                                  setFuncionesEditadas((prev) => ({
+                                    ...prev,
+                                    [f.id]: e.target.value,
+                                  }))
+                                }
+                                className="w-full text-xs bg-white outline-none"
+                              >
+                                <option value={f.funcion_id}>
+                                  {nombreFuncion(f.funcion_id)}
                                 </option>
-                              ))}
-                            </select>
-                          )
-                        ) : (
-                          <span className="block bg-white text-xs">
-                            {obtenerFuncion(f)}
-                          </span>
-                        )}
+
+                                {funcionesTurnoT.map((opcion, index) => (
+                                  <option key={index} value={opcion}>
+                                    {opcion}
+                                  </option>
+                                ))}
+                              </select>
+                            )
+                          ) : (
+                            <span className="block bg-white text-xs">
+                              {obtenerFuncion(f)}
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       <td className="border bg-white text-center">
@@ -585,7 +596,14 @@ const PlanillaDiaria = () => {
                           "08 a 16"
                         ) : estadoPorFuncionario[f.id]?.tipo === "BROU" ? (
                           "12 a 20"
-                        ) :f.medio_horario ? (
+                        ) : /^\d+\s*a\s*\d+$/i.test(
+                          estadoPorFuncionario[f.id]?.tipo || ""
+                        ) ? (
+                          estadoPorFuncionario[f.id]?.tipo.replace(
+                            /(\d+)\s*a\s*(\d+)/i,
+                            "$1 A $2"
+                          )
+                        ) : f.medio_horario ? (
                           <span
                             title="Funcionario con medio horario"
                             className="ms-1 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 px-0.5 py-0.5 rounded-full"
@@ -609,30 +627,30 @@ const PlanillaDiaria = () => {
                       </td>
                       <td className="border bg-white text-center">
                         {estadoPorFuncionario[f.id]?.tipo === "T-1" ||
-                        estadoPorFuncionario[f.id]?.tipo === "T-2"
-                          ? "12x12" :f.medio_horario ? (
-                          <span
-                            title="Funcionario con medio horario">
-                            4 horas
-                          </span>
-                        )
-                          : regimenNombre(turno.regimen_id)}
+                          estadoPorFuncionario[f.id]?.tipo === "T-2"
+                          ? "12x12" : f.medio_horario ? (
+                            <span
+                              title="Funcionario con medio horario">
+                              4 horas
+                            </span>
+                          )
+                            : regimenNombre(turno.regimen_id)}
                       </td>
                       <td className="border bg-white px-1">
                         {estadoPorFuncionario[f.id]?.tipo ===
                           "Licencia Médica" ||
-                        estadoPorFuncionario[f.id]?.tipo === "Licencia Anual" ||
-                        estadoPorFuncionario[f.id]?.tipo === "extraordinaria"
+                          estadoPorFuncionario[f.id]?.tipo === "Licencia Anual" ||
+                          estadoPorFuncionario[f.id]?.tipo === "extraordinaria"
                           ? "Hasta " +
-                            estadoPorFuncionario[f.id]?.fechaFin?.slice(0, 5)
+                          estadoPorFuncionario[f.id]?.fechaFin?.slice(0, 5)
                           : ""}
                         {turno.nombre === "Destacados" &&
-                        estadoPorFuncionario[f.id]?.tipo !==
+                          estadoPorFuncionario[f.id]?.tipo !==
                           "Licencia Semanal" &&
-                        estadoPorFuncionario[f.id]?.tipo !==
+                          estadoPorFuncionario[f.id]?.tipo !==
                           "Licencia Médica" &&
-                        estadoPorFuncionario[f.id]?.tipo !== "Licencia Anual" &&
-                        estadoPorFuncionario[f.id]?.tipo !== "T" ? (
+                          estadoPorFuncionario[f.id]?.tipo !== "Licencia Anual" &&
+                          estadoPorFuncionario[f.id]?.tipo !== "T" ? (
                           exportando ? (
                             <span className="block bg-white text-xs">
                               {funcionesEditadas[f.id] ??
