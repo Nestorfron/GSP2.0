@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ModalAgregarGuardia({
@@ -7,6 +7,9 @@ export default function ModalAgregarGuardia({
   onConfirmar,
   onEliminar,
 }) {
+  const [modoPersonalizado, setModoPersonalizado] = useState(false);
+  const [textoPersonalizado, setTextoPersonalizado] = useState("");
+
   if (!selectorTipo) return null;
 
   const { usuario, dia } = selectorTipo;
@@ -24,6 +27,7 @@ export default function ModalAgregarGuardia({
     "Serv.Ext.",
     "T-1",
     "T-2",
+    "Personalizado",
     "Eliminar",
   ];
 
@@ -37,15 +41,40 @@ export default function ModalAgregarGuardia({
         usuario,
         dia: diaSeleccionado,
       });
-    } else {
-      await onConfirmar({
-        usuario,
-        dia: diaSeleccionado,
-        tipo,
-        comentario: "",
-      });
+
+      setSelectorTipo(null);
+      return;
     }
 
+    if (tipo === "Personalizado") {
+      setModoPersonalizado(true);
+      return;
+    }
+
+    await onConfirmar({
+      usuario,
+      dia: diaSeleccionado,
+      tipo,
+      comentario: "",
+    });
+
+    setSelectorTipo(null);
+  };
+
+  const handleGuardarPersonalizado = async () => {
+    if (!textoPersonalizado.trim()) return;
+
+    const diaSeleccionado = dia.clone().startOf("day");
+
+    await onConfirmar({
+      usuario,
+      dia: diaSeleccionado,
+      tipo: textoPersonalizado,
+      comentario: "",
+    });
+
+    setTextoPersonalizado("");
+    setModoPersonalizado(false);
     setSelectorTipo(null);
   };
 
@@ -67,53 +96,94 @@ export default function ModalAgregarGuardia({
             Seleccionar tipo de guardia
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-            {tipos
-              .filter((tipo) =>
-                tipo === "Eliminar"
-                  ? selectorTipo?.tieneGuardia
-                  : true
-              )
-              .map((tipo) => {
-                const baseClass =
-                  "w-full font-medium py-2 px-4 rounded transition text-sm";
+          {!modoPersonalizado ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                {tipos
+                  .filter((tipo) =>
+                    tipo === "Eliminar"
+                      ? selectorTipo?.tieneGuardia
+                      : true
+                  )
+                  .map((tipo) => {
+                    const baseClass =
+                      "w-full font-medium py-2 px-4 rounded transition text-sm";
 
-                const colorClass =
-                  tipo === "Eliminar"
-                    ? "bg-red-600 hover:bg-red-700 text-white font-bold"
-                    : tipo === "D"
-                    ? "bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-gray-100"
-                    : tipo === "Curso" || tipo === "Custodia" || tipo === "Serv.Ext."
-                    ? "bg-blue-600 hover:bg-blue-700 text-white font-bold"
-                    : tipo === "BROU"
-                    ? "bg-white hover:bg-gray-100 text-black dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
-                    : tipo === "T-1"
-                    ? "bg-violet-300 hover:bg-violet-400 text-violet-900 font-semibold dark:bg-violet-500 dark:hover:bg-violet-600 dark:text-white"
-                    : tipo === "T-2"
-                    ? "bg-violet-700 hover:bg-violet-800 text-white font-semibold dark:bg-violet-900 dark:hover:bg-violet-950"
-                    : tipo === "T-I"
-                    ? "bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-semibold dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:text-white"
-                    : "bg-blue-100 hover:bg-blue-200 text-blue-900 dark:bg-blue-800 dark:text-blue-100";
+                    const colorClass =
+                      tipo === "Eliminar"
+                        ? "bg-red-600 hover:bg-red-700 text-white font-bold"
+                        : tipo === "Personalizado"
+                        ? "bg-green-600 hover:bg-green-700 text-white font-bold"
+                        : tipo === "D"
+                        ? "bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-gray-100"
+                        : tipo === "Curso" ||
+                          tipo === "Custodia" ||
+                          tipo === "Serv.Ext."
+                        ? "bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                        : tipo === "BROU"
+                        ? "bg-white hover:bg-gray-100 text-black dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
+                        : tipo === "T-1"
+                        ? "bg-violet-300 hover:bg-violet-400 text-violet-900 font-semibold dark:bg-violet-500 dark:hover:bg-violet-600 dark:text-white"
+                        : tipo === "T-2"
+                        ? "bg-violet-700 hover:bg-violet-800 text-white font-semibold dark:bg-violet-900 dark:hover:bg-violet-950"
+                        : tipo === "T-I"
+                        ? "bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-semibold dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:text-white"
+                        : "bg-blue-100 hover:bg-blue-200 text-blue-900 dark:bg-blue-800 dark:text-blue-100";
 
-                return (
-                  <button
-                    key={tipo}
-                    onClick={() => handleClickTipo(tipo)}
-                    className={`${baseClass} ${colorClass}`}
-                  >
-                    {tipo === "D"
-                      ? "Descanso (D)"
-                      : tipo === "Eliminar"
-                      ? "Eliminar"
-                      : tipo}
-                  </button>
-                );
-              })}
-          </div>
+                    return (
+                      <button
+                        key={tipo}
+                        onClick={() => handleClickTipo(tipo)}
+                        className={`${baseClass} ${colorClass}`}
+                      >
+                        {tipo === "D"
+                          ? "Descanso (D)"
+                          : tipo === "Personalizado"
+                          ? "Escribir horario"
+                          : tipo}
+                      </button>
+                    );
+                  })}
+              </div>
+            </>
+          ) : (
+            <div className="space-y-3 mb-4">
+              <input
+                type="text"
+                value={textoPersonalizado}
+                onChange={(e) => setTextoPersonalizado(e.target.value)}
+                placeholder="Ej: 13a21"
+                className="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+              />
+
+              <div className="flex gap-2">
+                <button
+                  onClick={handleGuardarPersonalizado}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg"
+                >
+                  Guardar
+                </button>
+
+                <button
+                  onClick={() => {
+                    setModoPersonalizado(false);
+                    setTextoPersonalizado("");
+                  }}
+                  className="flex-1 bg-gray-300 dark:bg-slate-700 text-gray-800 dark:text-white py-2 rounded-lg"
+                >
+                  Volver
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-end">
             <button
-              onClick={() => setSelectorTipo(null)}
+              onClick={() => {
+                setModoPersonalizado(false);
+                setTextoPersonalizado("");
+                setSelectorTipo(null);
+              }}
               className="px-3 py-1 rounded-lg bg-gray-300 dark:bg-slate-700 text-gray-800 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-slate-600 transition text-sm"
             >
               Cancelar
