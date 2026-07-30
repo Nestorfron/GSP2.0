@@ -28,9 +28,11 @@ export function getTurnoProps(turno) {
 
   if (["custodia", "curso", "ch", "serv.ext."].includes(t))
     return {
-      clase: "text-xs text-white bg-blue-600",
+      clase: "text-xs text-white bg-blue-300 font-bold",
       contenido: turno,
     };
+
+
 
   if (t === "guardia" || t === "t")
     return {

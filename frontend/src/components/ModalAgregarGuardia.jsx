@@ -119,7 +119,7 @@ export default function ModalAgregarGuardia({
                         : tipo === "Curso" ||
                           tipo === "Custodia" ||
                           tipo === "Serv.Ext."
-                        ? "bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                        ? "text-xs text-white bg-blue-300 font-bold hover:bg-blue-500"
                         : tipo === "BROU"
                         ? "bg-white hover:bg-gray-100 text-black dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
                         : tipo === "T-1"

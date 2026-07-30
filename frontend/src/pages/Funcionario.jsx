@@ -177,7 +177,7 @@ const Funcionario = () => {
                 </h3>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="h-[15rem] overflow-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
                   <thead className="bg-blue-50 dark:bg-slate-900">
                     <tr>
@@ -189,7 +189,7 @@ const Funcionario = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                  <tbody className="overflow-auto divide-y divide-gray-200 dark:divide-slate-700">
                     {misExtraordinarias.map((g) => {
                       return (
                         <tr

@@ -994,7 +994,7 @@ export default function EscalafonServicio() {
                                   turno?.nombre === "BROU"
                                     ? clase
                                     : contenido === "BROU"
-                                    ? "text-xs text-white bg-blue-600"
+                                    ? "text-xs text-white bg-blue-300 font-bold"
                                     : clase
                                 }`}
                               >
