@@ -26,13 +26,11 @@ export function getTurnoProps(turno) {
       contenido: "L.Ext",
     };
 
-  if (["custodia", "curso", "ch", "serv.ext."].includes(t))
+  if (["custodia", "curso", "ch", "serv.ext.", "teap", "edp"].includes(t))
     return {
-      clase: "text-xs text-white bg-blue-300 font-bold",
+      clase: "text-xs text-white bg-gray-500 font-bold",
       contenido: turno,
     };
-
-
 
   if (t === "guardia" || t === "t")
     return {
@@ -45,6 +43,7 @@ export function getTurnoProps(turno) {
       clase: "text-xs text-white bg-black",
       contenido: "D",
     };
+
 
   if (["1ro", "2do", "3er"].includes(turno))
     return {
@@ -66,10 +65,17 @@ export function getTurnoProps(turno) {
 
   if (t === "t-i")
     return {
-      clase: "text-xs text-yellow-900 bg-yellow-300 font-semibold",
+      clase: "text-xs text-gray-700 dark:text-gray-300 bg-transparent",
       contenido: turno,
     };
 
+   if (t === "t")
+    return {
+      clase: "text-xs text-white bg-violet-700 font-semibold",
+      contenido: turno,
+    };
+
+ 
    const esHorarioPersonalizado =
     /\d/.test(turno) &&
     (turno.includes("a") ||
@@ -84,7 +90,7 @@ export function getTurnoProps(turno) {
 
   // fallback
   return {
-    clase: "text-xs text-gray-700 dark:text-gray-300 bg-transparent",
+    clase: "text-xs text-white bg-gray-500 font-bold",
     contenido: turno,
   };
 }

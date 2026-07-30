@@ -158,6 +158,7 @@ export default function EscalafonServicio() {
 
   const ordenTurnos = [
     "Primer Turno",
+    "Desarmados",
     "Interna",
     "Jurídica",
     "BROU",
@@ -991,10 +992,8 @@ export default function EscalafonServicio() {
                               <td
                                 key={d.format("YYYY-MM-DD")}
                                 className={`border py-1 relative group ${
-                                  turno?.nombre === "BROU"
-                                    ? clase
-                                    : contenido === "BROU"
-                                    ? "text-xs text-white bg-blue-300 font-bold"
+                                  turno?.nombre === "BROU" & contenido === "BROU"
+                                    ? ""
                                     : clase
                                 }`}
                               >
