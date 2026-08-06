@@ -64,7 +64,7 @@ const BottomNavbar = () => {
   const getHomePath = () => {
     switch (usuario?.rol_jerarquico) {
       case "ADMINISTRADOR":
-        return "/admin";
+        return "/gestion";
       case "JEFE_ZONA":
         return "/zona";
       case "JEFE_DEPENDENCIA":
@@ -95,12 +95,6 @@ const BottomNavbar = () => {
   // 📋 Ítems del menú
   const menuItems = [
     { key: "home", icon: Home, path: getHomePath(), label: "Inicio" },
-    {
-      key: "gestion",
-      icon: Users,
-      path: "/gestion",
-      label: "Gestión",
-    },
     {
       key: "dependencia",
       icon: List,

@@ -371,6 +371,10 @@ def crear_usuario():
     estado = body.get("estado")
     is_admin = body.get("is_admin")
     medio_horario = body.get("medio_horario")
+    des_tres_diecisiete = body.get("des_tres_diecisiete")
+    des_ciento_once = body.get("des_ciento_once")
+    des_cert_prolongada = body.get("des_cert_prolongada")
+    des_preventivo = body.get("des_preventivo")
     turno_id = body.get("turno_id")
     funcion_id = body.get("funcion_id")
 
@@ -421,6 +425,10 @@ def crear_usuario():
         zona_id=zona_id,
         is_admin=is_admin,
         medio_horario=medio_horario,
+        des_tres_diecisiete=des_tres_diecisiete,
+        des_ciento_once=des_ciento_once,
+        des_cert_prolongada=des_cert_prolongada,
+        des_preventivo=des_preventivo,
         estado=estado,
         turno_id=turno_id,
         funcion_id=funcion_id,
@@ -466,6 +474,10 @@ def actualizar_usuario(id):
     estado = body.get("estado", usuario.estado)
     is_admin = body.get("is_admin", usuario.is_admin)
     medio_horario = body.get("medio_horario", usuario.medio_horario)
+    des_tres_diecisiete = body.get("des_tres_diecisiete", usuario.des_tres_diecisiete)
+    des_ciento_once = body.get("des_ciento_once", usuario.des_ciento_once)
+    des_cert_prolongada = body.get("des_cert_prolongada", usuario.des_cert_prolongada)
+    des_preventivo = body.get("des_preventivo", usuario.des_preventivo)
     funcion_id = body.get("funcion_id", usuario.funcion_id)
 
     # 🔥 ESTA ES LA PARTE IMPORTANTE
@@ -500,6 +512,10 @@ def actualizar_usuario(id):
     usuario.funcion_id = funcion_id
     usuario.is_admin = is_admin
     usuario.medio_horario = medio_horario
+    usuario.des_tres_diecisiete = des_tres_diecisiete
+    usuario.des_ciento_once = des_ciento_once
+    usuario.des_cert_prolongada = des_cert_prolongada
+    usuario.des_preventivo = des_preventivo
 
     db.session.commit()
     return jsonify(usuario.serialize()), 200
@@ -565,6 +581,10 @@ def setup_admin():
         zona_id=None,
         is_admin=True,
         medio_horario=False,
+        des_tres_diecisiete=False,
+        des_ciento_once=False,
+        des_cert_prolongada=False,
+        des_preventivo=False,
         estado="Activo",
         turno_id=None,
         funcion_id=None,

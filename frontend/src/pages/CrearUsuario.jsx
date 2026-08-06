@@ -38,6 +38,10 @@ export default function CrearUsuario() {
     funcion_id: "",
     estado: "ACTIVO",
     medio_horario: false,
+    des_tres_diecisiete: false,
+    des_ciento_once: false,
+    des_cert_prolongada: false,
+    des_preventivo: false,
     is_admin: false,
   });
 
@@ -217,6 +221,46 @@ export default function CrearUsuario() {
               onChange={handleChange}
             />
             Medio horario
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="des_tres_diecisiete"
+              checked={formData.des_tres_diecisiete}
+              onChange={handleChange}
+            />
+            Desarme por 317/2010
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="des_ciento_once"
+              checked={formData.des_ciento_once}
+              onChange={handleChange}
+            />
+            Desarme por 111/2015
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="des_cert_prolongada"
+              checked={formData.des_cert_prolongada}
+              onChange={handleChange}
+            />
+            Desarme por cert. prolongada
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="des_preventivo"
+              checked={formData.des_preventivo}
+              onChange={handleChange}
+            />
+            Desarme preventivo.
           </label>
 
           <button

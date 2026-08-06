@@ -27,6 +27,7 @@ const GestionPanel = () => {
     dependencias = [],
     vehiculos = [],
     regimenes = [],
+    obtenerGrado
   } = useAppContext();
 
   const navigate = useNavigate();
@@ -183,18 +184,7 @@ const GestionPanel = () => {
 
         {/* ================= DEPENDENCIAS ================= */}
         {activeSection === "dependencias" && (
-          <SectionCard
-            title="Dependencias"
-            actions={
-              usuario?.rol_jerarquico === "ADMINISTRADOR" && (
-                <IconButton
-                  icon={PlusCircle}
-                  tooltip="Agregar dependencia"
-                  onClick={() => navigate("/crear-dependencia")}
-                />
-              )
-            }
-          >
+          <SectionCard title="Dependencias">
             <div className="space-y-5">
               {jefaturas.map((j) => (
                 <div key={j.id} className="space-y-3">
@@ -204,7 +194,16 @@ const GestionPanel = () => {
 
                   {j.zonas?.map((zona) => (
                     <div key={zona.id} className="border rounded-xl p-3">
-                      <p className="font-semibold mb-2">{zona.nombre}</p>
+                      <div className="flex justify-between border-b p-3">
+                        <p className="font-semibold mb-2">{zona.nombre}</p>
+                        <IconButton
+                          icon={PlusCircle}
+                          size="sm"
+                          onClick={() =>
+                            navigate(`/crear-dependencia/${zona.id}`)
+                          }
+                        />
+                      </div>
 
                       {(zona.dependencias || []).map((d) => {
                         const jefe = d.usuarios?.find(
@@ -216,7 +215,7 @@ const GestionPanel = () => {
                             <div>
                               <p>{d.nombre}</p>
                               <p className="text-xs text-gray-500">
-                                {jefe?.nombre || "Sin jefe"}
+                                {obtenerGrado(jefe?.grado)} {jefe?.nombre || "Sin jefe"}
                               </p>
                             </div>
 

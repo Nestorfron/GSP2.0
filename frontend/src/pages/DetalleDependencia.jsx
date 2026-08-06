@@ -18,30 +18,45 @@ const DetalleDependencia = () => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
     dayjs().format("YYYY-MM-DD")
   );
-  const { usuario, jefaturas, licencias, guardias, token, loading , obtenerGradoAbreviado, obtenerGrado} = useAppContext();
-    useAppContext();
+  const {
+    usuario,
+    jefaturas,
+    licencias,
+    guardias,
+    token,
+    loading,
+    obtenerGradoAbreviado,
+    obtenerGrado,
+  } = useAppContext();
+  useAppContext();
 
   const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState(null);
-
 
   const dependencias = jefaturas
     ?.flatMap(
       (jefatura) =>
         jefatura.zonas?.flatMap((zona) => zona.dependencias || []) || []
     )
-    .filter((dep) => dep.zona_id === usuario.zona_id)
+    .filter((dep) => {
+      // ADMINISTRADOR ve todas
+      if (usuario.rol_jerarquico === "ADMINISTRADOR") {
+        return true;
+      }
+
+      // Usuarios con zona solo ven su zona
+      return dep.zona_id === usuario.zona_id;
+    })
     .filter((dep) => dep.nombre?.startsWith("Seccional"));
 
-    const [dependenciaFinal, setDependenciaFinal] = useState(
-      location.state?.dependencia || dependencias[0]
-    );
+  const [dependenciaFinal, setDependenciaFinal] = useState(
+    location.state?.dependencia || dependencias[0]
+  );
 
   const handleChange = (e) => {
     const id = Number(e.target.value) || null;
     const dependencia = dependencias.find((d) => d.id === id);
     setDependenciaFinal(dependencia);
   };
-
 
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) {
@@ -156,7 +171,9 @@ const DetalleDependencia = () => {
           </h3>
           <span className="font-bold text-gray-600 dark:text-gray-200">
             {JefeDependencia
-              ? obtenerGrado(JefeDependencia.grado) + " " + JefeDependencia.nombre
+              ? obtenerGrado(JefeDependencia.grado) +
+                " " +
+                JefeDependencia.nombre
               : "Sin Jefe"}
           </span>
         </div>
@@ -355,7 +372,7 @@ const DetalleDependencia = () => {
               </div>
             </div>
 
-            {/* ================= Vehículos ================= */} 
+            {/* ================= Vehículos ================= */}
             <div>
               {dependenciaFinal.vehiculos.length > 0 ? (
                 <div className="my-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-blue-100 dark:border-slate-700 overflow-x-auto">

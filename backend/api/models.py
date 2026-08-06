@@ -112,6 +112,10 @@ class Usuario(db.Model):
     fecha_ingreso = db.Column(db.DateTime, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
     medio_horario = db.Column(db.Boolean, default=False)
+    des_tres_diecisiete = db.Column(db.Boolean, default=False)
+    des_ciento_once = db.Column(db.Boolean, default=False)
+    des_cert_prolongada = db.Column(db.Boolean, default=False)
+    des_preventivo = db.Column(db.Boolean, default=False)
 
 
     dependencia_id = db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=True)
@@ -152,6 +156,10 @@ class Usuario(db.Model):
             'estado': self.estado,
             'is_admin': self.is_admin,
             'medio_horario': self.medio_horario,
+            'des_tres_diecisiete': self.des_tres_diecisiete,
+            'des_ciento_once': self.des_ciento_once,
+            'des_cert_prolongada': self.des_cert_prolongada,
+            'des_preventivo': self.des_preventivo,
             'funcion_id': self.funcion_id,
             'prendas': [p.serialize() for p in self.prendas],
         }

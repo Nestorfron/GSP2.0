@@ -232,6 +232,42 @@ export default function EditarUsuario() {
 
           <label className="flex items-center gap-2 text-sm">
             <input
+              type="checkbox" name="des_tres_diecisiete"
+              checked={formData.des_tres_diecisiete || false}
+              onChange={handleChange}
+            />
+            Desarme por 317/2010
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox" name="des_ciento_once"
+              checked={formData.des_ciento_once || false}
+              onChange={handleChange}
+            />
+            Desarme por 111/2015
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox" name="des_cert_prolongada"
+              checked={formData.des_cert_prolongada || false}
+              onChange={handleChange}
+            />
+            Desarme por cert. prolongada
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox" name="des_preventivo"
+              checked={formData.des_preventivo || false}
+              onChange={handleChange}
+            />
+            Desarme preventivo.
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
               type="checkbox"
               name="is_admin"
               checked={formData.is_admin || false}

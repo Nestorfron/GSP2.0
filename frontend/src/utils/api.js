@@ -60,7 +60,6 @@ export const putData = async (endpoint, payload, token, extraHeaders = {}) => {
     ...(token && { Authorization: `Bearer ${token}` }),
     ...extraHeaders,
   };
-  console.log(endpoint, payload, token, extraHeaders);
   try {
     const res = await fetch(url, {
       method: "PUT",

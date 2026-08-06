@@ -22,7 +22,7 @@ const Login = () => {
 
       switch (rol) {
         case "ADMINISTRADOR":
-          navigate("/admin");
+          navigate("/gestion");
           break;
         case "JEFE_ZONA":
           navigate("/zona");
