@@ -308,8 +308,8 @@ const PlanillaDiaria = () => {
 
           pdf.save(
             "Fuerza efectiva " +
-              dayjs(fechaSeleccionada).format("DD/MM/YY") +
-              ".pdf"
+            dayjs(fechaSeleccionada).format("DD/MM/YY") +
+            ".pdf"
           );
         })
         .catch((err) => {
@@ -599,8 +599,8 @@ const PlanillaDiaria = () => {
                         ) : estadoPorFuncionario[f.id]?.tipo === "BROU" ? (
                           "12 a 20"
                         ) : /^\d+\s*a\s*\d+$/i.test(
-                            estadoPorFuncionario[f.id]?.tipo || ""
-                          ) ? (
+                          estadoPorFuncionario[f.id]?.tipo || ""
+                        ) ? (
                           estadoPorFuncionario[f.id]?.tipo.replace(
                             /(\d+)\s*a\s*(\d+)/i,
                             "$1 A $2"
@@ -629,7 +629,7 @@ const PlanillaDiaria = () => {
                       </td>
                       <td className="border bg-white text-center">
                         {estadoPorFuncionario[f.id]?.tipo === "T-1" ||
-                        estadoPorFuncionario[f.id]?.tipo === "T-2" ? (
+                          estadoPorFuncionario[f.id]?.tipo === "T-2" ? (
                           "12x12"
                         ) : f.medio_horario ? (
                           <span title="Funcionario con medio horario">
@@ -641,28 +641,28 @@ const PlanillaDiaria = () => {
                       </td>
                       <td className="border bg-white px-1">
                         {f.des_tres_diecisiete === true
-                          ? "Dec. 317/010"
-                          : f.des_ciento_once === true
-                          ? "Dec. 111/015"
-                          : f.des_cert_prolongada === true
-                          ? "Cert. prolongada"
-                          : f.des_preventivo === true
+                          ? "Dec.317/010" : ""}{" "}
+                        {f.des_ciento_once === true
+                          ? ",111/015" : ""}{" "}
+                        {f.des_cert_prolongada === true
+                          ? "Cert. prolongada" : ""}{" "}
+                        {f.des_preventivo === true
                           ? "Preventivo."
                           : ""}
                         {estadoPorFuncionario[f.id]?.tipo ===
                           "Licencia Médica" ||
-                        estadoPorFuncionario[f.id]?.tipo === "Licencia Anual" ||
-                        estadoPorFuncionario[f.id]?.tipo === "extraordinaria"
+                          estadoPorFuncionario[f.id]?.tipo === "Licencia Anual" ||
+                          estadoPorFuncionario[f.id]?.tipo === "extraordinaria"
                           ? "Hasta " +
-                            estadoPorFuncionario[f.id]?.fechaFin?.slice(0, 5)
+                          estadoPorFuncionario[f.id]?.fechaFin?.slice(0, 5)
                           : ""}
                         {turno.nombre === "Destacados" &&
-                        estadoPorFuncionario[f.id]?.tipo !==
+                          estadoPorFuncionario[f.id]?.tipo !==
                           "Licencia Semanal" &&
-                        estadoPorFuncionario[f.id]?.tipo !==
+                          estadoPorFuncionario[f.id]?.tipo !==
                           "Licencia Médica" &&
-                        estadoPorFuncionario[f.id]?.tipo !== "Licencia Anual" &&
-                        estadoPorFuncionario[f.id]?.tipo !== "T" ? (
+                          estadoPorFuncionario[f.id]?.tipo !== "Licencia Anual" &&
+                          estadoPorFuncionario[f.id]?.tipo !== "T" ? (
                           exportando ? (
                             <span className="block bg-white text-xs">
                               {funcionesEditadas[f.id] ??
