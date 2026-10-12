@@ -126,11 +126,11 @@ const PlanillaDiaria = () => {
       case "D":
         return "Licencia Semanal";
       case "1RO":
-        return "Primer Turno (08 a 16)";
+        return "Primer Turno";
       case "2DO":
-        return "Segundo Turno (16 a 00)";
+        return "Segundo Turno";
       case "3ER":
-        return "Tercer Turno (00 a 08)";
+        return "Tercer Turno";
       case "T-I":
         return "Oficina Jurídica";
       default:
@@ -595,9 +595,9 @@ const PlanillaDiaria = () => {
                         ) : estadoPorFuncionario[f.id]?.tipo === "T-2" ? (
                           "20 a 08"
                         ) : estadoPorFuncionario[f.id]?.tipo === "1ro" ? (
-                          "08 a 16"
+                          "07 a 15"
                         ) : estadoPorFuncionario[f.id]?.tipo === "BROU" ? (
-                          "12 a 20"
+                          "11 a 19"
                         ) : /^\d+\s*a\s*\d+$/i.test(
                           estadoPorFuncionario[f.id]?.tipo || ""
                         ) ? (
@@ -615,14 +615,14 @@ const PlanillaDiaria = () => {
                         ) : turno.nombre === "Destacados" ? (
                           "24hs"
                         ) : estadoPorFuncionario[f.id]?.tipo ===
-                          "Primer Turno (08 a 16)" ? (
-                          "08 A 16"
+                          "Primer Turno" ? (
+                          "07 a 15"
                         ) : estadoPorFuncionario[f.id]?.tipo ===
-                          "Segundo Turno (16 a 00)" ? (
-                          "16 A 00"
+                          "Segundo Turno" ? (
+                          "15 A 23"
                         ) : estadoPorFuncionario[f.id]?.tipo ===
-                          "Tercer Turno (00 a 08)" ? (
-                          "00 A 08"
+                          "Tercer Turno" ? (
+                          "23 A 07"
                         ) : (
                           formatHorario(turno.hora_inicio, turno.hora_fin)
                         )}
