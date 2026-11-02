@@ -43,6 +43,7 @@ import EditarServicio from "./pages/EditarServicio";
 import EditarRegimen from "./pages/EditarRegimen";
 import RegimenesHorarios from "./pages/RegimenesHorarios";
 import CrearRegimen from "./pages/CrearRegimen";
+import PlanificadorLicencias from "./pages/PlanificadorLicenicas"
 
 
 /* ======================
@@ -104,6 +105,7 @@ function AppContent() {
         <Route path="/editar-regimen" element={<EditarRegimen />} />
         <Route path="/regimenes-horarios" element={<RegimenesHorarios />} />
         <Route path="/crear-regimen" element={<CrearRegimen />} />
+        <Route path="/planificador-licencias" element={<PlanificadorLicencias />} />
       </Routes>
     </>
   );
