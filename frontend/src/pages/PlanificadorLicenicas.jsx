@@ -1,26 +1,155 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CalendarDays,
   CheckCircle2,
   ClipboardCheck,
+  RotateCcw,
+  Camera,
 } from "lucide-react";
+import { toPng } from "html-to-image";
 
 import Navbar from "../components/BottomNavbar";
 import BackButton from "../components/BackButton";
 import { useAppContext } from "../context/AppContext";
 import { estaTokenExpirado } from "../utils/tokenUtils";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+import Loading from "../components/Loading";
 
-import SelectorPeriodosLicencia from "../components/SelectorPeriodosLicencia";
+dayjs.locale("es");
+
+
+// ----------------------------------
+// COLORES DE LOS 8 PERÍODOS
+// ----------------------------------
+
+const coloresPeriodos = [
+  {
+    borde: "border-blue-500",
+    texto: "text-blue-700 dark:text-blue-400",
+    fondo: "bg-blue-600",
+  },
+  {
+    borde: "border-green-500",
+    texto: "text-green-700 dark:text-green-400",
+    fondo: "bg-green-600",
+  },
+  {
+    borde: "border-purple-500",
+    texto: "text-purple-700 dark:text-purple-400",
+    fondo: "bg-purple-600",
+  },
+  {
+    borde: "border-orange-500",
+    texto: "text-orange-700 dark:text-orange-400",
+    fondo: "bg-orange-600",
+  },
+  {
+    borde: "border-cyan-500",
+    texto: "text-cyan-700 dark:text-cyan-400",
+    fondo: "bg-cyan-600",
+  },
+  {
+    borde: "border-pink-500",
+    texto: "text-pink-700 dark:text-pink-400",
+    fondo: "bg-pink-600",
+  },
+  {
+    borde: "border-yellow-500",
+    texto: "text-yellow-700 dark:text-yellow-400",
+    fondo: "bg-yellow-600",
+  },
+  {
+    borde: "border-red-500",
+    texto: "text-red-700 dark:text-red-400",
+    fondo: "bg-red-600",
+  },
+];
+
+// ----------------------------------
+// ORDEN DE TURNOS
+// ----------------------------------
+
+const ordenTurnos = [
+  "Primer Turno",
+  "1er Turno 7 a 15",
+  "BROU 11 a 19",
+  "2do Turno 15 a 23",
+  "3er Turno 23 a 07",
+  "Desarmados",
+  "Interna",
+  "Jurídica",
+  "Segundo Turno",
+  "Tercer Turno",
+  "Destacados",
+  "Primera Guardia",
+  "Segunda Guardia",
+  "Tercera Guardia",
+  "Cuarta Guardia",
+];
 
 export default function SeleccionarPeriodosLicencia() {
   const navigate = useNavigate();
 
-  const { token } = useAppContext();
+  const {
+    token,
+    usuario,
+    dependencias = [],
+    turnos = [],
+    obtenerGradoAbreviado,
+    loading,
+  } = useAppContext();
 
-  const [periodosSeleccionados, setPeriodosSeleccionados] = useState([]);
+  const [selecciones, setSelecciones] = useState({});
   const [mostrarResumen, setMostrarResumen] = useState(false);
+
+  const year = 2027;
+
+  const exportarGrillaPNG = async () => {
+    const elemento = document.getElementById("grilla-licencias");
+  
+    if (!elemento) {
+      alert("No se encontró la grilla para exportar.");
+      return;
+    }
+  
+    const anchoOriginal = elemento.style.width;
+    const altoOriginal = elemento.style.height;
+    const paddingOriginal = elemento.style.padding;
+    const overflowOriginal = elemento.style.overflow;
+  
+    const ancho = elemento.scrollWidth;
+    const alto = elemento.scrollHeight;
+  
+    try {
+      elemento.style.width = `${ancho + 10}px`;
+      elemento.style.height = `${alto + 10}px`;
+      elemento.style.padding = "10px";
+      elemento.style.overflow = "visible";
+  
+      const imagen = await toPng(elemento, {
+        cacheBust: true,
+        backgroundColor: "#ffffff",
+        width: ancho + 20,
+        height: alto + 20,
+        pixelRatio: 1,
+      });
+  
+      const link = document.createElement("a");
+      link.download = `planificación-licencias.png`;
+      link.href = imagen;
+      link.click();
+    } catch (error) {
+      console.error("Error exportando la grilla:", error);
+      alert("No se pudo exportar la grilla.");
+    } finally {
+      elemento.style.width = anchoOriginal;
+      elemento.style.height = altoOriginal;
+      elemento.style.padding = paddingOriginal;
+      elemento.style.overflow = overflowOriginal;
+    }
+  };
 
   // ----------------------------------
   // CONTROL DE ACCESO
@@ -30,209 +159,483 @@ export default function SeleccionarPeriodosLicencia() {
     if (!token || estaTokenExpirado(token)) {
       navigate("/login");
     }
-  }, [token, navigate]);
+    console.log(selecciones)
+  }, [token, navigate, selecciones]);
 
   // ----------------------------------
-  // ACTUALIZAR SELECCIÓN
+  // DEPENDENCIA
   // ----------------------------------
 
-  const handleSeleccion = (periodos) => {
-    setPeriodosSeleccionados(periodos);
+  const miDependencia = dependencias.find((dep) =>
+    dep.usuarios?.some((u) => u.id === usuario?.id)
+  );
+
+  // ----------------------------------
+  // PERÍODOS DE LICENCIA
+  // ----------------------------------
+
+  const periodos = useMemo(() => {
+    const inicio = dayjs(`${year - 1}-12-13`);
+
+    return Array.from({ length: 8 }, (_, i) => {
+      const fechaInicio =
+        i === 0 ? inicio : dayjs(`${year}-01-03`).add((i - 1) * 10, "day");
+
+      const fechaFin = fechaInicio.add(9, "day");
+
+      return {
+        id: i + 1,
+        fecha_inicio: fechaInicio.format("YYYY-MM-DD"),
+        fecha_fin: fechaFin.format("YYYY-MM-DD"),
+        dias: 10,
+      };
+    });
+  }, [year]);
+
+  // ----------------------------------
+  // TURNOS ORDENADOS
+  // ----------------------------------
+
+  const turnosOrdenados = useMemo(() => {
+    if (!miDependencia) return [];
+
+    return turnos
+      .filter((t) => t.dependencia_id === miDependencia.id)
+      .sort((a, b) => {
+        const indexA = ordenTurnos.indexOf(a.nombre);
+        const indexB = ordenTurnos.indexOf(b.nombre);
+
+        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+      });
+  }, [turnos, miDependencia]);
+
+  // ----------------------------------
+  // ORDENAR FUNCIONARIOS
+  // ----------------------------------
+
+  const ordenarFuncionarios = (lista) => {
+    return [...lista].sort((a, b) => {
+      const gradoA = a.grado || "";
+      const gradoB = b.grado || "";
+
+      if (gradoA > gradoB) return -1;
+      if (gradoA < gradoB) return 1;
+
+      const fechaA = new Date(a.fecha_ingreso);
+      const fechaB = new Date(b.fecha_ingreso);
+
+      return fechaA - fechaB;
+    });
+  };
+
+  const funcionariosPorTurno = (turnoId) => {
+    if (!miDependencia) return [];
+
+    const funcionarios = miDependencia.usuarios.filter(
+      (f) => f.rol_jerarquico !== "JEFE_DEPENDENCIA" && f.turno_id === turnoId
+    );
+
+    return ordenarFuncionarios(funcionarios);
+  };
+
+  // ----------------------------------
+  // ABREVIAR NOMBRES
+  // ----------------------------------
+
+  const abreviarNombre = (nombreCompleto) => {
+    if (!nombreCompleto) return "";
+
+    const partes = nombreCompleto.trim().split(" ");
+
+    if (partes.length === 1) return partes[0];
+
+    const inicial = partes[0][0];
+    const apellido = partes.find((p) => p === p.toUpperCase());
+
+    return inicial && apellido
+      ? `${inicial}. ${apellido}`
+      : `${inicial}. ${partes[1] || ""}`;
+  };
+
+  // ----------------------------------
+  // SELECCIONAR / DESELECCIONAR PERÍODO
+  // ----------------------------------
+
+  const togglePeriodo = (funcionarioId, periodoId) => {
+    const clave = `${funcionarioId}`;
+
+    setSelecciones((prev) => {
+      const actuales = prev[clave] || [];
+
+      const nuevos = actuales.includes(periodoId)
+        ? actuales.filter((id) => id !== periodoId)
+        : [...actuales, periodoId].sort((a, b) => a - b);
+
+      return {
+        ...prev,
+        [clave]: nuevos,
+      };
+    });
     setMostrarResumen(false);
   };
+
+  // ----------------------------------
+  // SELECCIONAR TODOS LOS PERÍODOS
+  // DE UN FUNCIONARIO
+  // ----------------------------------
+
+  const seleccionarTodosFuncionario = (funcionarioId) => {
+    const clave = `${funcionarioId}`;
+
+    setSelecciones((prev) => {
+      const actuales = prev[clave] || [];
+
+      return {
+        ...prev,
+        [clave]:
+          actuales.length === periodos.length ? [] : periodos.map((p) => p.id),
+      };
+    });
+
+    setMostrarResumen(false);
+  };
+
+  // ----------------------------------
+  // RESUMEN GENERAL
+  // ----------------------------------
+
+  const totalSeleccionados = Object.values(selecciones).reduce(
+    (total, lista) => total + lista.length,
+    0
+  );
+
+  const funcionariosSeleccionados = Object.values(selecciones).filter(
+    (lista) => lista.length > 0
+  ).length;
 
   // ----------------------------------
   // CONFIRMAR SELECCIÓN
   // ----------------------------------
 
   const handleConfirmar = () => {
-    if (periodosSeleccionados.length === 0) {
-      alert("Debés seleccionar al menos un período.");
+    if (totalSeleccionados === 0) {
+      alert("No hay períodos seleccionados.");
       return;
     }
 
-    console.log(
-      "Períodos seleccionados:",
-      periodosSeleccionados
-    );
+    const resultado = Object.entries(selecciones)
+      .filter(([id, lista]) => lista.length > 0)
+      .map(([id, lista]) => ({
+        usuario_id: Number(id),
+        periodos: periodos.filter((p) => lista.includes(p.id)),
+      }));
+
+    console.log("Planificación de licencias:", resultado);
 
     setMostrarResumen(true);
   };
 
   // ----------------------------------
+  // LIMPIAR SELECCIONES
+  // ----------------------------------
+
+  const limpiarTodo = () => {
+    setSelecciones({});
+    setMostrarResumen(false);
+  };
+
+  // ----------------------------------
+  // VALIDACIÓN
+  // ----------------------------------
+
+  if (!miDependencia) {
+    return <Loading />;
+  }
+
+  const cantidadFuncionarios = miDependencia.usuarios.filter(
+    (f) => f.rol_jerarquico !== "JEFE_DEPENDENCIA"
+  ).length;
+
+  // ----------------------------------
   // RENDER
   // ----------------------------------
 
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
-
-      <div className="flex flex-col items-center m-4 py-6 px-4 pb-24 bg-white dark:bg-slate-900 rounded-2xl shadow-lg flex-grow w-full lg:w-3/4 xl:max-w-6xl mx-auto">
-
+    <div
+      className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950"
+    >
+      <div className="m-3 mb-24 p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-lg flex-grow w-full lg:w-3/4 xl:max-w-7xl mx-auto">
         {/* ENCABEZADO */}
 
         <div className="flex items-center justify-center gap-2 mb-2">
-
           <CalendarDays
             className="text-blue-600 dark:text-blue-300"
             size={28}
           />
 
           <h1 className="text-xl font-semibold text-blue-900 dark:text-blue-200">
-            Selección de licencias
+            Planificador de licencias
           </h1>
-
         </div>
 
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
-          Seleccioná los períodos de licencia correspondientes al año 2027.
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-5">
+          {miDependencia.nombre} · Año {year}
         </p>
 
-        {/* COMPONENTE DE SELECCIÓN */}
+        {/* RESUMEN GENERAL */}
 
-        <div className="w-full">
-
-          <SelectorPeriodosLicencia
-            year={2027}
-            onChange={handleSeleccion}
-          />
-
-        </div>
-
-        {/* RESUMEN DE SELECCIÓN */}
-
-        <div className="w-full mt-5 p-4 rounded-xl border border-blue-200 dark:border-slate-700 bg-blue-50 dark:bg-slate-800">
-
-          <div className="flex items-center gap-2 mb-3">
-
-            <ClipboardCheck
-              className="text-blue-600 dark:text-blue-400"
-              size={21}
-            />
-
-            <h2 className="font-semibold text-blue-900 dark:text-blue-200">
-              Resumen de selección
-            </h2>
-
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-
-            <div className="bg-white dark:bg-slate-900 rounded-lg p-3">
-
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Períodos
-              </p>
-
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
-                {periodosSeleccionados.length} / 6
-              </p>
-
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 rounded-lg p-3">
-
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Total de días
-              </p>
-
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
-                {periodosSeleccionados.reduce(
-                  (total, p) => total + p.dias,
-                  0
-                )}
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* BOTÓN CONFIRMAR */}
-
-        <button
-          type="button"
-          onClick={handleConfirmar}
-          disabled={periodosSeleccionados.length === 0}
-          className={`w-full mt-5 py-3 rounded-lg text-white font-medium flex items-center justify-center gap-2 transition-all ${
-            periodosSeleccionados.length === 0
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-        >
-
-          <CheckCircle2 size={20} />
-
-          Confirmar selección
-
-        </button>
-
-        {/* RESULTADO DE CONFIRMACIÓN */}
-
-        {mostrarResumen && (
-
-          <div className="w-full mt-5 p-4 rounded-xl border border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
-
-            <div className="flex items-center gap-2 mb-3">
-
-              <CheckCircle2
-                className="text-green-600"
-                size={22}
-              />
-
-              <h3 className="font-semibold text-green-800 dark:text-green-300">
-                Selección confirmada
-              </h3>
-
-            </div>
-
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-              Los siguientes períodos fueron seleccionados correctamente:
+        {/* <div className="grid grid-cols-3 gap-2 mb-5">
+          <div className="bg-blue-50 dark:bg-slate-800 rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Funcionarios
             </p>
+            <p className="text-xl font-bold text-blue-700 dark:text-blue-400">
+              {cantidadFuncionarios}
+            </p>
+          </div>
 
-            <div className="space-y-2">
+          <div className="bg-blue-50 dark:bg-slate-800 rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Seleccionados
+            </p>
+            <p className="text-xl font-bold text-blue-700 dark:text-blue-400">
+              {funcionariosSeleccionados}
+            </p>
+          </div>
 
-              {periodosSeleccionados.map((p) => (
+          <div className="bg-blue-50 dark:bg-slate-800 rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Selecciones
+            </p>
+            <p className="text-xl font-bold text-blue-700 dark:text-blue-400">
+              {totalSeleccionados}
+            </p>
+          </div>
+        </div> */}
 
+        {/* REFERENCIA DE PERÍODOS */}
+
+        {/* <div className="mb-4">
+          <h2 className="font-semibold text-sm text-blue-900 dark:text-blue-300 mb-2">
+            Períodos disponibles
+          </h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-2">
+            {periodos.map((p, index) => {
+              const color = coloresPeriodos[index];
+
+              return (
                 <div
                   key={p.id}
-                  className="flex justify-between items-center bg-white dark:bg-slate-900 rounded-lg p-3 text-sm"
+                  className={`border-l-4 ${color.borde} bg-gray-50 dark:bg-slate-800 rounded p-2`}
                 >
-
-                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                  <p className={`font-semibold text-xs ${color.texto}`}>
                     Período {p.id}
-                  </span>
+                  </p>
 
-                  <span className="text-gray-500 dark:text-gray-400">
-                    {p.fecha_inicio.split("-").reverse().join("/")}
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    {dayjs(p.fecha_inicio).format("DD/MM")}
                     {" - "}
-                    {p.fecha_fin.split("-").reverse().join("/")}
-                  </span>
-
+                    {dayjs(p.fecha_fin).format("DD/MM")}
+                  </p>
                 </div>
+              );
+            })}
+          </div>
+        </div> */}
 
+        {/* GRILLA DE FUNCIONARIOS */}
+
+        <div id="grilla-licencias" className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700">
+          <table className="w-full min-w-[1000px] table-fixed border-collapse text-xs text-center">
+            <colgroup>
+              <col style={{ width: "190px" }} />
+              {periodos.map((p) => (
+                <col key={p.id} style={{ width: "100px" }} />
               ))}
+            </colgroup>
 
+            <thead>
+              <tr className="bg-gray-100 dark:bg-slate-800">
+                <th className="sticky left-0 z-30 border border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-3 py-3 text-left">
+                  Funcionario
+                </th>
+
+                {periodos.map((p, index) => {
+                  const color = coloresPeriodos[index];
+
+                  return (
+                    <th
+                      key={p.id}
+                      className={`border border-gray-200 dark:border-slate-700 border-t-4 ${color.borde} px-2 py-2`}
+                    >
+                      <div className={`font-bold ${color.texto}`}>
+                        Período {p.id}
+                      </div>
+
+                      <div className="mt-1 text-[10px] font-normal text-gray-500 dark:text-gray-300">
+                        {dayjs(p.fecha_inicio).format("DD/MM")}
+                        <br />
+                        al {dayjs(p.fecha_fin).format("DD/MM")}
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+
+            <tbody>
+              {turnosOrdenados.map((turno) => {
+                const funcionarios = funcionariosPorTurno(turno.id);
+
+                if (funcionarios.length === 0) return null;
+
+                return (
+                  <React.Fragment key={turno.id}>
+                    {/* ENCABEZADO DEL TURNO */}
+                    <tr className="bg-blue-100 dark:bg-slate-800">
+                      <td
+                        colSpan={periodos.length + 1}
+                        className="border border-gray-200 dark:border-slate-700 px-3 py-2 text-left font-bold text-blue-900 dark:text-blue-300"
+                      >
+                        {turno.nombre}
+                        <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                          ({funcionarios.length} funcionarios)
+                        </span>
+                      </td>
+                    </tr>
+
+                    {/* FUNCIONARIOS */}
+                    {funcionarios.map((f) => {
+                      const seleccionados = selecciones[f.id] || [];
+
+                      return (
+                        <tr
+                          key={f.id}
+                          className="hover:bg-blue-50 dark:hover:bg-slate-800/70"
+                        >
+                          {/* NOMBRE */}
+                          <td
+                            className="sticky left-0 z-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-2 text-left"
+                            title={`${obtenerGradoAbreviado(f.grado)} ${
+                              f.nombre
+                            }`}
+                          >
+                            <div className="truncate font-semibold text-gray-800 dark:text-gray-200">
+                              {obtenerGradoAbreviado(f.grado)}{" "}
+                              {abreviarNombre(f.nombre)}
+                            </div>
+
+                            {f.medio_horario && (
+                              <span className="rounded bg-yellow-100 px-1 text-[10px] text-yellow-800">
+                                1/2 horario
+                              </span>
+                            )}
+                          </td>
+
+                          {/* PERÍODOS */}
+                          {periodos.map((p, index) => {
+                            const activo = seleccionados.includes(p.id);
+                            const color = coloresPeriodos[index];
+
+                            return (
+                              <td
+                                key={p.id}
+                                className="border border-gray-200 dark:border-slate-700 p-1"
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => togglePeriodo(f.id, p.id)}
+                                  aria-label={`Funcionario ${f.nombre}, período ${p.id}`}
+                                  aria-pressed={activo}
+                                  className={`flex min-h-9 w-full items-center justify-center rounded border transition-all ${
+                                    activo
+                                      ? `${color.fondo} ${color.borde} text-white shadow`
+                                      : "border-gray-200 bg-gray-100 text-gray-400 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-400 dark:hover:bg-slate-700"
+                                  }`}
+                                >
+                                  {activo ? (
+                                    <CheckCircle2 size={17} />
+                                  ) : (
+                                    <span>+</span>
+                                  )}
+                                </button>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ACCIONES */}
+
+        <div className="flex flex-wrap gap-3 justify-between items-center mt-5">
+          <button
+            type="button"
+            onClick={limpiarTodo}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-300 dark:hover:bg-slate-600"
+          >
+            <RotateCcw size={16} />
+            Limpiar todo
+          </button>
+
+          <button
+            type="button"
+            disabled={totalSeleccionados === 0}
+            onClick={handleConfirmar}
+            className="flex items-center gap-2 px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-medium"
+          >
+            <ClipboardCheck size={18} />
+            Confirmar selección
+          </button>
+          <button
+            type="button"
+            onClick={exportarGrillaPNG}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition"
+          >
+            <Camera size={17} />
+            Exportar PNG
+          </button>
+        </div>
+
+        {/* CONFIRMACIÓN VISUAL */}
+
+        {mostrarResumen && (
+          <div className="mt-5 p-4 rounded-lg border border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-800">
+            <div className="flex items-center gap-2 text-green-700 dark:text-green-400 font-semibold mb-2">
+              <CheckCircle2 size={20} />
+              Selección confirmada visualmente
             </div>
 
-            <p className="text-xs text-green-700 dark:text-green-400 mt-3">
-              Esta confirmación es solamente visual. Todavía no se registraron licencias en el sistema.
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Se seleccionaron {totalSeleccionados} períodos para{" "}
+              {funcionariosSeleccionados} funcionarios.
             </p>
 
+            <p className="text-xs text-gray-500 mt-2">
+              Los datos todavía no fueron guardados en el sistema.
+            </p>
           </div>
-
         )}
 
         {/* VOLVER */}
 
-        <div className="w-full flex justify-start mt-6">
+        <div className="mt-6">
           <BackButton to={-1} tooltip="Volver" />
         </div>
-
       </div>
 
       <Navbar />
-
     </div>
   );
 }

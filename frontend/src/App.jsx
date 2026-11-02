@@ -43,7 +43,7 @@ import EditarServicio from "./pages/EditarServicio";
 import EditarRegimen from "./pages/EditarRegimen";
 import RegimenesHorarios from "./pages/RegimenesHorarios";
 import CrearRegimen from "./pages/CrearRegimen";
-import PlanificadorLicencias from "./pages/PlanificadorLicencias"
+import PlanificadorLicencias from "./pages/PlanificadorLicenicas"
 
 
 /* ======================
