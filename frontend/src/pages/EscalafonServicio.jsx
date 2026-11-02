@@ -19,6 +19,7 @@ import "dayjs/locale/es";
 dayjs.locale("es");
 dayjs.extend(utc);
 import { toPng } from "html-to-image";
+import { obtenerFeriados } from "../utils/feriadosHelper"
 
 export default function EscalafonServicio() {
   const navigate = useNavigate();
@@ -41,6 +42,8 @@ export default function EscalafonServicio() {
   const [selectorLicencia, setSelectorLicencia] = useState(null);
   const [controlTurnos, setControlTurnos] = useState({});
   const [confirmarMes, setConfirmarMes] = useState(null);
+  const [feriados, setFeriados] = useState(null);
+
 
   useEffect(() => {
     if (!token || estaTokenExpirado(token)) navigate("/login");
@@ -49,8 +52,16 @@ export default function EscalafonServicio() {
   useEffect(() => {
     if (usuario.rol_jerarquico === "JEFE_DEPENDENCIA" || usuario.is_admin === true) {
       setDaysToShow(31);
+      obtenerFeriados(startDate.year())
+      .then(data => {
+        setFeriados(
+          data.filter(f => Number(f.date.split("-")[1]) === Number(startDate.month() + 1))
+        );
+      })
+      .catch(console.error);
     }
-  }, []);
+  }, [startDate.month(), startDate.year()]);
+
 
   if (loading) return <Loading />;
 
@@ -325,8 +336,8 @@ export default function EscalafonServicio() {
               existente.tipo === "licencia"
                 ? `licencias/${existente.id}`
                 : existente.tipo === "licencia_medica"
-                ? `licencias-medicas/${existente.id}`
-                : `guardias/${existente.id}`;
+                  ? `licencias-medicas/${existente.id}`
+                  : `guardias/${existente.id}`;
 
             await deleteData(endpoint, token);
           }
@@ -365,8 +376,8 @@ export default function EscalafonServicio() {
             existente.tipo === "licencia"
               ? `licencias/${existente.id}`
               : existente.tipo === "licencia_medica"
-              ? `licencias-medicas/${existente.id}`
-              : `guardias/${existente.id}`;
+                ? `licencias-medicas/${existente.id}`
+                : `guardias/${existente.id}`;
           await deleteData(endpoint, token);
         }
 
@@ -441,8 +452,8 @@ export default function EscalafonServicio() {
         const diasACrear = aplicarMesCompleto
           ? diasBloque
           : hayGuardiaFutura
-          ? [diasBloque[0]]
-          : diasBloque;
+            ? [diasBloque[0]]
+            : diasBloque;
 
         for (const item of diasACrear) {
           const fecha = item.fecha;
@@ -459,8 +470,8 @@ export default function EscalafonServicio() {
               existente.tipo === "licencia"
                 ? `licencias/${existente.id}`
                 : existente.tipo === "licencia_medica"
-                ? `licencias-medicas/${existente.id}`
-                : `guardias/${existente.id}`;
+                  ? `licencias-medicas/${existente.id}`
+                  : `guardias/${existente.id}`;
 
             await deleteData(endpoint, token);
           }
@@ -540,8 +551,8 @@ export default function EscalafonServicio() {
         guardia.tipo === "licencia"
           ? `licencias/${guardia.id}`
           : guardia.tipo === "licencia_medica"
-          ? `licencias-medicas/${guardia.id}`
-          : `guardias/${guardia.id}`;
+            ? `licencias-medicas/${guardia.id}`
+            : `guardias/${guardia.id}`;
 
       await deleteData(endpoint, token);
 
@@ -708,15 +719,15 @@ export default function EscalafonServicio() {
         <div className="flex ms-auto">
           {(usuario?.rol_jerarquico === "JEFE_DEPENDENCIA" ||
             usuario?.is_admin) && (
-            <button
-              onClick={() => imprimirFuncionariosPorTurno(startDate)}
-              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg ml-2
+              <button
+                onClick={() => imprimirFuncionariosPorTurno(startDate)}
+                className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg ml-2
              flex items-center justify-center transition"
-              title="Verificar"
-            >
-              <CheckCircle className="w-5 h-5" />
-            </button>
-          )}
+                title="Verificar"
+              >
+                <CheckCircle className="w-5 h-5" />
+              </button>
+            )}
 
           <button
             onClick={() =>
@@ -742,10 +753,19 @@ export default function EscalafonServicio() {
         </div>
       </div>
 
+      {feriados ? <div>
+        <strong>
+          Feriados {startDate.format("MMMM")} días:
+        </strong>{" "}
+        {feriados.length !== 0 ? feriados.map(f => `${f.date.split("-")[2]}- ${f.localName}`).join(", ") : "sin feriados"}
+      </div> : ""}
+
+
+
       {/* Encargado */}
 
       {usuario.rol_jerarquico === "JEFE_DEPENDENCIA" ||
-      usuario.is_admin === true ? (
+        usuario.is_admin === true ? (
         <div className="mb-6 overflow-x-auto">
           <table className="min-w-fu2l text-sm text-center border-collapse table-fixed w-full border border-gray-200 dark:border-slate-700">
             <thead>
@@ -964,9 +984,8 @@ export default function EscalafonServicio() {
                         <tr key={f.id}>
                           <td
                             className="border bg-white dark:bg-slate-800 px-2 py-1 text-left w-40 min-w-[12rem] max-w-[10rem] whitespace-nowrap overflow-hidden truncate sticky left-0 z-10"
-                            title={`${obtenerGradoAbreviado(f.grado)} ${
-                              f.nombre
-                            }`}
+                            title={`${obtenerGradoAbreviado(f.grado)} ${f.nombre
+                              }`}
                           >
                             {obtenerGradoAbreviado(f.grado)}{" "}
                             {abreviarNombre(f.nombre)}
@@ -991,11 +1010,10 @@ export default function EscalafonServicio() {
                             return (
                               <td
                                 key={d.format("YYYY-MM-DD")}
-                                className={`border py-1 relative group ${
-                                  turno?.nombre === "BROU" & contenido === "BROU"
-                                    ? ""
-                                    : clase
-                                }`}
+                                className={`border py-1 relative group ${turno?.nombre === "BROU" & contenido === "BROU"
+                                  ? ""
+                                  : clase
+                                  }`}
                               >
                                 {contenido}
                                 {puedeEditar && (
