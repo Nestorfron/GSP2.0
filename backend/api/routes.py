@@ -458,7 +458,85 @@ def eliminar_periodo_licencia(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': str(e)}), 500
+    
+@api.route(
+    '/usuarios/<int:usuario_id>/periodos-licencia/<int:periodo_id>',
+    methods=['POST']
+)
+@jwt_required()
+def asignar_periodo_licencia(usuario_id, periodo_id):
 
+    usuario = Usuario.query.get(usuario_id)
+    if not usuario:
+        return jsonify({'error': 'Funcionario no encontrado'}), 404
+
+    periodo = PeriodosLicencia.query.get(periodo_id)
+    if not periodo:
+        return jsonify({'error': 'Período de licencia no encontrado'}), 404
+
+    # Verificar que pertenezcan a la misma dependencia
+    if usuario.dependencia_id != periodo.dependencia_id:
+        return jsonify({
+            'error': 'El funcionario y el período no pertenecen a la misma dependencia'
+        }), 400
+
+    # Evitar duplicados
+    if periodo in usuario.periodos_licencia:
+        return jsonify({
+            'error': 'El funcionario ya tiene asignado este período'
+        }), 409
+
+    try:
+        usuario.periodos_licencia.append(periodo)
+        db.session.commit()
+
+        return jsonify({
+            'mensaje': 'Período asignado correctamente',
+            'usuario_id': usuario.id,
+            'periodo_id': periodo.id,
+            'periodos_asignados': [
+                p.id for p in usuario.periodos_licencia
+            ]
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@api.route(
+    '/usuarios/<int:usuario_id>/periodos-licencia/<int:periodo_id>',
+    methods=['DELETE']
+)
+@jwt_required()
+def quitar_periodo_licencia(usuario_id, periodo_id):
+
+    usuario = Usuario.query.get(usuario_id)
+    if not usuario:
+        return jsonify({'error': 'Funcionario no encontrado'}), 404
+
+    periodo = PeriodosLicencia.query.get(periodo_id)
+    if not periodo:
+        return jsonify({'error': 'Período de licencia no encontrado'}), 404
+
+    if periodo not in usuario.periodos_licencia:
+        return jsonify({
+            'error': 'El funcionario no tiene asignado este período'
+        }), 404
+
+    try:
+        usuario.periodos_licencia.remove(periodo)
+        db.session.commit()
+
+        return jsonify({
+            'mensaje': 'Asignación eliminada correctamente',
+            'usuario_id': usuario.id,
+            'periodo_id': periodo.id,
+            'periodos_asignados': [p.id for p in usuario.periodos_licencia]
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 # -------------------------------------------------------------------
