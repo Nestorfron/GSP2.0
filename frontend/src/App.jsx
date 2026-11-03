@@ -43,8 +43,9 @@ import EditarServicio from "./pages/EditarServicio";
 import EditarRegimen from "./pages/EditarRegimen";
 import RegimenesHorarios from "./pages/RegimenesHorarios";
 import CrearRegimen from "./pages/CrearRegimen";
-import PlanificadorLicencias from "./pages/PlanificadorLicenicas"
+import PlanificadorLicencias from "./pages/PlanificadorLicenicas";
 import CrearPeriodoLicencia from "./pages/CrearPeriodoLicencia";
+import EditarPeriodoLicencia from "./pages/EditarPeriodoLicencia";
 
 
 /* ======================
@@ -108,6 +109,7 @@ function AppContent() {
         <Route path="/crear-regimen" element={<CrearRegimen />} />
         <Route path="/planificador-licencias" element={<PlanificadorLicencias />} />
         <Route path="/crear-periodo-licencia" element={<CrearPeriodoLicencia />} />
+        <Route path="/editar-periodo-licencia" element={<EditarPeriodoLicencia />} />
       </Routes>
     </>
   );

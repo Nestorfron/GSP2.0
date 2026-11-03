@@ -14,4 +14,3 @@ pywebpush
 cryptography
 pyjwt
 flask-limiter
-
