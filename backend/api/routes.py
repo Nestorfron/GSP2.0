@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from flask_mail import Message # type: ignore
 from extensions import mail
 from werkzeug.security import generate_password_hash, check_password_hash # type: ignore
-from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion, Vehiculo, Servicio, RegimenHorario
+from api.models import db, Jefatura, Zona, Dependencia, Usuario, Turno, Guardia, Licencia, PasswordResetToken, Notificacion, Suscripcion, Prenda, Funcion, Vehiculo, Servicio, RegimenHorario, PeriodosLicencia
 import secrets
 from datetime import datetime, timedelta
 from .utils.email_utils import send_email
@@ -351,6 +351,115 @@ def obtener_todas_licencias_usuario(usuario_id):
         "licencias": [l.serialize() for l in usuario.licencias],
         "licencias_medicas": [lm.serialize() for lm in usuario.licencias_medicas],
     })
+
+# -------------------------------------------------------------------
+# PERIODOS LICENCIA
+# -------------------------------------------------------------------
+
+@api.route('/periodos_licencia', methods=['GET'])
+@jwt_required()
+def listar_periodos_licencias():
+    data = PeriodosLicencia.query.all()
+    return jsonify([x.serialize() for x in data]), 200
+
+
+@api.route('/periodos_licencia', methods=['POST'])
+@jwt_required()
+def crear_periodo_licencia():
+    body = request.get_json()
+
+    try:
+        fecha_inicio = datetime.fromisoformat(body.get('fecha_inicio'))
+        fecha_fin = datetime.fromisoformat(body.get('fecha_fin'))
+        dependencia_id = body.get('dependencia_id')
+
+        if not dependencia_id:
+            return jsonify({'msg': 'La dependencia es obligatoria'}), 400
+
+        if fecha_fin <= fecha_inicio:
+            return jsonify({'msg': 'La fecha de fin debe ser posterior a la fecha de inicio'}), 400
+
+        nuevo_periodo = PeriodosLicencia(
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            dependencia_id=dependencia_id
+        )
+
+        db.session.add(nuevo_periodo)
+        db.session.commit()
+
+        return jsonify(nuevo_periodo.serialize()), 201
+
+    except (ValueError, TypeError):
+        return jsonify({'msg': 'Formato de fecha inválido. Use YYYY-MM-DDTHH:MM:SS'}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': str(e)}), 500
+
+@api.route('/periodos_licencia/<int:id>', methods=['PUT'])
+@jwt_required()
+def actualizar_periodo_licencia(id):
+    body = request.get_json()
+
+    periodo = PeriodosLicencia.query.get(id)
+
+    if not periodo:
+        return jsonify({'msg': 'Período de licencia no encontrado'}), 404
+
+    try:
+        if body.get('fecha_inicio'):
+            periodo.fecha_inicio = datetime.fromisoformat(body['fecha_inicio'])
+
+        if body.get('fecha_fin'):
+            periodo.fecha_fin = datetime.fromisoformat(body['fecha_fin'])
+
+        if body.get('dependencia_id'):
+            periodo.dependencia_id = body['dependencia_id']
+
+        if periodo.fecha_fin <= periodo.fecha_inicio:
+            return jsonify({
+                'msg': 'La fecha de fin debe ser posterior a la fecha de inicio'
+            }), 400
+
+        db.session.commit()
+
+        return jsonify({
+            'msg': 'Período de licencia actualizado correctamente',
+            'periodo': periodo.serialize()
+        }), 200
+
+    except (ValueError, TypeError):
+        db.session.rollback()
+        return jsonify({'msg': 'Formato de fecha inválido'}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': str(e)}), 500
+    
+@api.route('/periodos_licencia/<int:id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_periodo_licencia(id):
+    periodo = PeriodosLicencia.query.get(id)
+
+    if not periodo:
+        return jsonify({
+            'msg': 'Período de licencia no encontrado'
+        }), 404
+
+    try:
+        db.session.delete(periodo)
+        db.session.commit()
+
+        return jsonify({
+            'msg': 'Período de licencia eliminado correctamente'
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': str(e)}), 500
+
+
 
 # -------------------------------------------------------------------
 # USUARIOS

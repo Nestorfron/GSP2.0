@@ -306,7 +306,28 @@ class Licencia(db.Model):
 
     def __repr__(self):
         return f'<Licencia {self.id}>'
-    
+
+
+# -------------------------
+# PERIODOS DE LICENCIA
+# -------------------------
+
+class PeriodosLicencia(db.Model):
+    __tablename__= 'periodo_licencia'
+    id = db.Column(db.Integer, primary_key=True)
+    fecha_inicio = db.Column(db.DateTime, nullable=False)
+    fecha_fin = db.Column(db.DateTime, nullable=False)
+
+    dependencia_id=db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=False)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'fecha_inicio': self.fecha_inicio,
+            'fecha_fin': self.fecha_fin,
+            'dependencia_id': self.dependencia_id,
+        }
+
 # -------------------------
 # NOTIFICACIONES
 # -------------------------

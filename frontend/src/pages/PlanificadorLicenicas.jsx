@@ -6,8 +6,10 @@ import {
   ClipboardCheck,
   RotateCcw,
   Camera,
+  PlusCircle
 } from "lucide-react";
 import { toPng } from "html-to-image";
+import IconButton from "../components/IconButton";
 
 import Navbar from "../components/BottomNavbar";
 import BackButton from "../components/BackButton";
@@ -98,6 +100,7 @@ export default function SeleccionarPeriodosLicencia() {
     dependencias = [],
     turnos = [],
     obtenerGradoAbreviado,
+    periodosLicencia,
     loading,
   } = useAppContext();
 
@@ -159,7 +162,6 @@ export default function SeleccionarPeriodosLicencia() {
     if (!token || estaTokenExpirado(token)) {
       navigate("/login");
     }
-    console.log(selecciones)
   }, [token, navigate, selecciones]);
 
   // ----------------------------------
@@ -174,23 +176,13 @@ export default function SeleccionarPeriodosLicencia() {
   // PERÍODOS DE LICENCIA
   // ----------------------------------
 
-  const periodos = useMemo(() => {
-    const inicio = dayjs(`${year - 1}-12-13`);
+  const periodosFiltrados = periodosLicencia.filter(
+    periodo => Number(periodo.dependencia_id) === Number(miDependencia.id)
+  );
 
-    return Array.from({ length: 8 }, (_, i) => {
-      const fechaInicio =
-        i === 0 ? inicio : dayjs(`${year}-01-03`).add((i - 1) * 10, "day");
+  console.log(periodosFiltrados)
 
-      const fechaFin = fechaInicio.add(9, "day");
-
-      return {
-        id: i + 1,
-        fecha_inicio: fechaInicio.format("YYYY-MM-DD"),
-        fecha_fin: fechaFin.format("YYYY-MM-DD"),
-        dias: 10,
-      };
-    });
-  }, [year]);
+ 
 
   // ----------------------------------
   // TURNOS ORDENADOS
@@ -386,6 +378,14 @@ export default function SeleccionarPeriodosLicencia() {
           {miDependencia.nombre} · Año {year}
         </p>
 
+        <IconButton
+              className="ms-auto my-2"
+              icon={PlusCircle}
+              tooltip="Agregar periodo licencia"
+              onClick={() => navigate(`/crear-periodo-licencia`)}
+              size="sm"
+            />
+
         {/* RESUMEN GENERAL */}
 
         {/* <div className="grid grid-cols-3 gap-2 mb-5">
@@ -453,9 +453,9 @@ export default function SeleccionarPeriodosLicencia() {
         <div id="grilla-licencias" className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700">
           <table className="w-full min-w-[1000px] table-fixed border-collapse text-xs text-center">
             <colgroup>
-              <col style={{ width: "190px" }} />
-              {periodos.map((p) => (
-                <col key={p.id} style={{ width: "100px" }} />
+              <col style={{ width: "60px" }} />
+              {periodosFiltrados.map((p) => (
+                <col key={p.id} style={{ width: "48px" }} />
               ))}
             </colgroup>
 
@@ -465,7 +465,7 @@ export default function SeleccionarPeriodosLicencia() {
                   Funcionario
                 </th>
 
-                {periodos.map((p, index) => {
+                {periodosFiltrados.map((p, index) => {
                   const color = coloresPeriodos[index];
 
                   return (
@@ -499,7 +499,7 @@ export default function SeleccionarPeriodosLicencia() {
                     {/* ENCABEZADO DEL TURNO */}
                     <tr className="bg-blue-100 dark:bg-slate-800">
                       <td
-                        colSpan={periodos.length + 1}
+                        colSpan={periodosFiltrados.length + 1}
                         className="border border-gray-200 dark:border-slate-700 px-3 py-2 text-left font-bold text-blue-900 dark:text-blue-300"
                       >
                         {turno.nombre}
@@ -538,7 +538,7 @@ export default function SeleccionarPeriodosLicencia() {
                           </td>
 
                           {/* PERÍODOS */}
-                          {periodos.map((p, index) => {
+                          {periodosFiltrados.map((p, index) => {
                             const activo = seleccionados.includes(p.id);
                             const color = coloresPeriodos[index];
 
