@@ -137,7 +137,6 @@ export const AppProvider = ({ children }) => {
         setServicios(serviciosData || []);
         setRegimenes(regimenesData || []);
         setPeriodosLicencia(periodosLicenciaData || []);
-        console.log(periodosLicenciaData)
       }
       
     } catch (error) {
@@ -324,6 +323,17 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const recargarPeriodosLicencia = async () => {
+    try {
+      const periodosLicenciaData = await fetchData("/periodos_licencia", token);
+      setPeriodosLicencia(periodosLicenciaData || []);
+    } catch (error) {
+      console.error("Error cargando datos de periodos de licencia", error);      
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const recargarDatos = async () => {
     await fetchAppData();
   };
@@ -399,6 +409,7 @@ export const AppProvider = ({ children }) => {
         recargarPrendas,
         obtenerGrado,
         obtenerGradoAbreviado,
+        recargarPeriodosLicencia,
       }}
     >
       {children}

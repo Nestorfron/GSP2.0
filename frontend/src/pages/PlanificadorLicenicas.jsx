@@ -6,11 +6,13 @@ import {
   ClipboardCheck,
   RotateCcw,
   Camera,
-  PlusCircle
+  PlusCircle,
+  Pencil,
+  XCircle,
 } from "lucide-react";
 import { toPng } from "html-to-image";
 import IconButton from "../components/IconButton";
-
+import { postData, deleteData } from "../utils/api";
 import Navbar from "../components/BottomNavbar";
 import BackButton from "../components/BackButton";
 import { useAppContext } from "../context/AppContext";
@@ -20,7 +22,6 @@ import "dayjs/locale/es";
 import Loading from "../components/Loading";
 
 dayjs.locale("es");
-
 
 // ----------------------------------
 // COLORES DE LOS 8 PERÍODOS
@@ -102,6 +103,8 @@ export default function SeleccionarPeriodosLicencia() {
     obtenerGradoAbreviado,
     periodosLicencia,
     loading,
+    recargarPeriodosLicencia,
+    recargarDependencias,
   } = useAppContext();
 
   const [selecciones, setSelecciones] = useState({});
@@ -111,26 +114,26 @@ export default function SeleccionarPeriodosLicencia() {
 
   const exportarGrillaPNG = async () => {
     const elemento = document.getElementById("grilla-licencias");
-  
+
     if (!elemento) {
       alert("No se encontró la grilla para exportar.");
       return;
     }
-  
+
     const anchoOriginal = elemento.style.width;
     const altoOriginal = elemento.style.height;
     const paddingOriginal = elemento.style.padding;
     const overflowOriginal = elemento.style.overflow;
-  
+
     const ancho = elemento.scrollWidth;
     const alto = elemento.scrollHeight;
-  
+
     try {
       elemento.style.width = `${ancho + 10}px`;
       elemento.style.height = `${alto + 10}px`;
       elemento.style.padding = "10px";
       elemento.style.overflow = "visible";
-  
+
       const imagen = await toPng(elemento, {
         cacheBust: true,
         backgroundColor: "#ffffff",
@@ -138,7 +141,7 @@ export default function SeleccionarPeriodosLicencia() {
         height: alto + 20,
         pixelRatio: 1,
       });
-  
+
       const link = document.createElement("a");
       link.download = `planificación-licencias.png`;
       link.href = imagen;
@@ -162,7 +165,7 @@ export default function SeleccionarPeriodosLicencia() {
     if (!token || estaTokenExpirado(token)) {
       navigate("/login");
     }
-  }, [token, navigate, selecciones]);
+  }, [token, navigate]);
 
   // ----------------------------------
   // DEPENDENCIA
@@ -172,17 +175,29 @@ export default function SeleccionarPeriodosLicencia() {
     dep.usuarios?.some((u) => u.id === usuario?.id)
   );
 
+  useEffect(() => {
+    if (!miDependencia?.usuarios) return;
+
+    const inicial = {};
+
+    miDependencia.usuarios.forEach((funcionario) => {
+      inicial[`${funcionario.id}`] = (funcionario.periodos_licencia || []).map(
+        (periodo) => Number(typeof periodo === "object" ? periodo.id : periodo)
+      );
+    });
+
+    setSelecciones(inicial);
+  }, [miDependencia?.usuarios]);
+
   // ----------------------------------
   // PERÍODOS DE LICENCIA
   // ----------------------------------
 
-  const periodosFiltrados = periodosLicencia.filter(
-    periodo => Number(periodo.dependencia_id) === Number(miDependencia.id)
-  );
-
-  console.log(periodosFiltrados)
-
- 
+  const periodosFiltrados = periodosLicencia
+    .filter(
+      (periodo) => Number(periodo.dependencia_id) === Number(miDependencia.id)
+    )
+    .sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
 
   // ----------------------------------
   // TURNOS ORDENADOS
@@ -226,7 +241,6 @@ export default function SeleccionarPeriodosLicencia() {
     const funcionarios = miDependencia.usuarios.filter(
       (f) => f.rol_jerarquico !== "JEFE_DEPENDENCIA" && f.turno_id === turnoId
     );
-
     return ordenarFuncionarios(funcionarios);
   };
 
@@ -253,22 +267,45 @@ export default function SeleccionarPeriodosLicencia() {
   // SELECCIONAR / DESELECCIONAR PERÍODO
   // ----------------------------------
 
-  const togglePeriodo = (funcionarioId, periodoId) => {
+  const togglePeriodo = async (funcionarioId, periodoId) => {
     const clave = `${funcionarioId}`;
+    const idPeriodo = Number(periodoId);
+    const actuales = selecciones[clave] || [];
 
-    setSelecciones((prev) => {
-      const actuales = prev[clave] || [];
+    const estaAsignado = actuales.includes(idPeriodo);
 
-      const nuevos = actuales.includes(periodoId)
-        ? actuales.filter((id) => id !== periodoId)
-        : [...actuales, periodoId].sort((a, b) => a - b);
+    try {
+      let nuevos;
 
-      return {
+      if (estaAsignado) {
+        await deleteData(
+          `/usuarios/${funcionarioId}/periodos-licencia/${idPeriodo}`,
+          token
+        );
+
+        nuevos = actuales.filter((id) => id !== idPeriodo);
+      } else {
+        const response = await postData(
+          `/usuarios/${funcionarioId}/periodos-licencia/${idPeriodo}`,
+          {},
+          token
+        );
+
+        nuevos = response.periodos_asignados.map(Number);
+      }
+
+      setSelecciones((prev) => ({
         ...prev,
-        [clave]: nuevos,
-      };
-    });
-    setMostrarResumen(false);
+        [clave]: [...nuevos].sort((a, b) => a - b),
+      }));
+
+      setMostrarResumen(false);
+
+      recargarDependencias();
+    } catch (error) {
+      console.error("Error al modificar período:", error);
+      alert(error.message);
+    }
   };
 
   // ----------------------------------
@@ -349,6 +386,19 @@ export default function SeleccionarPeriodosLicencia() {
   ).length;
 
   // ----------------------------------
+  // ELIMINAR PERIODO LICENCIA
+  // ----------------------------------
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteData(`/periodos_licencia/${id}`, token);
+      recargarPeriodosLicencia();
+    } catch (error) {
+      alert("No se pudo eliminar la prenda.");
+    }
+  };
+
+  // ----------------------------------
   // RENDER
   // ----------------------------------
 
@@ -357,9 +407,7 @@ export default function SeleccionarPeriodosLicencia() {
   }
 
   return (
-    <div
-      className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950"
-    >
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950">
       <div className="m-3 mb-24 p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-lg flex-grow w-full lg:w-3/4 xl:max-w-7xl mx-auto">
         {/* ENCABEZADO */}
 
@@ -379,12 +427,12 @@ export default function SeleccionarPeriodosLicencia() {
         </p>
 
         <IconButton
-              className="ms-auto my-2"
-              icon={PlusCircle}
-              tooltip="Agregar periodo licencia"
-              onClick={() => navigate(`/crear-periodo-licencia`)}
-              size="sm"
-            />
+          className="ms-auto my-2"
+          icon={PlusCircle}
+          tooltip="Agregar periodo licencia"
+          onClick={() => navigate(`/crear-periodo-licencia`)}
+          size="sm"
+        />
 
         {/* RESUMEN GENERAL */}
 
@@ -450,18 +498,22 @@ export default function SeleccionarPeriodosLicencia() {
 
         {/* GRILLA DE FUNCIONARIOS */}
 
-        <div id="grilla-licencias" className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700">
-          <table className="w-full min-w-[1000px] table-fixed border-collapse text-xs text-center">
+        <div
+          id="grilla-licencias"
+          className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700"
+        >
+          <table className="w-full min-w-max table-fixed border-collapse text-xs text-center">
             <colgroup>
-              <col style={{ width: "60px" }} />
+              <col style={{ width: "170px" }} />
+
               {periodosFiltrados.map((p) => (
-                <col key={p.id} style={{ width: "48px" }} />
+                <col key={p.id} style={{ width: "110px" }} />
               ))}
             </colgroup>
 
             <thead>
               <tr className="bg-gray-100 dark:bg-slate-800">
-                <th className="sticky left-0 z-30 border border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-3 py-3 text-left">
+                <th className="sticky left-0 z-30 w-[190px] min-w-[190px] border border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-2 py-1 text-left">
                   Funcionario
                 </th>
 
@@ -471,16 +523,36 @@ export default function SeleccionarPeriodosLicencia() {
                   return (
                     <th
                       key={p.id}
-                      className={`border border-gray-200 dark:border-slate-700 border-t-4 ${color.borde} px-2 py-2`}
+                      className={`border border-gray-200 dark:border-slate-700 border-t-4 ${color.borde} px-1 py-0.5`}
                     >
-                      <div className={`font-bold ${color.texto}`}>
-                        Período {p.id}
+                      <div
+                        className={`font-bold ${color.texto} flex items-center justify-center gap-1 whitespace-nowrap`}
+                      >
+                        <h3 className="mb-0">Período {index + 1}</h3>
+
+                        <IconButton
+                          icon={Pencil}
+                          tooltip="Editar período licencia"
+                          onClick={() =>
+                            navigate("/editar-periodo-licencia", {
+                              state: { periodo: p },
+                            })
+                          }
+                          size="xxs"
+                        />
+
+                        <IconButton
+                          icon={XCircle}
+                          tooltip="Eliminar período licencia"
+                          onClick={() => handleDelete(p.id)}
+                          size="xxs"
+                        />
                       </div>
 
-                      <div className="mt-1 text-[10px] font-normal text-gray-500 dark:text-gray-300">
-                        {dayjs(p.fecha_inicio).format("DD/MM")}
+                      <div className="mt-0.5 text-[10px] leading-3 font-normal text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                        {dayjs(p.fecha_inicio).utc().format("DD/MM")}
                         <br />
-                        al {dayjs(p.fecha_fin).format("DD/MM")}
+                        al {dayjs(p.fecha_fin).utc().format("DD/MM")}
                       </div>
                     </th>
                   );
@@ -500,10 +572,11 @@ export default function SeleccionarPeriodosLicencia() {
                     <tr className="bg-blue-100 dark:bg-slate-800">
                       <td
                         colSpan={periodosFiltrados.length + 1}
-                        className="border border-gray-200 dark:border-slate-700 px-3 py-2 text-left font-bold text-blue-900 dark:text-blue-300"
+                        className="border border-gray-200 dark:border-slate-700 px-2 py-0.5 text-left font-bold text-blue-900 dark:text-blue-300"
                       >
                         {turno.nombre}
-                        <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+
+                        <span className="ml-2 text-[10px] font-normal text-gray-500 dark:text-gray-400">
                           ({funcionarios.length} funcionarios)
                         </span>
                       </td>
@@ -518,50 +591,50 @@ export default function SeleccionarPeriodosLicencia() {
                           key={f.id}
                           className="hover:bg-blue-50 dark:hover:bg-slate-800/70"
                         >
-                          {/* NOMBRE */}
+                          {/* NOMBRE DEL FUNCIONARIO */}
                           <td
-                            className="sticky left-0 z-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-2 text-left"
+                            className="sticky left-0 z-10 w-[190px] min-w-[190px] border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-0.5 text-left leading-tight"
                             title={`${obtenerGradoAbreviado(f.grado)} ${
                               f.nombre
                             }`}
                           >
-                            <div className="truncate font-semibold text-gray-800 dark:text-gray-200">
+                            <div className="truncate font-semibold text-gray-800 dark:text-gray-200 leading-tight">
                               {obtenerGradoAbreviado(f.grado)}{" "}
                               {abreviarNombre(f.nombre)}
                             </div>
 
                             {f.medio_horario && (
-                              <span className="rounded bg-yellow-100 px-1 text-[10px] text-yellow-800">
+                              <span className="rounded bg-yellow-100 px-1 text-[9px] leading-none text-yellow-800">
                                 1/2 horario
                               </span>
                             )}
                           </td>
 
-                          {/* PERÍODOS */}
+                          {/* PERÍODOS DE LICENCIA */}
                           {periodosFiltrados.map((p, index) => {
-                            const activo = seleccionados.includes(p.id);
+                            const activo = seleccionados.includes(Number(p.id));
                             const color = coloresPeriodos[index];
 
                             return (
                               <td
                                 key={p.id}
-                                className="border border-gray-200 dark:border-slate-700 p-1"
+                                className="w-[110px] border border-gray-200 dark:border-slate-700 px-1 py-0.5"
                               >
                                 <button
                                   type="button"
                                   onClick={() => togglePeriodo(f.id, p.id)}
                                   aria-label={`Funcionario ${f.nombre}, período ${p.id}`}
                                   aria-pressed={activo}
-                                  className={`flex min-h-9 w-full items-center justify-center rounded border transition-all ${
+                                  className={`flex min-h-5 w-full items-center justify-center rounded border transition-all ${
                                     activo
                                       ? `${color.fondo} ${color.borde} text-white shadow`
                                       : "border-gray-200 bg-gray-100 text-gray-400 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-400 dark:hover:bg-slate-700"
                                   }`}
                                 >
                                   {activo ? (
-                                    <CheckCircle2 size={17} />
+                                    <CheckCircle2 size={14} />
                                   ) : (
-                                    <span>+</span>
+                                    <span className="leading-none">+</span>
                                   )}
                                 </button>
                               </td>
@@ -582,24 +655,6 @@ export default function SeleccionarPeriodosLicencia() {
         <div className="flex flex-wrap gap-3 justify-between items-center mt-5">
           <button
             type="button"
-            onClick={limpiarTodo}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-300 dark:hover:bg-slate-600"
-          >
-            <RotateCcw size={16} />
-            Limpiar todo
-          </button>
-
-          <button
-            type="button"
-            disabled={totalSeleccionados === 0}
-            onClick={handleConfirmar}
-            className="flex items-center gap-2 px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-medium"
-          >
-            <ClipboardCheck size={18} />
-            Confirmar selección
-          </button>
-          <button
-            type="button"
             onClick={exportarGrillaPNG}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition"
           >
@@ -607,28 +662,6 @@ export default function SeleccionarPeriodosLicencia() {
             Exportar PNG
           </button>
         </div>
-
-        {/* CONFIRMACIÓN VISUAL */}
-
-        {mostrarResumen && (
-          <div className="mt-5 p-4 rounded-lg border border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-800">
-            <div className="flex items-center gap-2 text-green-700 dark:text-green-400 font-semibold mb-2">
-              <CheckCircle2 size={20} />
-              Selección confirmada visualmente
-            </div>
-
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              Se seleccionaron {totalSeleccionados} períodos para{" "}
-              {funcionariosSeleccionados} funcionarios.
-            </p>
-
-            <p className="text-xs text-gray-500 mt-2">
-              Los datos todavía no fueron guardados en el sistema.
-            </p>
-          </div>
-        )}
-
-        {/* VOLVER */}
 
         <div className="mt-6">
           <BackButton to={-1} tooltip="Volver" />

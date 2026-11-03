@@ -12,7 +12,7 @@ export default function CrearPeriodoLicencia() {
   const depId = useLocation().state?.depId;
   const navigate = useNavigate();
 
-  const { token, dependencias, recargarDatos } = useAppContext();
+  const { token, dependencias, recargarPeriodosLicencia } = useAppContext();
 
   const [formData, setFormData] = useState({
     fecha_inicio: "",
@@ -111,7 +111,7 @@ export default function CrearPeriodoLicencia() {
 
       if (data) {
         setSuccess(true);
-        recargarDatos();
+        recargarPeriodosLicencia();
       }
     } catch (err) {
       alert(`❌ Error: ${err.message}`);
