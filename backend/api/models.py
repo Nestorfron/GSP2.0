@@ -4,6 +4,23 @@ from datetime import datetime
 
 db = SQLAlchemy(engine_options=Config.SQLALCHEMY_ENGINE_OPTIONS)
 
+usuarios_periodos_licencia = db.Table(
+    'usuarios_periodos_licencia',
+
+    db.Column(
+        'usuario_id',
+        db.Integer,
+        db.ForeignKey('usuarios.id'),
+        primary_key=True
+    ),
+
+    db.Column(
+        'periodo_licencia_id',
+        db.Integer,
+        db.ForeignKey('periodo_licencia.id'),
+        primary_key=True
+    )
+)
 
 # -------------------------
 # ENTIDADES PRINCIPALES
@@ -74,6 +91,8 @@ class Dependencia(db.Model):
     usuarios = db.relationship('Usuario', backref='dependencia', lazy=True)
     turnos = db.relationship('Turno', backref='dependencia', lazy=True)
     vehiculos = db.relationship('Vehiculo', backref='dependencia', lazy=True)
+    periodos_licencia = db.relationship('PeriodosLicencia', backref='dependencia', lazy=True)
+
 
 
     zonas_asignadas = db.relationship(
@@ -94,7 +113,8 @@ class Dependencia(db.Model):
             'regimen_id': self.regimen_id,
             'usuarios': [u.serialize() for u in self.usuarios],
             'turnos': [t.serialize() for t in self.turnos],
-            'vehiculos': [v.serialize() for v in self.vehiculos]
+            'vehiculos': [v.serialize() for v in self.vehiculos],
+            'periodos_licencia': [v.serialize() for v in self.periodos_licencia],
         }
 
     def __repr__(self):
@@ -140,6 +160,8 @@ class Usuario(db.Model):
 
     prendas = db.relationship('Prenda', backref='usuario', lazy=True)
 
+    periodos_licencia = db.relationship('PeriodosLicencia', secondary=usuarios_periodos_licencia, back_populates='usuarios', lazy='select')
+
     
 
     def serialize(self):
@@ -162,6 +184,7 @@ class Usuario(db.Model):
             'des_preventivo': self.des_preventivo,
             'funcion_id': self.funcion_id,
             'prendas': [p.serialize() for p in self.prendas],
+            'periodos_licencia': [p.id for p in self.periodos_licencia],
         }
 
 
@@ -306,7 +329,30 @@ class Licencia(db.Model):
 
     def __repr__(self):
         return f'<Licencia {self.id}>'
-    
+
+
+# -------------------------
+# PERIODOS DE LICENCIA
+# -------------------------
+
+class PeriodosLicencia(db.Model):
+    __tablename__= 'periodo_licencia'
+    id = db.Column(db.Integer, primary_key=True)
+    fecha_inicio = db.Column(db.DateTime, nullable=False)
+    fecha_fin = db.Column(db.DateTime, nullable=False)
+
+    dependencia_id=db.Column(db.Integer, db.ForeignKey('dependencias.id'), nullable=False)
+
+    usuarios = db.relationship('Usuario',secondary=usuarios_periodos_licencia, back_populates='periodos_licencia', lazy='select')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'fecha_inicio': self.fecha_inicio,
+            'fecha_fin': self.fecha_fin,
+            'dependencia_id': self.dependencia_id,
+        }
+
 # -------------------------
 # NOTIFICACIONES
 # -------------------------
