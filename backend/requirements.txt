@@ -14,3 +14,4 @@ pywebpush
 cryptography
 pyjwt
 flask-limiter
+psycopg
