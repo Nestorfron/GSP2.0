@@ -502,7 +502,7 @@ export default function SeleccionarPeriodosLicencia() {
           id="grilla-licencias"
           className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700"
         >
-          <table className="w-full min-w-max table-fixed border-collapse text-xs text-center">
+          <table className="w-full table-fixed border-collapse text-xs text-center">
             <colgroup>
               <col style={{ width: "170px" }} />
 
@@ -594,9 +594,8 @@ export default function SeleccionarPeriodosLicencia() {
                           {/* NOMBRE DEL FUNCIONARIO */}
                           <td
                             className="sticky left-0 z-10 w-[190px] min-w-[190px] border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-0.5 text-left leading-tight"
-                            title={`${obtenerGradoAbreviado(f.grado)} ${
-                              f.nombre
-                            }`}
+                            title={`${obtenerGradoAbreviado(f.grado)} ${f.nombre
+                              }`}
                           >
                             <div className="truncate font-semibold text-gray-800 dark:text-gray-200 leading-tight">
                               {obtenerGradoAbreviado(f.grado)}{" "}
@@ -625,11 +624,10 @@ export default function SeleccionarPeriodosLicencia() {
                                   onClick={() => togglePeriodo(f.id, p.id)}
                                   aria-label={`Funcionario ${f.nombre}, período ${p.id}`}
                                   aria-pressed={activo}
-                                  className={`flex min-h-5 w-full items-center justify-center rounded border transition-all ${
-                                    activo
+                                  className={`flex min-h-5 w-full items-center justify-center rounded border transition-all ${activo
                                       ? `${color.fondo} ${color.borde} text-white shadow`
                                       : "border-gray-200 bg-gray-100 text-gray-400 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-400 dark:hover:bg-slate-700"
-                                  }`}
+                                    }`}
                                 >
                                   {activo ? (
                                     <CheckCircle2 size={14} />
