@@ -479,9 +479,9 @@ export default function SeleccionarPeriodosLicencia() {
               return (
                 <div
                   key={p.id}
-                  className={`border-l-4 ${color.borde} bg-gray-50 dark:bg-slate-800 rounded p-2`}
+                  className={`border-l-4 bg-gray-50 dark:bg-slate-800 rounded p-2`}
                 >
-                  <p className={`font-semibold text-xs ${color.texto}`}>
+                  <p className={`font-semibold text-xs`}>
                     Período {p.id}
                   </p>
 
@@ -523,10 +523,10 @@ export default function SeleccionarPeriodosLicencia() {
                   return (
                     <th
                       key={p.id}
-                      className={`border border-gray-200 dark:border-slate-700 border-t-4 ${color.borde} px-1 py-0.5`}
+                      className={`border border-gray-200 dark:border-slate-700 border-t-4 px-1 py-0.5`}
                     >
                       <div
-                        className={`font-bold ${color.texto} flex items-center justify-center gap-1 whitespace-nowrap`}
+                        className={`font-bold flex items-center justify-center gap-1 whitespace-nowrap`}
                       >
                         <h3 className="mb-0">Período {index + 1}</h3>
 
@@ -625,7 +625,7 @@ export default function SeleccionarPeriodosLicencia() {
                                   aria-label={`Funcionario ${f.nombre}, período ${p.id}`}
                                   aria-pressed={activo}
                                   className={`flex min-h-5 w-full items-center justify-center rounded border transition-all ${activo
-                                      ? `${color.fondo} ${color.borde} text-white shadow`
+                                      ? `${color.fondo} text-white shadow`
                                       : "border-gray-200 bg-gray-100 text-gray-400 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-400 dark:hover:bg-slate-700"
                                     }`}
                                 >
