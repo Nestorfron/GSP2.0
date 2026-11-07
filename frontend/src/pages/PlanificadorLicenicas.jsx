@@ -20,8 +20,27 @@ import { estaTokenExpirado } from "../utils/tokenUtils";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import Loading from "../components/Loading";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 dayjs.locale("es");
+
+// ----------------------------------
+// GENERADOR ILIMITADO DE COLORES
+// ----------------------------------
+
+const generarColorPeriodo = (index) => {
+  // Distribución áurea para separar los tonos
+  const goldenAngle = 137.508;
+
+  const hue = (index * goldenAngle) % 360;
+
+  return {
+    fondo: `hsl(${hue}, 75%, 45%)`,
+    texto: `hsl(${hue}, 75%, 30%)`,
+    borde: `hsl(${hue}, 75%, 45%)`,
+  };
+};
 
 // ----------------------------------
 // COLORES DE LOS 8 PERÍODOS
@@ -98,13 +117,15 @@ export default function SeleccionarPeriodosLicencia() {
   const {
     token,
     usuario,
+    obtenerGradoAbreviado,
     dependencias = [],
     turnos = [],
-    obtenerGradoAbreviado,
     periodosLicencia,
+    licencias = [],
     loading,
     recargarPeriodosLicencia,
     recargarDependencias,
+    recargarGuaridas,
   } = useAppContext();
 
   const [selecciones, setSelecciones] = useState({});
@@ -154,6 +175,59 @@ export default function SeleccionarPeriodosLicencia() {
       elemento.style.height = altoOriginal;
       elemento.style.padding = paddingOriginal;
       elemento.style.overflow = overflowOriginal;
+    }
+  };
+
+  // ----------------------------------
+  // GENERAR LICENCIA DESDE PLANIFICADOR
+  // ----------------------------------
+
+  const handleCrearLicencia = async (funcionario, periodo) => {
+    if (!token) return;
+
+    // Verificar si ya existe una licencia para ese período
+    const yaExiste = licencias.some(
+      (l) =>
+        Number(l.usuario_id) === Number(funcionario.id) &&
+        dayjs(l.fecha_inicio).utc().format("YYYY-MM-DD") ===
+        dayjs(periodo.fecha_inicio).utc().format("YYYY-MM-DD") &&
+        dayjs(l.fecha_fin).utc().format("YYYY-MM-DD") ===
+        dayjs(periodo.fecha_fin).utc().format("YYYY-MM-DD")
+    );
+
+    if (yaExiste) {
+      alert("Este funcionario ya tiene una licencia registrada para este período.");
+      return;
+    }
+
+    const confirmar = window.confirm(
+      `¿Generar licencia reglamentaria para ${funcionario.nombre}?\n\n` +
+      `Desde: ${dayjs(periodo.fecha_inicio).utc().format("DD/MM/YYYY")}\n` +
+      `Hasta: ${dayjs(periodo.fecha_fin).utc().format("DD/MM/YYYY")}`
+    );
+
+    if (!confirmar) return;
+
+    try {
+      const nuevaLicencia = {
+        usuario_id: funcionario.id,
+        fecha_inicio: dayjs(periodo.fecha_inicio).utc().format("YYYY-MM-DD"),
+        fecha_fin: dayjs(periodo.fecha_fin).utc().format("YYYY-MM-DD"),
+        tipo: "reglamentaria",
+        motivo: "Licencia generada desde el planificador",
+        estado: "aprobado",
+      };
+
+      await postData("licencias", nuevaLicencia, token);
+
+      alert("Licencia generada correctamente.");
+
+      // Actualizar los datos de la aplicación
+      recargarPeriodosLicencia()
+      recargarGuaridas()
+      } catch (error) {
+      console.error("Error al generar licencia:", error);
+      alert(error.message || "No se pudo generar la licencia.");
     }
   };
 
@@ -518,41 +592,52 @@ export default function SeleccionarPeriodosLicencia() {
                 </th>
 
                 {periodosFiltrados.map((p, index) => {
-                  const color = coloresPeriodos[index];
+                  const color = generarColorPeriodo(index);
 
                   return (
                     <th
                       key={p.id}
-                      className={`border border-gray-200 dark:border-slate-700 border-t-4 px-1 py-0.5`}
+                      className="border border-gray-200 dark:border-slate-700 border-t-4 px-1 py-1"
+                      style={{ borderTopColor: color.borde }}
                     >
-                      <div
-                        className={`font-bold flex items-center justify-center gap-1 whitespace-nowrap`}
-                      >
-                        <h3 className="mb-0">Período {index + 1}</h3>
+                      {/* FECHAS */}
 
-                        <IconButton
-                          icon={Pencil}
-                          tooltip="Editar período licencia"
+                      <div className="text-[10px] leading-3 font-normal text-gray-500 dark:text-gray-300 whitespace-nowrap mb-1">
+                        Del {dayjs(p.fecha_inicio).utc().format("DD/MM")}
+                        <br />
+                        al {dayjs(p.fecha_fin).utc().format("DD/MM")}
+                      </div>
+
+                      {/* BOTONES */}
+
+                      <div className="flex items-center justify-center gap-1">
+
+                        <button
+                          type="button"
+                          title="Editar período licencia"
+                          aria-label="Editar período licencia"
                           onClick={() =>
                             navigate("/editar-periodo-licencia", {
                               state: { periodo: p },
                             })
                           }
-                          size="xxs"
-                        />
+                          className="flex items-center justify-center rounded p-1 transition hover:brightness-90"
 
-                        <IconButton
-                          icon={XCircle}
-                          tooltip="Eliminar período licencia"
+                        >
+                          <Pencil size={11} />
+                        </button>
+
+                        <button
+                          type="button"
+                          title="Eliminar período licencia"
+                          aria-label="Eliminar período licencia"
                           onClick={() => handleDelete(p.id)}
-                          size="xxs"
-                        />
-                      </div>
+                          className="flex items-center justify-center rounded p-1 transition hover:brightness-90"
 
-                      <div className="mt-0.5 text-[10px] leading-3 font-normal text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                        {dayjs(p.fecha_inicio).utc().format("DD/MM")}
-                        <br />
-                        al {dayjs(p.fecha_fin).utc().format("DD/MM")}
+                        >
+                          <XCircle size={11} />
+                        </button>
+
                       </div>
                     </th>
                   );
@@ -612,29 +697,55 @@ export default function SeleccionarPeriodosLicencia() {
                           {/* PERÍODOS DE LICENCIA */}
                           {periodosFiltrados.map((p, index) => {
                             const activo = seleccionados.includes(Number(p.id));
-                            const color = coloresPeriodos[index];
+                            const color = generarColorPeriodo(index);
 
                             return (
                               <td
                                 key={p.id}
                                 className="w-[110px] border border-gray-200 dark:border-slate-700 px-1 py-0.5"
                               >
-                                <button
-                                  type="button"
-                                  onClick={() => togglePeriodo(f.id, p.id)}
-                                  aria-label={`Funcionario ${f.nombre}, período ${p.id}`}
-                                  aria-pressed={activo}
-                                  className={`flex min-h-5 w-full items-center justify-center rounded border transition-all ${activo
-                                      ? `${color.fondo} text-white shadow`
-                                      : "border-gray-200 bg-gray-100 text-gray-400 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-400 dark:hover:bg-slate-700"
-                                    }`}
-                                >
-                                  {activo ? (
-                                    <CheckCircle2 size={14} />
-                                  ) : (
-                                    <span className="leading-none">+</span>
+                                <div className="flex items-center justify-center gap-1">
+
+                                  {/* ASIGNAR PERÍODO */}
+
+                                  <button
+                                    type="button"
+                                    onClick={() => togglePeriodo(f.id, p.id)}
+                                    aria-label={`Asignar período ${p.id}`}
+                                    aria-pressed={activo}
+                                    className={`flex min-h-5 flex-1 items-center justify-center rounded border transition-all ${activo
+                                        ? "text-white shadow border-transparent"
+                                        : "border-gray-200 bg-gray-100 text-gray-400 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-800"
+                                      }`}
+                                    style={
+                                      activo
+                                        ? { backgroundColor: color.fondo }
+                                        : undefined
+                                    }
+                                  >
+                                    {activo ? (
+                                      <CheckCircle2 size={14} />
+                                    ) : (
+                                      <span>+</span>
+                                    )}
+                                  </button>
+
+                                  {/* GENERAR LICENCIA */}
+
+                                  {activo && (
+                                    <button
+                                      type="button"
+                                      title="Generar licencia para este período"
+                                      aria-label="Generar licencia"
+                                      onClick={() => handleCrearLicencia(f, p)}
+                                      className="flex items-center justify-center rounded p-1 text-white shadow transition hover:brightness-90"
+                                      style={{ backgroundColor: color.fondo }}
+                                    >
+                                      <CalendarDays size={13} />
+                                    </button>
                                   )}
-                                </button>
+
+                                </div>
                               </td>
                             );
                           })}
